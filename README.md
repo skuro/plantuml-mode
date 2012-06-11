@@ -11,4 +11,4 @@ Emacs.
 License
 =======
 
-Released under the terms of [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html). See LICENSE.txt.
+Released under the terms of [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html). See [LICENSE.txt](https://github.com/skuro/plantuml-mode/blob/master/LICENSE.txt).
