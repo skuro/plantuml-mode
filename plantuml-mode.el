@@ -2,7 +2,7 @@
 
 ;; Author: Zhang Weize (zwz)
 ;; Keywords: uml ascii
-;; Version: 0.1
+;; Version: 0.2
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
