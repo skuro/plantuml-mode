@@ -1,4 +1,4 @@
-;; plantuml-mode.el -- Major mode for plantuml
+;;; plantuml-mode.el -- Major mode for plantuml
 
 ;; Author: Zhang Weize (zwz)
 ;; Keywords: uml ascii
@@ -188,3 +188,4 @@ Shortcuts             Command Name
   (run-mode-hooks 'plantuml-mode-hook))
 
 (provide 'plantuml-mode)
+;;; plantuml-mode.el ends here
