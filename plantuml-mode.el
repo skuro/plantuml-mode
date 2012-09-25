@@ -1,7 +1,8 @@
-;;; plantuml-mode.el -- Major mode for plantuml
+;;; plantuml-mode.el --- Major mode for plantuml
 
 ;; Author: Zhang Weize (zwz)
 ;; Keywords: uml ascii
+;; Version: 0.1
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
