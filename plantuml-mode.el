@@ -71,7 +71,7 @@
                            (shell-quote-argument plantuml-jar-path)
                            " -language") (current-buffer))
     (goto-char (point-min))
-    (let ((found (search-forward ";" nil nil))
+    (let ((found (search-forward ";" nil t))
           (word "")
           (count 0)
           (pos 0))
@@ -190,3 +190,4 @@ Shortcuts             Command Name
 
 (provide 'plantuml-mode)
 ;;; plantuml-mode.el ends here
+
