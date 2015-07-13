@@ -37,11 +37,11 @@
 
 (defvar plantuml-jar-path (expand-file-name "~/plantuml.jar"))
 
-(defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
+(defvar plantuml-mode-hook nil "Standard hook for puml-mode.")
 
-(defvar plantuml-mode-version nil "plantuml-mode version string.")
+(defvar plantuml-mode-version nil "puml-mode version string.")
 
-(defvar plantuml-mode-map nil "Keymap for plantuml-mode")
+(defvar plantuml-mode-map nil "Keymap for puml-mode")
 
 ;;; syntax table
 (defvar plantuml-mode-syntax-table
@@ -52,7 +52,7 @@
     (modify-syntax-entry ?@ "w" synTable)
     (modify-syntax-entry ?# "'" synTable)
     synTable)
-  "Syntax table for `plantuml-mode'.")
+  "Syntax table for `puml-mode'.")
 
 (defvar plantuml-types nil)
 (defvar plantuml-keywords nil)
@@ -167,7 +167,7 @@
                 meat))
              (message "Making completion list...%s" "done")))))
 
-(add-to-list 'auto-mode-alist '("\\.plu$" . plantuml-mode))
+(add-to-list 'auto-mode-alist '("\\.pum$" . puml-mode))
 
 ;;;###autoload
 (defun puml-mode ()
