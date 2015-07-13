@@ -1,8 +1,9 @@
-;;; plantuml-mode.el --- Major mode for plantuml
+;;; puml-mode.el --- Major mode for PlantUML
 
 ;; Author: Zhang Weize (zwz)
+;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml ascii
-;; Version: 0.2
+;; Version: 0.3
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
@@ -23,13 +24,14 @@
 ;; using a simple and intuitive language.
 
 ;;; HISTORY
+;; version 0.3, 2015-06-13 Compatibility with Emacs 24.x
 ;; version 0.2, 2010-09-20 Initialize the keywords from the -language output of plantuml.jar instead of the hard-coded way.
 ;; version 0.1, 2010-08-25 First version
 
-
+;;; Code:
 (require 'thingatpt)
 
-(defgroup plantuml-mode nil
+(defgroup puml-mode nil
   "Major mode for editing plantuml file."
   :group 'languages)
 
@@ -168,7 +170,7 @@
 (add-to-list 'auto-mode-alist '("\\.plu$" . plantuml-mode))
 
 ;;;###autoload
-(defun plantuml-mode ()
+(defun puml-mode ()
   "Major mode for plantuml.
 
 Shortcuts             Command Name
@@ -178,8 +180,8 @@ Shortcuts             Command Name
   (kill-all-local-variables)
 
 ;;  (python-mode) ; for indentation
-  (setq major-mode 'plantuml-mode
-        mode-name "plantuml")
+  (setq major-mode 'puml-mode
+        mode-name "puml")
   (set-syntax-table plantuml-mode-syntax-table)
   (use-local-map plantuml-mode-map)
 
@@ -188,6 +190,5 @@ Shortcuts             Command Name
 
   (run-mode-hooks 'plantuml-mode-hook))
 
-(provide 'plantuml-mode)
-;;; plantuml-mode.el ends here
-
+(provide 'puml-mode)
+;;; puml-mode.el ends here
