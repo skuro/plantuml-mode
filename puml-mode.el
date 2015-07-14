@@ -39,11 +39,13 @@
   "Major mode for editing plantuml file."
   :group 'languages)
 
-(defvar puml-plantuml-jar-path (expand-file-name "~/plantuml.jar"))
+(defcustom puml-plantuml-jar-path
+  (expand-file-name "~/plantuml.jar")
+  "The location of the PlantUML executable JAR.")
 
 (defvar puml-mode-hook nil "Standard hook for puml-mode.")
 
-(defvar puml-mode-version nil "The puml-mode version string.")
+(defvar puml-mode-version "0.4" "The puml-mode version string.")
 
 (defvar puml-mode-map nil "Keymap for puml-mode.")
 
