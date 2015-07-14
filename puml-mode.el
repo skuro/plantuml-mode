@@ -21,8 +21,6 @@
 ;;     - component diagram,
 ;;     - state diagram
 ;;     - object diagram
-;; using a simple and intuitive language.
-
 ;;; HISTORY
 ;; version 0.3, 2015-06-13 Compatibility with Emacs 24.x
 ;; version 0.2, 2010-09-20 Initialize the keywords from the -language output of plantuml.jar instead of the hard-coded way.
@@ -35,16 +33,16 @@
   "Major mode for editing plantuml file."
   :group 'languages)
 
-(defvar plantuml-jar-path (expand-file-name "~/plantuml.jar"))
+(defvar puml-plantuml-jar-path (expand-file-name "~/plantuml.jar"))
 
-(defvar plantuml-mode-hook nil "Standard hook for puml-mode.")
+(defvar puml-mode-hook nil "Standard hook for puml-mode.")
 
-(defvar plantuml-mode-version nil "puml-mode version string.")
+(defvar puml-mode-version nil "puml-mode version string.")
 
-(defvar plantuml-mode-map nil "Keymap for puml-mode")
+(defvar puml-mode-map nil "Keymap for puml-mode")
 
 ;;; syntax table
-(defvar plantuml-mode-syntax-table
+(defvar puml-mode-syntax-table
   (let ((synTable (make-syntax-table)))
     (modify-syntax-entry ?' "< b" synTable)
     (modify-syntax-entry ?\n "> b" synTable)
@@ -54,23 +52,23 @@
     synTable)
   "Syntax table for `puml-mode'.")
 
-(defvar plantuml-types nil)
-(defvar plantuml-keywords nil)
-(defvar plantuml-preprocessors nil)
-(defvar plantuml-builtins nil)
+(defvar puml-plantuml-types nil)
+(defvar puml-plantuml-keywords nil)
+(defvar puml-plantuml-preprocessors nil)
+(defvar puml-plantuml-builtins nil)
 
 ;; keyword completion
-(defvar plantuml-kwdList nil "plantuml keywords.")
+(defvar puml-plantuml-kwdList nil "plantuml keywords.")
 
 ;;; font-lock
 
-(defun plantuml-init ()
+(defun puml-init ()
   "Initialize the keywords or builtins from the cmdline language output"
-  (unless (file-exists-p plantuml-jar-path)
-    (error "Could not find plantuml.jar at %s" plantuml-jar-path))
+  (unless (file-exists-p puml-plantuml-jar-path)
+    (error "Could not find plantuml.jar at %s" puml-plantuml-jar-path))
   (with-temp-buffer
     (shell-command (concat "java -jar "
-                           (shell-quote-argument plantuml-jar-path)
+                           (shell-quote-argument puml-plantuml-jar-path)
                            " -language") (current-buffer))
     (goto-char (point-min))
     (let ((found (search-forward ";" nil t))
@@ -88,62 +86,62 @@
             (setq pos (point))
             (forward-line count)
             (cond ((string= word "type")
-                   (setq plantuml-types
+                   (setq puml-plantuml-types
                      (split-string
                       (buffer-substring-no-properties pos (point)))))
                   ((string= word "keyword")
-                   (setq plantuml-keywords
+                   (setq puml-plantuml-keywords
                      (split-string
                       (buffer-substring-no-properties pos (point)))))
                   ((string= word "preprocessor")
-                   (setq plantuml-preprocessors
+                   (setq puml-plantuml-preprocessors
                      (split-string
                       (buffer-substring-no-properties pos (point)))))
-                  (t (setq plantuml-builtins
+                  (t (setq puml-plantuml-builtins
                            (append
-                            plantuml-builtins
+                            puml-plantuml-builtins
                             (split-string
                              (buffer-substring-no-properties pos (point)))))))
 ;;                  ((string= word "skinparameter")
 ;;                  ((string= word "color")))
             (setq found (search-forward ";" nil nil)))))))
 
-(unless plantuml-kwdList
-  (plantuml-init)
-  (defvar plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
-  (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
-  (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
-  (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
+(unless puml-plantuml-kwdList
+  (puml-init)
+  (defvar puml-plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt puml-plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
+  (defvar puml-plantuml-keywords-regexp (concat "^\\s *" (regexp-opt puml-plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
+  (defvar puml-plantuml-builtins-regexp (regexp-opt puml-plantuml-builtins 'words))
+  (defvar puml-plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt puml-plantuml-preprocessors 'words)))
 
-  (setq plantuml-font-lock-keywords
+  (setq puml-font-lock-keywords
         `(
-          (,plantuml-types-regexp . font-lock-type-face)
-          (,plantuml-keywords-regexp . font-lock-keyword-face)
-          (,plantuml-builtins-regexp . font-lock-builtin-face)
-          (,plantuml-preprocessors-regexp . font-lock-preprocessor-face)
+          (,puml-plantuml-types-regexp . font-lock-type-face)
+          (,puml-plantuml-keywords-regexp . font-lock-keyword-face)
+          (,puml-plantuml-builtins-regexp . font-lock-builtin-face)
+          (,puml-plantuml-preprocessors-regexp . font-lock-preprocessor-face)
           ;; note: order matters
           ))
 
 
 
-  (setq plantuml-kwdList (make-hash-table :test 'equal))
-  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-types)
-  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-keywords)
-  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-builtins)
-  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-preprocessors)
-  (put 'plantuml-kwdList 'risky-local-variable t)
+  (setq puml-plantuml-kwdList (make-hash-table :test 'equal))
+  (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-types)
+  (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-keywords)
+  (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-builtins)
+  (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-preprocessors)
+  (put 'puml-plantuml-kwdList 'risky-local-variable t)
 
   ;; clear memory
-  (setq plantuml-types nil)
-  (setq plantuml-keywords nil)
-  (setq plantuml-builtins nil)
-  (setq plantuml-preprocessors nil)
-  (setq plantuml-types-regexp nil)
-  (setq plantuml-keywords-regexp nil)
-  (setq plantuml-builtins-regexp nil)
-  (setq plantuml-preprocessors-regexp nil))
+  (setq puml-plantuml-types nil)
+  (setq puml-plantuml-keywords nil)
+  (setq puml-plantuml-builtins nil)
+  (setq puml-plantuml-preprocessors nil)
+  (setq puml-plantuml-types-regexp nil)
+  (setq puml-plantuml-keywords-regexp nil)
+  (setq puml-plantuml-builtins-regexp nil)
+  (setq puml-plantuml-preprocessors-regexp nil))
 
-(defun plantuml-complete-symbol ()
+(defun puml-complete-symbol ()
   "Perform keyword completion on word before cursor."
   (interactive)
   (let ((posEnd (point))
@@ -152,7 +150,7 @@
 
     (when (not meat) (setq meat ""))
 
-    (setq maxMatchResult (try-completion meat plantuml-kwdList))
+    (setq maxMatchResult (try-completion meat puml-plantuml-kwdList))
     (cond ((eq maxMatchResult t))
           ((null maxMatchResult)
            (message "Can't find completion for \"%s\"" meat)
@@ -163,7 +161,7 @@
           (t (message "Making completion list...")
              (with-output-to-temp-buffer "*Completions*"
                (display-completion-list
-                (all-completions meat plantuml-kwdList)
+                (all-completions meat puml-plantuml-kwdList)
                 meat))
              (message "Making completion list...%s" "done")))))
 
@@ -174,7 +172,7 @@
   "Major mode for plantuml.
 
 Shortcuts             Command Name
-\\[plantuml-complete-symbol]      `plantuml-complete-symbol'"
+\\[puml-complete-symbol]      `puml-complete-symbol'"
 
   (interactive)
   (kill-all-local-variables)
@@ -182,13 +180,13 @@ Shortcuts             Command Name
 ;;  (python-mode) ; for indentation
   (setq major-mode 'puml-mode
         mode-name "puml")
-  (set-syntax-table plantuml-mode-syntax-table)
-  (use-local-map plantuml-mode-map)
+  (set-syntax-table puml-mode-syntax-table)
+  (use-local-map puml-mode-map)
 
   (make-local-variable 'font-lock-defaults)
-  (setq font-lock-defaults '((plantuml-font-lock-keywords) nil t))
+  (setq font-lock-defaults '((puml-font-lock-keywords) nil t))
 
-  (run-mode-hooks 'plantuml-mode-hook))
+  (run-mode-hooks 'puml-mode-hook))
 
 (provide 'puml-mode)
 ;;; puml-mode.el ends here
