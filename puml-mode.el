@@ -1,17 +1,20 @@
 ;;; puml-mode.el --- Major mode for PlantUML
 
+;; Filename: puml-mode.el
+;; Description: Major mode for PlantUML diagrams sources
+;; Compatibility: Tested with Emacs 24.3 and 24.4 on OS X 10.10
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml ascii
-;; Version: 0.3
+;; Version: 0.4
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
 ;; Foundation; either version 2
 ;; NOTE: licensing fixed to GPLv2 as per original author comment
 
-;;; DESCRIPTION
-
+;;; Commentary:
+;;
 ;; A major mode for plantuml, see: http://plantuml.sourceforge.net/
 ;; Plantuml is an open-source tool in java that allows to quickly write :
 ;;     - sequence diagram,
@@ -21,7 +24,10 @@
 ;;     - component diagram,
 ;;     - state diagram
 ;;     - object diagram
-;;; HISTORY
+
+;;; Change log:
+;;
+;; version 0.4, 2015-06-14 Use a puml- prefix to distinguish from the other plantuml-mode
 ;; version 0.3, 2015-06-13 Compatibility with Emacs 24.x
 ;; version 0.2, 2010-09-20 Initialize the keywords from the -language output of plantuml.jar instead of the hard-coded way.
 ;; version 0.1, 2010-08-25 First version
@@ -37,9 +43,9 @@
 
 (defvar puml-mode-hook nil "Standard hook for puml-mode.")
 
-(defvar puml-mode-version nil "puml-mode version string.")
+(defvar puml-mode-version nil "The puml-mode version string.")
 
-(defvar puml-mode-map nil "Keymap for puml-mode")
+(defvar puml-mode-map nil "Keymap for puml-mode.")
 
 ;;; syntax table
 (defvar puml-mode-syntax-table
@@ -58,12 +64,12 @@
 (defvar puml-plantuml-builtins nil)
 
 ;; keyword completion
-(defvar puml-plantuml-kwdList nil "plantuml keywords.")
+(defvar puml-plantuml-kwdList nil "The plantuml keywords.")
 
 ;;; font-lock
 
 (defun puml-init ()
-  "Initialize the keywords or builtins from the cmdline language output"
+  "Initialize the keywords or builtins from the cmdline language output."
   (unless (file-exists-p puml-plantuml-jar-path)
     (error "Could not find plantuml.jar at %s" puml-plantuml-jar-path))
   (with-temp-buffer
