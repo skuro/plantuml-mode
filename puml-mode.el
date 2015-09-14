@@ -114,6 +114,38 @@
 ;;                  ((string= word "color")))
             (setq found (search-forward ";" nil nil)))))))
 
+(defconst puml-preview-buffer "*PUML Preview*")
+
+(defun puml-output-type-opt ()
+  "Detect displayable format."
+  (if (display-images-p)
+      "-tsvg"
+    "-tutxt"))
+
+(defun puml-preview-sentinel (ps findescr)
+  "Sentinel of preview process"
+  (if (equal findescr "finished\n")
+      (progn
+        (switch-to-buffer puml-preview-buffer)
+        (when (display-images-p)
+            (image-mode)))
+    (warn "PUML Preview failed: %s" findescr)))
+
+(defun puml-preview ()
+  "Preview diagram"
+  (interactive)
+  (let ((b (get-buffer puml-preview-buffer)))
+    (when b
+      (kill-buffer b)))
+  (let ((process-connection-type nil)
+        (buf (get-buffer-create puml-preview-buffer)))
+    (let ((ps (start-process "PUML" buf
+                             "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
+                             (puml-output-type-opt) "-p")))
+      (process-send-region ps (point-min) (point-max))
+      (process-send-eof ps)
+      (set-process-sentinel ps 'puml-preview-sentinel))))
+
 (unless puml-plantuml-kwdList
   (puml-init)
   (defvar puml-plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt puml-plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
@@ -193,6 +225,7 @@ Shortcuts             Command Name
 
   (make-local-variable 'font-lock-defaults)
   (setq font-lock-defaults '((puml-font-lock-keywords) nil t))
+  (local-set-key (kbd "C-c C-c") 'puml-preview)
 
   (run-mode-hooks 'puml-mode-hook))
 
