@@ -4,12 +4,12 @@ PlantUML mode for Emacs
 <img src="https://raw.githubusercontent.com/skuro/puml-mode/master/banner.png"
  alt="puml-mode in action" title="Behold the beauty of text-based UML diagrams!" />
 
-**NOTE**: This is currently almost only a GitHub mirror of the nice job done by [Zhang
-Weize](http://zhangweize.wordpress.com/2010/09/20/update-plantuml-mode/)
-as I couldn't find anything like a source repository. Just minor changes were introduced.
+> “Pummel me all you want," I say. "Pummel me to death, in fact. My answers will not change."
+> The Invierno step back, frowning. "You must love her very much," he says, not unkindly.”
+> from [The Bitter Kingdom - Fire and Thorns #3](https://www.goodreads.com/book/show/11431896-the-bitter-kingdom)
 
-Provides a [PlantUml](http://plantuml.sourceforge.net/) major mode for
-Emacs.
+
+A [PlantUml](http://plantuml.sourceforge.net/) major mode for Emacs.
 
 Installation
 ============
@@ -57,6 +57,14 @@ Default key bindings
 The following shortcuts are enabled by default:
 
     C-c C-c  renders a PlantUML diagram from the current buffer in the best supported format
+
+Credits
+=======
+
+This project stemmed from the great work of [Zhang Weize](http://zhangweize.wordpress.com/2010/09/20/update-plantuml-mode/),
+and the current code still borrows a lot from it.
+
+Thanks to [Pavel G. Koukoushkin](https://github.com/svargellin) for implementing the preview functionality.
 
 License
 =======
