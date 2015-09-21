@@ -1,3 +1,5 @@
+[![MELPA](http://melpa.org/packages/puml-mode-badge.svg)](http://melpa.org/#/puml-mode)
+
 PlantUML mode for Emacs
 =======================
 
