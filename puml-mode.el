@@ -214,8 +214,7 @@
           (t (message "Making completion list...")
              (with-output-to-temp-buffer "*Completions*"
                (display-completion-list
-                (all-completions meat puml-plantuml-kwdList)
-                meat))
+                (all-completions meat puml-plantuml-kwdList)))
              (message "Making completion list...%s" "done")))))
 
 (add-to-list 'auto-mode-alist '("\\.pum$" . puml-mode))
