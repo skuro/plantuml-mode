@@ -50,7 +50,7 @@ You can either tell `puml-mode` to autocomplete the word before the cursor by ty
 To render the PlantUML diagram within Emacs, you can also hit `M-x puml-preview`. This will run PlantUML and display the result in the `*PUML-Preview*` buffer. The format used to render the diagram is automagically chosen from what's supported by your Emacs. It will be one of the following, in order of preference:
 
 - SVG
-- ~~PNG~~ still unsupported, see #6
+- ~~PNG~~ **still unsupported, see [#6](https://github.com/skuro/puml-mode/issues/6)**
 - Unicode ASCII art
 
 Default key bindings
