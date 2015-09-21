@@ -2,11 +2,11 @@
 
 ;; Filename: puml-mode.el
 ;; Description: Major mode for PlantUML diagrams sources
-;; Compatibility: Tested with Emacs 24.3 and 24.4 on OS X 10.10
+;; Compatibility: Tested with Emacs 24.3 through 24.5 on OS X 10.10
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
-;; Keywords: uml ascii
-;; Version: 0.4
+;; Keywords: uml plantuml ascii
+;; Version: 0.5
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@
 
 ;;; Change log:
 ;;
+;; version 0.5, 2015-09-21 Added preview capabilities
 ;; version 0.4, 2015-06-14 Use a puml- prefix to distinguish from the other plantuml-mode
 ;; version 0.3, 2015-06-13 Compatibility with Emacs 24.x
 ;; version 0.2, 2010-09-20 Initialize the keywords from the -language output of plantuml.jar instead of the hard-coded way.

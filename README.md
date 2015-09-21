@@ -18,10 +18,42 @@ Make sure you have [MELPA](http://melpa.org/) enabled in your ``emacs.d``. Then,
 
 Enjoy!
 
+Features
+========
+
+- Syntax highlight
+- Autocompletion
+- Preview
+
+Enable the major mode
+=====================
+
+You can automatically enable `puml-mode` for files with extension `.puml` or `plantuml` by adding the following to your `.emacsrc`:
+
+    ;; Enable puml-mode for PlantUML files
+    (add-to-list 'auto-mode-alist
+                 '("\\.puml\\'" . puml-mode)
+                 '("\\.plantuml\\'" . puml-mode))
+
+Of course, you can always enable manually the major mode by typing `M-x puml-mode` once in the desired PlantUML file buffer.
+
 Usage
 =====
 
-Currently, the only available documentation is that provided by [Zhang's post](http://zhangweize.wordpress.com/2010/09/20/update-plantuml-mode/).
+You can either tell `puml-mode` to autocomplete the word before the cursor by typing `M-x puml-complete-symbol`. This will open a popup with all the available completions as found in the list of keywords given by running PlantUML with the `-language` flag.
+
+To render the PlantUML diagram within Emacs, you can also hit `M-x puml-preview`. This will run PlantUML and display the result in the `*PUML-Preview*` buffer. The format used to render the diagram is automagically chosen from what's supported by your Emacs. It will be one of the following, in order of preference:
+
+- SVG
+- ~~PNG~~ still unsupported, see #6
+- Unicode ASCII art
+
+Default key bindings
+====================
+
+The following shortcuts are enabled by default:
+
+    C-c C-c  renders a PlantUML diagram from the current buffer in the best supported format
 
 License
 =======
