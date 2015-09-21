@@ -1,6 +1,9 @@
 PlantUML mode for Emacs
 =======================
 
+<img src="https://raw.githubusercontent.com/skuro/puml-mode/master/banner.png"
+ alt="puml-mode in action" title="Behold the beauty of text-based UML diagrams!" />
+
 **NOTE**: This is currently almost only a GitHub mirror of the nice job done by [Zhang
 Weize](http://zhangweize.wordpress.com/2010/09/20/update-plantuml-mode/)
 as I couldn't find anything like a source repository. Just minor changes were introduced.
