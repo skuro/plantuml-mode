@@ -116,23 +116,35 @@
 
 (defconst puml-preview-buffer "*PUML Preview*")
 
-(defun puml-output-type-opt ()
-  "Detect displayable format."
-  (if (display-images-p)
-      "-tsvg"
-    "-tutxt"))
+(defun puml-output-type ()
+  "Detects the best output type to use for generated diagrams."
+  (cond ((image-type-available-p 'svg) 'svg)
+        ; TODO: PNG is not yet supported, see issue #6
+        ((image-type-available-p 'png) 'utxt)
+        ('utxt)))
 
-(defun puml-preview-sentinel (ps findescr)
-  "Sentinel of preview process"
-  (if (equal findescr "finished\n")
+(defun puml-is-image-output-p ()
+  "Return true if the diagram output format is an image, false if it's text based."
+  (not (equalp 'utxt
+               (puml-output-type))))
+
+(defun puml-output-type-opt ()
+  "Create the flag to pass to PlantUML to produce the selected output format."
+  (let ((type (puml-output-type)))
+    (concat "-t" (symbol-name type))))
+
+(defun puml-preview-sentinel (ps event)
+  "For the PlantUML process (as PS) reacts on the termination event (as EVENT)."
+  (if (equal event "finished\n")
       (progn
         (switch-to-buffer puml-preview-buffer)
-        (when (display-images-p)
-            (image-mode)))
-    (warn "PUML Preview failed: %s" findescr)))
+        (when (and (display-images-p)
+                   (puml-is-image-output-p))
+          (image-mode)))
+    (warn "PUML Preview failed: %s" event)))
 
 (defun puml-preview ()
-  "Preview diagram"
+  "Preview diagram."
   (interactive)
   (let ((b (get-buffer puml-preview-buffer)))
     (when b
