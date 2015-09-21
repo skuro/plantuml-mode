@@ -8,6 +8,7 @@ PlantUML mode for Emacs
 
 > “Pummel me all you want," I say. "Pummel me to death, in fact. My answers will not change."
 > The Invierno step back, frowning. "You must love her very much," he says, not unkindly.”
+> 
 > from [The Bitter Kingdom - Fire and Thorns #3](https://www.goodreads.com/book/show/11431896-the-bitter-kingdom)
 
 
