@@ -1,4 +1,4 @@
-[![MELPA](http://melpa.org/packages/puml-mode-badge.svg)](http://melpa.org/#/puml-mode)
+[![MELPA](http://melpa.org/packages/puml-mode-badge.svg)](http://melpa.org/#/puml-mode) [![MELPA Stable](http://stable.melpa.org/packages/puml-mode-badge.svg)](http://stable.melpa.org/#/puml-mode)
 
 PlantUML mode for Emacs
 =======================
