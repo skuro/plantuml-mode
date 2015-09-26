@@ -123,20 +123,43 @@
 
 (defconst puml-preview-buffer "*PUML Preview*")
 
-(defun puml-output-type ()
-  "Detects the best output type to use for generated diagrams."
-  (cond ((image-type-available-p 'svg) 'svg)
-        ((image-type-available-p 'png) 'png)
-        ('utxt)))
+(defvar puml-output-type
+  (cond ((image-type-available-p 'svg) "svg")
+        ((image-type-available-p 'png) "png")
+        (t "utxt"))
+  "Specify the desired output type to use for generated diagrams.")
+
+(defun puml-read-output-type ()
+  "Read from the minibuffer a output type."
+  (let* ((completion-ignore-case t)
+         (available-types
+          (append
+           (and (image-type-available-p 'svg) '("svg"))
+           (and (image-type-available-p 'png) '("png"))
+           '("utxt"))))
+    (completing-read (format "Output type [%s]: " puml-output-type)
+                     available-types
+                     nil
+                     t
+                     nil
+                     nil
+                     puml-output-type)))
+
+(defun puml-set-output-type (type)
+  "Set the desired output type for the current buffer. If the
+major mode of the current buffer mode is not puml-mode, set the
+default output type for new buffers."
+  (interactive (list (puml-read-output-type)))
+  (setq puml-output-type type))
+
 
 (defun puml-is-image-output-p ()
   "Return true if the diagram output format is an image, false if it's text based."
-  (not (eq 'utxt (puml-output-type))))
+  (not (equal "utxt" puml-output-type)))
 
 (defun puml-output-type-opt ()
   "Create the flag to pass to PlantUML to produce the selected output format."
-  (let ((type (puml-output-type)))
-    (concat "-t" (symbol-name type))))
+  (concat "-t" puml-output-type))
 
 (defun puml-preview-sentinel (ps event)
   "For the PlantUML process (as PS) reacts on the termination event (as EVENT)."
@@ -231,6 +254,7 @@
 
 Shortcuts             Command Name
 \\[puml-complete-symbol]      `puml-complete-symbol'"
+  (make-local-variable 'puml-output-type)
   (setq font-lock-defaults '((puml-font-lock-keywords) nil t)))
 
 (provide 'puml-mode)
