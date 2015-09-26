@@ -48,7 +48,7 @@
 
 (defvar puml-mode-hook nil "Standard hook for puml-mode.")
 
-(defvar puml-mode-version "0.4" "The puml-mode version string.")
+(defvar puml-mode-version "0.6.1" "The puml-mode version string.")
 
 (defvar puml-mode-map
   (let ((keymap (make-keymap)))
