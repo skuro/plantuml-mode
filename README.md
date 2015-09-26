@@ -25,7 +25,7 @@ Make sure you have [MELPA](http://melpa.org/) enabled in your ``emacs.d``. Then,
 Also, to enable preview you need to tell `puml-mode` where to locate the PlantUML JAR file. By default it will look for it in `~/plantuml.jar`, but you can specify any location with:
 
     M-x customize-variable<RET>
-    puml-plantuml-jar-path
+    puml-plantuml-jar-path<RET>
 
 Features
 ========
