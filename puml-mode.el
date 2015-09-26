@@ -126,8 +126,7 @@
 
 (defun puml-is-image-output-p ()
   "Return true if the diagram output format is an image, false if it's text based."
-  (not (equalp 'utxt
-               (puml-output-type))))
+  (not (eq 'utxt (puml-output-type))))
 
 (defun puml-output-type-opt ()
   "Create the flag to pass to PlantUML to produce the selected output format."
