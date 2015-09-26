@@ -1,4 +1,4 @@
-;;; puml-mode.el --- Major mode for PlantUML
+;;; puml-mode.el --- Major mode for PlantUML    -*- lexical-binding: t; -*-
 
 ;; Filename: puml-mode.el
 ;; Description: Major mode for PlantUML diagrams sources
@@ -163,32 +163,33 @@ default output type for new buffers."
   "Create the flag to pass to PlantUML to produce the selected output format."
   (concat "-t" puml-output-type))
 
-(defun puml-preview-sentinel (ps event)
-  "For the PlantUML process (as PS) reacts on the termination event (as EVENT)."
-  (if (equal event "finished\n")
-      (progn
-        (switch-to-buffer puml-preview-buffer)
-        (when (and (display-images-p)
-                   (puml-is-image-output-p))
-          (image-mode)))
-    (warn "PUML Preview failed: %s" event)))
-
 (defun puml-preview ()
   "Preview diagram."
   (interactive)
   (let ((b (get-buffer puml-preview-buffer)))
     (when b
       (kill-buffer b)))
-  (let ((process-connection-type nil)
-        (buf (get-buffer-create puml-preview-buffer))
-        (coding-system-for-read 'binary)
-        (coding-system-for-write 'binary))
+
+  (let* ((imagep (and (display-images-p)
+                      (puml-is-image-output-p)))
+         (process-connection-type nil)
+         (buf (get-buffer-create puml-preview-buffer))
+         (coding-system-for-read (and imagep 'binary))
+         (coding-system-for-write (and imagep 'binary)))
+    
     (let ((ps (start-process "PUML" buf
                              "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
                              (puml-output-type-opt) "-p")))
       (process-send-region ps (point-min) (point-max))
       (process-send-eof ps)
-      (set-process-sentinel ps 'puml-preview-sentinel))))
+      (set-process-sentinel ps
+                            (lambda (ps event)
+                              (unless (equal event "finished\n")
+                                (error "PUML Preview failed: %s" event))
+                              (switch-to-buffer puml-preview-buffer)
+                              (when imagep
+                                (image-mode)
+                                (set-buffer-multibyte t)))))))
 
 (unless puml-plantuml-kwdList
   (puml-init)
