@@ -27,6 +27,7 @@
 
 ;;; Change log:
 ;;
+;; version 0.6.1, 2015-09-26 Bugfix: use eq to compare symbols instead of cl-equalp
 ;; version 0.6, 2015-09-26 Fixed PNG preview
 ;; version 0.5, 2015-09-21 Added preview capabilities
 ;; version 0.4, 2015-06-14 Use a puml- prefix to distinguish from the other plantuml-mode
