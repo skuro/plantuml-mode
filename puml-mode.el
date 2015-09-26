@@ -50,7 +50,11 @@
 
 (defvar puml-mode-version "0.4" "The puml-mode version string.")
 
-(defvar puml-mode-map nil "Keymap for puml-mode.")
+(defvar puml-mode-map
+  (let ((keymap (make-keymap)))
+    (define-key keymap (kbd "C-c C-c") 'puml-preview)
+    keymap)
+  "Keymap for puml-mode.")
 
 ;;; syntax table
 (defvar puml-mode-syntax-table
@@ -222,26 +226,12 @@
 (add-to-list 'auto-mode-alist '("\\.pum$" . puml-mode))
 
 ;;;###autoload
-(defun puml-mode ()
+(define-derived-mode puml-mode prog-mode "puml"
   "Major mode for plantuml.
 
 Shortcuts             Command Name
 \\[puml-complete-symbol]      `puml-complete-symbol'"
-
-  (interactive)
-  (kill-all-local-variables)
-
-;;  (python-mode) ; for indentation
-  (setq major-mode 'puml-mode
-        mode-name "puml")
-  (set-syntax-table puml-mode-syntax-table)
-  (use-local-map puml-mode-map)
-
-  (make-local-variable 'font-lock-defaults)
-  (setq font-lock-defaults '((puml-font-lock-keywords) nil t))
-  (local-set-key (kbd "C-c C-c") 'puml-preview)
-
-  (run-mode-hooks 'puml-mode-hook))
+  (setq font-lock-defaults '((puml-font-lock-keywords) nil t)))
 
 (provide 'puml-mode)
 ;;; puml-mode.el ends here
