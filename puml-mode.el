@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 0.5
+;; Version: 0.6
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
@@ -120,8 +120,7 @@
 (defun puml-output-type ()
   "Detects the best output type to use for generated diagrams."
   (cond ((image-type-available-p 'svg) 'svg)
-        ; TODO: PNG is not yet supported, see issue #6
-        ((image-type-available-p 'png) 'utxt)
+        ((image-type-available-p 'png) 'png)
         ('utxt)))
 
 (defun puml-is-image-output-p ()
@@ -151,7 +150,9 @@
     (when b
       (kill-buffer b)))
   (let ((process-connection-type nil)
-        (buf (get-buffer-create puml-preview-buffer)))
+        (buf (get-buffer-create puml-preview-buffer))
+        (coding-system-for-read 'binary)
+        (coding-system-for-write 'binary))
     (let ((ps (start-process "PUML" buf
                              "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
                              (puml-output-type-opt) "-p")))

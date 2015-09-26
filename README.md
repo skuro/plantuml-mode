@@ -8,7 +8,7 @@ PlantUML mode for Emacs
 
 > “Pummel me all you want," I say. "Pummel me to death, in fact. My answers will not change."
 > The Invierno step back, frowning. "You must love her very much," he says, not unkindly.”
-> 
+>
 > from [The Bitter Kingdom - Fire and Thorns #3](https://www.goodreads.com/book/show/11431896-the-bitter-kingdom)
 
 
@@ -51,7 +51,7 @@ You can either tell `puml-mode` to autocomplete the word before the cursor by ty
 To render the PlantUML diagram within Emacs, you can also hit `M-x puml-preview`. This will run PlantUML and display the result in the `*PUML-Preview*` buffer. The format used to render the diagram is automagically chosen from what's supported by your Emacs. It will be one of the following, in order of preference:
 
 - SVG
-- ~~PNG~~ **still unsupported, see [#6](https://github.com/skuro/puml-mode/issues/6)**
+- PNG
 - Unicode ASCII art
 
 Default key bindings
