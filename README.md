@@ -12,7 +12,7 @@ PlantUML mode for Emacs
 > from [The Bitter Kingdom - Fire and Thorns #3](https://www.goodreads.com/book/show/11431896-the-bitter-kingdom)
 
 
-A [PlantUml](http://plantuml.sourceforge.net/) major mode for Emacs.
+A [PlantUML](http://plantuml.sourceforge.net/) major mode for Emacs.
 
 Installation
 ============
@@ -63,6 +63,18 @@ Default key bindings
 The following shortcuts are enabled by default:
 
     C-c C-c  renders a PlantUML diagram from the current buffer in the best supported format
+
+Troubleshooting
+===============
+
+As of `v0.6.2` the following commands have been added to help resolving problems:
+
+```
+puml-enable-debug
+puml-disable-debug
+```
+
+With debug enabled, the actual command used to invoke PlantUML is printed into a buffer called `*PUML Messages*`. You can inspect that buffer to make sure that PlantUML is properly set up, or use it to supply extra information when opening [issues](https://github.com/skuro/puml-mode/issues).
 
 Credits
 =======
