@@ -50,6 +50,8 @@
 
 (defvar puml-mode-version "0.6.1" "The puml-mode version string.")
 
+(defvar puml-mode-debug-enabled nil)
+
 (defvar puml-mode-map
   (let ((keymap (make-keymap)))
     (define-key keymap (kbd "C-c C-c") 'puml-preview)
@@ -75,7 +77,24 @@
 ;; keyword completion
 (defvar puml-plantuml-kwdList nil "The plantuml keywords.")
 
-;;; font-lock
+(defun puml-enable-debug ()
+  "Enables debug messages into the *PUML Messages* buffer."
+  (setq puml-mode-debug-enabled t))
+
+(defun puml-disable-debug ()
+  "Stops any debug messages to be added into the *PUML Messages* buffer."
+  (setq puml-mode-debug-enabled nil))
+
+(defun puml-debug (msg)
+  "Writes msg (as MSG) into the *PUML Messages* buffer without annoying the user."
+  (if puml-mode-debug-enabled
+      (let* ((log-buffer-name "*PUML Messages*")
+             (log-buffer (get-buffer-create log-buffer-name)))
+        (save-excursion
+          (with-current-buffer log-buffer
+            (goto-char (point-max))
+            (insert msg)
+            (insert "\n"))))))
 
 (defun puml-init ()
   "Initialize the keywords or builtins from the cmdline language output."
@@ -155,9 +174,12 @@
   (let ((process-connection-type nil)
         (buf (get-buffer-create puml-preview-buffer))
         (coding-system-for-read 'binary)
-        (coding-system-for-write 'binary))
+        (coding-system-for-write 'binary)
+        (command-params (shell-quote-argument puml-plantuml-jar-path)))
+    (puml-debug "Executing:")
+    (puml-debug (concat "java -jar " command-params " " (puml-output-type-opt) " -p"))
     (let ((ps (start-process "PUML" buf
-                             "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
+                             "java" "-jar" command-params
                              (puml-output-type-opt) "-p")))
       (process-send-region ps (point-min) (point-max))
       (process-send-eof ps)
