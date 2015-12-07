@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 0.6
+;; Version: 0.6.2
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@
 
 ;;; Change log:
 ;;
+;; version 0.6.2, 2015-11-07 Added debugging capabilities to improve issue analysis
 ;; version 0.6.1, 2015-09-26 Bugfix: use eq to compare symbols instead of cl-equalp
 ;; version 0.6, 2015-09-26 Fixed PNG preview
 ;; version 0.5, 2015-09-21 Added preview capabilities
