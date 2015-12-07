@@ -117,8 +117,6 @@
                             puml-plantuml-builtins
                             (split-string
                              (buffer-substring-no-properties pos (point)))))))
-;;                  ((string= word "skinparameter")
-;;                  ((string= word "color")))
             (setq found (search-forward ";" nil nil)))))))
 
 (defconst puml-preview-buffer "*PUML Preview*")
