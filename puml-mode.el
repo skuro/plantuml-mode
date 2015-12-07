@@ -79,10 +79,12 @@
 
 (defun puml-enable-debug ()
   "Enables debug messages into the *PUML Messages* buffer."
+  (interactive)
   (setq puml-mode-debug-enabled t))
 
 (defun puml-disable-debug ()
   "Stops any debug messages to be added into the *PUML Messages* buffer."
+  (interactive)
   (setq puml-mode-debug-enabled nil))
 
 (defun puml-debug (msg)
