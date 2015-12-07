@@ -27,6 +27,7 @@
 
 ;;; Change log:
 ;;
+;; version 0.6.3, 2015-11-07 Added per-buffer configurability of output type (thanks to https://github.com/davazp)
 ;; version 0.6.2, 2015-11-07 Added debugging capabilities to improve issue analysis
 ;; version 0.6.1, 2015-09-26 Bugfix: use eq to compare symbols instead of cl-equalp
 ;; version 0.6, 2015-09-26 Fixed PNG preview
@@ -149,8 +150,8 @@
   (if (not (display-images-p))
       "utxt"
     (cond ((image-type-available-p 'svg) "svg")
-          ((image-type-available-p 'png) "png")
-          (t "utxt")))
+	  ((image-type-available-p 'png) "png")
+	  (t "utxt")))
   "Specify the desired output type to use for generated diagrams.")
 
 (defun puml-read-output-type ()
@@ -171,11 +172,11 @@
 
 (defun puml-set-output-type (type)
   "Set the desired output type (as TYPE) for the current buffer.
-If the major mode of the current buffer mode is not puml-mode, set the
+If the
+major mode of the current buffer mode is not puml-mode, set the
 default output type for new buffers."
   (interactive (list (puml-read-output-type)))
   (setq puml-output-type type))
-
 
 (defun puml-is-image-output-p ()
   "Return true if the diagram output format is an image, false if it's text based."
@@ -191,17 +192,16 @@ default output type for new buffers."
   (let ((b (get-buffer puml-preview-buffer)))
     (when b
       (kill-buffer b)))
+
   (let* ((imagep (and (display-images-p)
                       (puml-is-image-output-p)))
          (process-connection-type nil)
          (buf (get-buffer-create puml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
-         (coding-system-for-write (and imagep 'binary))
-         (command-params (shell-quote-argument puml-plantuml-jar-path)))
-    (puml-debug "Executing:")
-    (puml-debug (concat "java -jar " command-params " " (puml-output-type-opt) " -p"))
+         (coding-system-for-write (and imagep 'binary)))
+
     (let ((ps (start-process "PUML" buf
-                             "java" "-jar" command-params
+                             "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
                              (puml-output-type-opt) "-p")))
       (process-send-region ps (point-min) (point-max))
       (process-send-eof ps)
