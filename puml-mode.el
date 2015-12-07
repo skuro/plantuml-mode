@@ -1,4 +1,4 @@
-;;; puml-mode.el --- Major mode for PlantUML
+;;; puml-mode.el --- Major mode for PlantUML    -*- lexical-binding: t; -*-
 
 ;; Filename: puml-mode.el
 ;; Description: Major mode for PlantUML diagrams sources
@@ -52,6 +52,8 @@
 (defvar puml-mode-version "0.6.1" "The puml-mode version string.")
 
 (defvar puml-mode-debug-enabled nil)
+
+(defvar puml-font-lock-keywords nil)
 
 (defvar puml-mode-map
   (let ((keymap (make-keymap)))
@@ -143,30 +145,45 @@
 
 (defconst puml-preview-buffer "*PUML Preview*")
 
-(defun puml-output-type ()
-  "Detects the best output type to use for generated diagrams."
-  (cond ((image-type-available-p 'svg) 'svg)
-        ((image-type-available-p 'png) 'png)
-        ('utxt)))
+(defvar puml-output-type
+  (if (not (display-images-p))
+      "utxt"
+    (cond ((image-type-available-p 'svg) "svg")
+          ((image-type-available-p 'png) "png")
+          (t "utxt")))
+  "Specify the desired output type to use for generated diagrams.")
+
+(defun puml-read-output-type ()
+  "Read from the minibuffer a output type."
+  (let* ((completion-ignore-case t)
+         (available-types
+          (append
+           (and (image-type-available-p 'svg) '("svg"))
+           (and (image-type-available-p 'png) '("png"))
+           '("utxt"))))
+    (completing-read (format "Output type [%s]: " puml-output-type)
+                     available-types
+                     nil
+                     t
+                     nil
+                     nil
+                     puml-output-type)))
+
+(defun puml-set-output-type (type)
+  "Set the desired output type (as TYPE) for the current buffer.
+If the major mode of the current buffer mode is not puml-mode, set the
+default output type for new buffers."
+  (interactive (list (puml-read-output-type)))
+  (setq puml-output-type type))
+
 
 (defun puml-is-image-output-p ()
   "Return true if the diagram output format is an image, false if it's text based."
-  (not (eq 'utxt (puml-output-type))))
+  (not (equal "utxt" puml-output-type)))
 
 (defun puml-output-type-opt ()
   "Create the flag to pass to PlantUML to produce the selected output format."
-  (let ((type (puml-output-type)))
-    (concat "-t" (symbol-name type))))
-
-(defun puml-preview-sentinel (ps event)
-  "For the PlantUML process (as PS) reacts on the termination event (as EVENT)."
-  (if (equal event "finished\n")
-      (progn
-        (switch-to-buffer puml-preview-buffer)
-        (when (and (display-images-p)
-                   (puml-is-image-output-p))
-          (image-mode)))
-    (warn "PUML Preview failed: %s" event)))
+  (concat "-t" puml-output-type))
 
 (defun puml-preview ()
   "Preview diagram."
@@ -174,11 +191,13 @@
   (let ((b (get-buffer puml-preview-buffer)))
     (when b
       (kill-buffer b)))
-  (let ((process-connection-type nil)
-        (buf (get-buffer-create puml-preview-buffer))
-        (coding-system-for-read 'binary)
-        (coding-system-for-write 'binary)
-        (command-params (shell-quote-argument puml-plantuml-jar-path)))
+  (let* ((imagep (and (display-images-p)
+                      (puml-is-image-output-p)))
+         (process-connection-type nil)
+         (buf (get-buffer-create puml-preview-buffer))
+         (coding-system-for-read (and imagep 'binary))
+         (coding-system-for-write (and imagep 'binary))
+         (command-params (shell-quote-argument puml-plantuml-jar-path)))
     (puml-debug "Executing:")
     (puml-debug (concat "java -jar " command-params " " (puml-output-type-opt) " -p"))
     (let ((ps (start-process "PUML" buf
@@ -186,7 +205,14 @@
                              (puml-output-type-opt) "-p")))
       (process-send-region ps (point-min) (point-max))
       (process-send-eof ps)
-      (set-process-sentinel ps 'puml-preview-sentinel))))
+      (set-process-sentinel ps
+                            (lambda (ps event)
+                              (unless (equal event "finished\n")
+                                (error "PUML Preview failed: %s" event))
+                              (switch-to-buffer puml-preview-buffer)
+                              (when imagep
+                                (image-mode)
+                                (set-buffer-multibyte t)))))))
 
 (unless puml-plantuml-kwdList
   (puml-init)
@@ -254,6 +280,7 @@
 
 Shortcuts             Command Name
 \\[puml-complete-symbol]      `puml-complete-symbol'"
+  (make-local-variable 'puml-output-type)
   (setq font-lock-defaults '((puml-font-lock-keywords) nil t)))
 
 (provide 'puml-mode)
