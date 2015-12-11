@@ -281,6 +281,7 @@ default output type for new buffers."
 Shortcuts             Command Name
 \\[puml-complete-symbol]      `puml-complete-symbol'"
   (make-local-variable 'puml-output-type)
+  (set (make-local-variable 'comment-start) "' ")
   (setq font-lock-defaults '((puml-font-lock-keywords) nil t)))
 
 (provide 'puml-mode)
