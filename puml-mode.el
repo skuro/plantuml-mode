@@ -27,6 +27,7 @@
 
 ;;; Change log:
 ;;
+;; version 0.6.4, 2015-12-12 Added support for comments (single and multiline) -- thanks to https://github.com/nivekuil
 ;; version 0.6.3, 2015-11-07 Added per-buffer configurability of output type (thanks to https://github.com/davazp)
 ;; version 0.6.2, 2015-11-07 Added debugging capabilities to improve issue analysis
 ;; version 0.6.1, 2015-09-26 Bugfix: use eq to compare symbols instead of cl-equalp
@@ -65,8 +66,8 @@
 ;;; syntax table
 (defvar puml-mode-syntax-table
   (let ((synTable (make-syntax-table)))
-    (modify-syntax-entry ?\/  "14b"    synTable)
-    (modify-syntax-entry ?'   "<23b"    synTable)
+    (modify-syntax-entry ?\/  ". 41"    synTable)
+    (modify-syntax-entry ?'   ". 23b"    synTable)
     (modify-syntax-entry ?\n  ">"       synTable)
     (modify-syntax-entry ?\r  ">"       synTable)
     (modify-syntax-entry ?!   "w"       synTable)
