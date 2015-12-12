@@ -67,7 +67,7 @@
 (defvar puml-mode-syntax-table
   (let ((synTable (make-syntax-table)))
     (modify-syntax-entry ?\/  ". 41"    synTable)
-    (modify-syntax-entry ?'   ". 23b"    synTable)
+    (modify-syntax-entry ?'   "! 23b"    synTable)
     (modify-syntax-entry ?\n  ">"       synTable)
     (modify-syntax-entry ?\r  ">"       synTable)
     (modify-syntax-entry ?!   "w"       synTable)
