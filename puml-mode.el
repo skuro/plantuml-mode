@@ -65,11 +65,13 @@
 ;;; syntax table
 (defvar puml-mode-syntax-table
   (let ((synTable (make-syntax-table)))
-    (modify-syntax-entry ?' "< b" synTable)
-    (modify-syntax-entry ?\n "> b" synTable)
-    (modify-syntax-entry ?! "w" synTable)
-    (modify-syntax-entry ?@ "w" synTable)
-    (modify-syntax-entry ?# "'" synTable)
+    (modify-syntax-entry ?\/  "14b"    synTable)
+    (modify-syntax-entry ?'   "<23b"    synTable)
+    (modify-syntax-entry ?\n  ">"       synTable)
+    (modify-syntax-entry ?\r  ">"       synTable)
+    (modify-syntax-entry ?!   "w"       synTable)
+    (modify-syntax-entry ?@   "w"       synTable)
+    (modify-syntax-entry ?#   "'"       synTable)
     synTable)
   "Syntax table for `puml-mode'.")
 
@@ -281,6 +283,11 @@ default output type for new buffers."
 Shortcuts             Command Name
 \\[puml-complete-symbol]      `puml-complete-symbol'"
   (make-local-variable 'puml-output-type)
+  (set (make-local-variable 'comment-start-skip) "\\('+\\|/'+\\)\\s *")
+  (set (make-local-variable 'comment-start) "/'")
+  (set (make-local-variable 'comment-end) "'/")
+  (set (make-local-variable 'comment-multi-line) t)
+  (set (make-local-variable 'comment-style) 'extra-line)
   (setq font-lock-defaults '((puml-font-lock-keywords) nil t)))
 
 (provide 'puml-mode)
