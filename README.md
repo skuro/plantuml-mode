@@ -40,9 +40,8 @@ Enable the major mode
 You can automatically enable `puml-mode` for files with extension `.puml` or `plantuml` by adding the following to your `.emacsrc`:
 
     ;; Enable puml-mode for PlantUML files
-    (add-to-list 'auto-mode-alist
-                 '("\\.puml\\'" . puml-mode)
-                 '("\\.plantuml\\'" . puml-mode))
+    (add-to-list 'auto-mode-alist '("\\.puml\\'" . puml-mode))
+    (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . puml-mode))
 
 Of course, you can always enable manually the major mode by typing `M-x puml-mode` once in the desired PlantUML file buffer.
 
