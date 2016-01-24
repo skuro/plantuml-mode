@@ -153,8 +153,8 @@
   (if (not (display-images-p))
       "utxt"
     (cond ((image-type-available-p 'svg) "svg")
-	  ((image-type-available-p 'png) "png")
-	  (t "utxt")))
+          ((image-type-available-p 'png) "png")
+          (t "utxt")))
   "Specify the desired output type to use for generated diagrams.")
 
 (defun puml-read-output-type ()
