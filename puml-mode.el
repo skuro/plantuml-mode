@@ -194,7 +194,8 @@ default output type for new buffers."
   (interactive)
   (let ((b (get-buffer puml-preview-buffer)))
     (when b
-      (kill-buffer b)))
+      (with-current-buffer puml-preview-buffer
+        (let ((inhibit-read-only t)) (erase-buffer)))))
 
   (let* ((imagep (and (display-images-p)
                       (puml-is-image-output-p)))
@@ -202,20 +203,25 @@ default output type for new buffers."
          (buf (get-buffer-create puml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
-
     (let ((ps (start-process "PUML" buf
                              "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
                              (puml-output-type-opt) "-p")))
+
       (process-send-region ps (point-min) (point-max))
       (process-send-eof ps)
       (set-process-sentinel ps
                             (lambda (ps event)
                               (unless (equal event "finished\n")
                                 (error "PUML Preview failed: %s" event))
-                              (switch-to-buffer puml-preview-buffer)
+                              (let ((split-width-threshold 0)
+                                    (split-height-threshold nil))
+                                (display-buffer puml-preview-buffer))
                               (when imagep
-                                (image-mode)
-                                (set-buffer-multibyte t)))))))
+                                (with-current-buffer puml-preview-buffer
+                                  (image-mode))
+                                (set-buffer-multibyte t))
+                              )
+                           ))))
 
 (unless puml-plantuml-kwdList
   (puml-init)
@@ -280,7 +286,6 @@ default output type for new buffers."
 ;;;###autoload
 (define-derived-mode puml-mode prog-mode "puml"
   "Major mode for plantuml.
-
 Shortcuts             Command Name
 \\[puml-complete-symbol]      `puml-complete-symbol'"
   (make-local-variable 'puml-output-type)
