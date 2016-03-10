@@ -112,7 +112,7 @@
   (with-temp-buffer
     (shell-command (concat "java -jar "
                            (shell-quote-argument puml-plantuml-jar-path)
-                           " -language") (current-buffer))
+                           " -charset UTF-8 -language") (current-buffer))
     (goto-char (point-min))
     (let ((found (search-forward ";" nil t))
           (word "")
