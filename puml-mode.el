@@ -189,9 +189,9 @@ default output type for new buffers."
   "Create the flag to pass to PlantUML to produce the selected output format."
   (concat "-t" puml-output-type))
 
-(defun puml-preview ()
+(defun puml-preview (prefix)
   "Preview diagram."
-  (interactive)
+  (interactive "p")
   (let ((b (get-buffer puml-preview-buffer)))
     (when b
       (kill-buffer b)))
@@ -212,7 +212,12 @@ default output type for new buffers."
                             (lambda (ps event)
                               (unless (equal event "finished\n")
                                 (error "PUML Preview failed: %s" event))
-                              (switch-to-buffer puml-preview-buffer)
+                              (cond
+                               ((= prefix 16)
+                                (switch-to-buffer-other-frame puml-preview-buffer))
+                               ((= prefix 4)
+                                (switch-to-buffer-other-window puml-preview-buffer))
+                               (t (switch-to-buffer puml-preview-buffer)))
                               (when imagep
                                 (image-mode)
                                 (set-buffer-multibyte t)))))))
