@@ -27,6 +27,7 @@
 
 ;;; Change log:
 ;;
+;; version 0.6.5, 2016-03-24 Added UTF8 support and open in new window / frame shortcuts
 ;; version 0.6.4, 2015-12-12 Added support for comments (single and multiline) -- thanks to https://github.com/nivekuil
 ;; version 0.6.3, 2015-11-07 Added per-buffer configurability of output type (thanks to https://github.com/davazp)
 ;; version 0.6.2, 2015-11-07 Added debugging capabilities to improve issue analysis

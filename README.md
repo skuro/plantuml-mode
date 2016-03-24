@@ -62,9 +62,9 @@ Default key bindings
 The following shortcuts are enabled by default:
 
     C-c C-c  puml-preview: renders a PlantUML diagram from the current buffer in the best supported format
-    
+
     C-u C-c C-c  puml-preview in other window
-    
+
     C-u C-u C-c C-c puml-preview in other frame
 
 Troubleshooting
