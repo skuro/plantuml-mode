@@ -191,7 +191,10 @@ default output type for new buffers."
   (concat "-t" puml-output-type))
 
 (defun puml-preview (prefix)
-  "Preview diagram."
+  "Preview diagram, using prefix (as PREFIX) to choose where to display it:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
   (interactive "p")
   (let ((b (get-buffer puml-preview-buffer)))
     (when b
@@ -238,8 +241,6 @@ default output type for new buffers."
           (,puml-plantuml-preprocessors-regexp . font-lock-preprocessor-face)
           ;; note: order matters
           ))
-
-
 
   (setq puml-plantuml-kwdList (make-hash-table :test 'equal))
   (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-types)
