@@ -52,7 +52,7 @@
 
 (defvar puml-mode-hook nil "Standard hook for puml-mode.")
 
-(defvar puml-mode-version "0.6.5" "The puml-mode version string.")
+(defconst puml-mode-version "0.6.5" "The puml-mode version string.")
 
 (defvar puml-mode-debug-enabled nil)
 
