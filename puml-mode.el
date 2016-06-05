@@ -106,47 +106,69 @@
             (insert msg)
             (insert "\n"))))))
 
+(defun puml-plantuml-program-and-args ()
+  "Determines program and args for calling plantuml.
+Returns a list of two elements:
+- program name
+- list of arguments
+If unable to determine how to call plantuml, does not return."
+  (let ((puml-plantuml-command-path (executable-find "plantuml")))
+    (cond
+     ((file-exists-p puml-plantuml-jar-path)
+      (list
+       "java" ;; program
+       (list "-jar" (shell-quote-argument puml-plantuml-jar-path)))) ;; args
+     (puml-plantuml-command-path
+      (list
+       puml-plantuml-command-path ;; program
+       ())) ;; args
+     (t
+      (error "Could not find file plantuml.jar at %s nor command
+             plantuml in PATH" puml-plantuml-jar-path)))))
+
 (defun puml-init ()
   "Initialize the keywords or builtins from the cmdline language output."
-  (unless (file-exists-p puml-plantuml-jar-path)
-    (error "Could not find plantuml.jar at %s" puml-plantuml-jar-path))
-  (with-temp-buffer
-    (shell-command (concat "java -jar "
-                           (shell-quote-argument puml-plantuml-jar-path)
-                           " -charset UTF-8 -language") (current-buffer))
-    (goto-char (point-min))
-    (let ((found (search-forward ";" nil t))
-          (word "")
-          (count 0)
-          (pos 0))
-      (while found
-        (forward-char)
-        (setq word (current-word))
-        (if (string= word "EOF") (setq found nil)
-            ;; else
-            (forward-line)
-            (setq count (string-to-number (current-word)))
-            (beginning-of-line 2)
-            (setq pos (point))
-            (forward-line count)
-            (cond ((string= word "type")
-                   (setq puml-plantuml-types
-                     (split-string
-                      (buffer-substring-no-properties pos (point)))))
-                  ((string= word "keyword")
-                   (setq puml-plantuml-keywords
-                     (split-string
-                      (buffer-substring-no-properties pos (point)))))
-                  ((string= word "preprocessor")
-                   (setq puml-plantuml-preprocessors
-                     (split-string
-                      (buffer-substring-no-properties pos (point)))))
-                  (t (setq puml-plantuml-builtins
-                           (append
-                            puml-plantuml-builtins
-                            (split-string
-                             (buffer-substring-no-properties pos (point)))))))
-            (setq found (search-forward ";" nil nil)))))))
+  (let ((plantuml-program-and-args (puml-plantuml-program-and-args)))
+    (let ((plantuml-program (car plantuml-program-and-args))
+          (plantuml-args (cadr plantuml-program-and-args)))
+      (with-temp-buffer
+        (apply 'call-process plantuml-program nil t nil
+               (append plantuml-args (list
+                                      "-charset" "UTF-8"
+                                      "-language")))
+        (goto-char (point-min))
+        (let ((found (search-forward ";" nil t))
+              (word "")
+              (count 0)
+              (pos 0))
+          (while found
+            (forward-char)
+            (setq word (current-word))
+            (if (string= word "EOF") (setq found nil)
+              ;; else
+              (forward-line)
+              (setq count (string-to-number (current-word)))
+              (beginning-of-line 2)
+              (setq pos (point))
+              (forward-line count)
+              (cond ((string= word "type")
+                     (setq puml-plantuml-types
+                           (split-string
+                            (buffer-substring-no-properties pos (point)))))
+                    ((string= word "keyword")
+                     (setq puml-plantuml-keywords
+                           (split-string
+                            (buffer-substring-no-properties pos (point)))))
+                    ((string= word "preprocessor")
+                     (setq puml-plantuml-preprocessors
+                           (split-string
+                            (buffer-substring-no-properties pos (point)))))
+                    (t (setq puml-plantuml-builtins
+                             (append
+                              puml-plantuml-builtins
+                              (split-string
+                               (buffer-substring-no-properties pos (point)))))))
+              (setq found (search-forward ";" nil nil)))))))))
 
 (defconst puml-preview-buffer "*PUML Preview*")
 
@@ -207,24 +229,31 @@ default output type for new buffers."
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
 
-    (let ((ps (start-process "PUML" buf
-                             "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
-                             (puml-output-type-opt) "-p")))
-      (process-send-region ps (point-min) (point-max))
-      (process-send-eof ps)
-      (set-process-sentinel ps
-                            (lambda (ps event)
-                              (unless (equal event "finished\n")
-                                (error "PUML Preview failed: %s" event))
-                              (cond
-                               ((= prefix 16)
-                                (switch-to-buffer-other-frame puml-preview-buffer))
-                               ((= prefix 4)
-                                (switch-to-buffer-other-window puml-preview-buffer))
-                               (t (switch-to-buffer puml-preview-buffer)))
-                              (when imagep
-                                (image-mode)
-                                (set-buffer-multibyte t)))))))
+    (let ((plantuml-program-and-args (puml-plantuml-program-and-args)))
+      (let ((plantuml-program (car plantuml-program-and-args))
+            (plantuml-args (cadr plantuml-program-and-args)))
+
+        (let ((ps (apply 'start-process "PUML" buf
+                         plantuml-program
+                         (append plantuml-args (list
+                                                (puml-output-type-opt)
+                                                "-p")))))
+
+          (process-send-region ps (point-min) (point-max))
+          (process-send-eof ps)
+          (set-process-sentinel ps
+                                (lambda (ps event)
+                                  (unless (equal event "finished\n")
+                                    (error "PUML Preview failed: %s" event))
+                                  (cond
+                                   ((= prefix 16)
+                                    (switch-to-buffer-other-frame puml-preview-buffer))
+                                   ((= prefix 4)
+                                    (switch-to-buffer-other-window puml-preview-buffer))
+                                   (t (switch-to-buffer puml-preview-buffer)))
+                                  (when imagep
+                                    (image-mode)
+                                    (set-buffer-multibyte t)))))))))
 
 (unless puml-plantuml-kwdList
   (puml-init)
