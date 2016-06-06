@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 0.6.2
+;; Version: 0.6.5
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@
 
 (defvar puml-mode-hook nil "Standard hook for puml-mode.")
 
-(defvar puml-mode-version "0.6.1" "The puml-mode version string.")
+(defconst puml-mode-version "0.6.5" "The puml-mode version string.")
 
 (defvar puml-mode-debug-enabled nil)
 
