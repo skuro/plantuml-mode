@@ -282,6 +282,7 @@ default output type for new buffers."
                 (all-completions meat puml-plantuml-kwdList)))
              (message "Making completion list...%s" "done")))))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pum$" . puml-mode))
 
 ;;;###autoload
