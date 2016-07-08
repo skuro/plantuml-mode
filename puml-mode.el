@@ -213,7 +213,7 @@ default output type for new buffers."
       (process-send-region ps (point-min) (point-max))
       (process-send-eof ps)
       (set-process-sentinel ps
-                            (lambda (ps event)
+                            (lambda (_ps event)
                               (unless (equal event "finished\n")
                                 (error "PUML Preview failed: %s" event))
                               (cond
