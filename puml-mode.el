@@ -7,6 +7,7 @@
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
 ;; Version: 0.6.5
+;; Package-Requires: ((emacs "24"))
 
 ;; You can redistribute this program and/or modify it under the terms
 ;; of the GNU General Public License as published by the Free Software
@@ -213,7 +214,7 @@ default output type for new buffers."
       (process-send-region ps (point-min) (point-max))
       (process-send-eof ps)
       (set-process-sentinel ps
-                            (lambda (ps event)
+                            (lambda (_ps event)
                               (unless (equal event "finished\n")
                                 (error "PUML Preview failed: %s" event))
                               (cond
@@ -282,6 +283,7 @@ default output type for new buffers."
                 (all-completions meat puml-plantuml-kwdList)))
              (message "Making completion list...%s" "done")))))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.pum$" . puml-mode))
 
 ;;;###autoload
