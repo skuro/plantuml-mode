@@ -1,6 +1,6 @@
-;;; puml-mode.el --- Major mode for PlantUML    -*- lexical-binding: t; -*-
+;;; plantuml-mode.el --- Major mode for PlantUML    -*- lexical-binding: t; -*-
 
-;; Filename: puml-mode.el
+;; Filename: plantuml-mode.el
 ;; Description: Major mode for PlantUML diagrams sources
 ;; Compatibility: Tested with Emacs 24.3 through 24.5 on OS X 10.10
 ;; Author: Zhang Weize (zwz)
@@ -28,7 +28,8 @@
 
 ;;; Change log:
 ;;
-;; Version 0.6.7, 2016-10-11 Added deprecation warning in favor of plantuml-mode
+;; version 0.6.8, 2016-10-11 Moved the mode to plantuml-mode
+;; version 0.6.7, 2016-10-11 Added deprecation warning in favor of plantuml-mode
 ;; version 0.6.6, 2016-07-19 Added autoload, minor bug fixes
 ;; version 0.6.5, 2016-03-24 Added UTF8 support and open in new window / frame shortcuts
 ;; version 0.6.4, 2015-12-12 Added support for comments (single and multiline) -- thanks to https://github.com/nivekuil
@@ -45,40 +46,40 @@
 ;;; Code:
 (require 'thingatpt)
 
-(defgroup puml-mode nil
+(defgroup plantuml-mode nil
   "Major mode for editing plantuml file."
   :group 'languages)
 
-(defcustom puml-plantuml-jar-path
+(defcustom plantuml-jar-path
   (expand-file-name "~/plantuml.jar")
   "The location of the PlantUML executable JAR.")
 
-(defvar puml-mode-hook nil "Standard hook for puml-mode.")
+(defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst puml-mode-version "0.6.7" "The puml-mode version string.")
+(defconst plantuml-mode-version "0.6.8" "The plantuml-mode version string.")
 
-(defvar puml-mode-debug-enabled nil)
+(defvar plantuml-mode-debug-enabled nil)
 
-(defvar puml-font-lock-keywords nil)
+(defvar plantuml-font-lock-keywords nil)
 
-(defvar puml-mode-map
+(defvar plantuml-mode-map
   (let ((keymap (make-sparse-keymap)))
-    (define-key keymap (kbd "C-c C-c") 'puml-preview)
+    (define-key keymap (kbd "C-c C-c") 'plantuml-preview)
     keymap)
-  "Keymap for puml-mode.")
+  "Keymap for plantuml-mode.")
 
-(defvar puml-run-command "java -jar %s")
+(defvar plantuml-run-command "java -jar %s")
 
-(defun puml-render-command (&rest arguments)
+(defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
 
   ;; (shell-command (format "") (concat plantuml-run-command " " buffer-file-name))
-  (let ((cmd (format puml-run-command (shell-quote-argument puml-plantuml-jar-path)))
+  (let ((cmd (format plantuml-run-command (shell-quote-argument plantuml-jar-path)))
         (argstring (mapconcat 'shell-quote-argument arguments " ")))
     (concat cmd " " argstring)))
 
 ;;; syntax table
-(defvar puml-mode-syntax-table
+(defvar plantuml-mode-syntax-table
   (let ((synTable (make-syntax-table)))
     (modify-syntax-entry ?\/  ". 41"    synTable)
     (modify-syntax-entry ?'   "! 23b"    synTable)
@@ -88,30 +89,30 @@
     (modify-syntax-entry ?@   "w"       synTable)
     (modify-syntax-entry ?#   "'"       synTable)
     synTable)
-  "Syntax table for `puml-mode'.")
+  "Syntax table for `plantuml-mode'.")
 
-(defvar puml-plantuml-types nil)
-(defvar puml-plantuml-keywords nil)
-(defvar puml-plantuml-preprocessors nil)
-(defvar puml-plantuml-builtins nil)
+(defvar plantuml-types nil)
+(defvar plantuml-keywords nil)
+(defvar plantuml-preprocessors nil)
+(defvar plantuml-builtins nil)
 
 ;; keyword completion
-(defvar puml-plantuml-kwdList nil "The plantuml keywords.")
+(defvar plantuml-kwdList nil "The plantuml keywords.")
 
-(defun puml-enable-debug ()
-  "Enables debug messages into the *PUML Messages* buffer."
+(defun plantuml-enable-debug ()
+  "Enables debug messages into the *PLANTUML Messages* buffer."
   (interactive)
-  (setq puml-mode-debug-enabled t))
+  (setq plantuml-mode-debug-enabled t))
 
-(defun puml-disable-debug ()
-  "Stops any debug messages to be added into the *PUML Messages* buffer."
+(defun plantuml-disable-debug ()
+  "Stops any debug messages to be added into the *PLANTUML Messages* buffer."
   (interactive)
-  (setq puml-mode-debug-enabled nil))
+  (setq plantuml-mode-debug-enabled nil))
 
-(defun puml-debug (msg)
-  "Writes msg (as MSG) into the *PUML Messages* buffer without annoying the user."
-  (if puml-mode-debug-enabled
-      (let* ((log-buffer-name "*PUML Messages*")
+(defun plantuml-debug (msg)
+  "Writes msg (as MSG) into the *PLANTUML Messages* buffer without annoying the user."
+  (if plantuml-mode-debug-enabled
+      (let* ((log-buffer-name "*PLANTUML Messages*")
              (log-buffer (get-buffer-create log-buffer-name)))
         (save-excursion
           (with-current-buffer log-buffer
@@ -119,13 +120,13 @@
             (insert msg)
             (insert "\n"))))))
 
-(defun puml-init ()
+(defun plantuml-init ()
   "Initialize the keywords or builtins from the cmdline language output."
-  (display-warning :warning "`puml-mode' is deprecated in favor of `plantuml-mode', make sure to update your configuration")
-  (unless (file-exists-p puml-plantuml-jar-path)
-    (error "Could not find plantuml.jar at %s" puml-plantuml-jar-path))
+  (display-warning :warning "`plantuml-mode' is deprecated in favor of `plantuml-mode', make sure to update your configuration")
+  (unless (file-exists-p plantuml-jar-path)
+    (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
-    (shell-command (puml-render-command "-charset UTF-8 -language") (current-buffer))
+    (shell-command (plantuml-render-command "-charset UTF-8 -language") (current-buffer))
     (goto-char (point-min))
     (let ((found (search-forward ";" nil t))
           (word "")
@@ -142,27 +143,27 @@
           (setq pos (point))
           (forward-line count)
           (cond ((string= word "type")
-                 (setq puml-plantuml-types
+                 (setq plantuml-types
                        (split-string
                         (buffer-substring-no-properties pos (point)))))
                 ((string= word "keyword")
-                 (setq puml-plantuml-keywords
+                 (setq plantuml-keywords
                        (split-string
                         (buffer-substring-no-properties pos (point)))))
                 ((string= word "preprocessor")
-                 (setq puml-plantuml-preprocessors
+                 (setq plantuml-preprocessors
                        (split-string
                         (buffer-substring-no-properties pos (point)))))
-                (t (setq puml-plantuml-builtins
+                (t (setq plantuml-builtins
                          (append
-                          puml-plantuml-builtins
+                          plantuml-builtins
                           (split-string
                            (buffer-substring-no-properties pos (point)))))))
           (setq found (search-forward ";" nil nil)))))))
 
-(defconst puml-preview-buffer "*PUML Preview*")
+(defconst plantuml-preview-buffer "*PLANTUML Preview*")
 
-(defvar puml-output-type
+(defvar plantuml-output-type
   (if (not (display-images-p))
       "utxt"
     (cond ((image-type-available-p 'svg) "svg")
@@ -170,7 +171,7 @@
           (t "utxt")))
   "Specify the desired output type to use for generated diagrams.")
 
-(defun puml-read-output-type ()
+(defun plantuml-read-output-type ()
   "Read from the minibuffer a output type."
   (let* ((completion-ignore-case t)
          (available-types
@@ -178,88 +179,88 @@
            (and (image-type-available-p 'svg) '("svg"))
            (and (image-type-available-p 'png) '("png"))
            '("utxt"))))
-    (completing-read (format "Output type [%s]: " puml-output-type)
+    (completing-read (format "Output type [%s]: " plantuml-output-type)
                      available-types
                      nil
                      t
                      nil
                      nil
-                     puml-output-type)))
+                     plantuml-output-type)))
 
-(defun puml-set-output-type (type)
+(defun plantuml-set-output-type (type)
   "Set the desired output type (as TYPE) for the current buffer.
 If the
-major mode of the current buffer mode is not puml-mode, set the
+major mode of the current buffer mode is not plantuml-mode, set the
 default output type for new buffers."
-  (interactive (list (puml-read-output-type)))
-  (setq puml-output-type type))
+  (interactive (list (plantuml-read-output-type)))
+  (setq plantuml-output-type type))
 
-(defun puml-is-image-output-p ()
+(defun plantuml-is-image-output-p ()
   "Return true if the diagram output format is an image, false if it's text based."
-  (not (equal "utxt" puml-output-type)))
+  (not (equal "utxt" plantuml-output-type)))
 
-(defun puml-output-type-opt ()
+(defun plantuml-output-type-opt ()
   "Create the flag to pass to PlantUML to produce the selected output format."
-  (concat "-t" puml-output-type))
+  (concat "-t" plantuml-output-type))
 
-(defun puml-preview-string (prefix string)
+(defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
 to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
-  (let ((b (get-buffer puml-preview-buffer)))
+  (let ((b (get-buffer plantuml-preview-buffer)))
     (when b
       (kill-buffer b)))
 
   (let* ((imagep (and (display-images-p)
-                      (puml-is-image-output-p)))
+                      (plantuml-is-image-output-p)))
          (process-connection-type nil)
-         (buf (get-buffer-create puml-preview-buffer))
+         (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
 
-    (let ((ps (start-process "PUML" buf
-                             "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
-                             (puml-output-type-opt) "-p")))
+    (let ((ps (start-process "PLANTUML" buf
+                             "java" "-jar" (shell-quote-argument plantuml-jar-path)
+                             (plantuml-output-type-opt) "-p")))
       (process-send-string ps string)
       (process-send-eof ps)
       (set-process-sentinel ps
                             (lambda (_ps event)
                               (unless (equal event "finished\n")
-                                (error "PUML Preview failed: %s" event))
+                                (error "PLANTUML Preview failed: %s" event))
                               (cond
                                ((= prefix 16)
-                                (switch-to-buffer-other-frame puml-preview-buffer))
+                                (switch-to-buffer-other-frame plantuml-preview-buffer))
                                ((= prefix 4)
-                                (switch-to-buffer-other-window puml-preview-buffer))
-                               (t (switch-to-buffer puml-preview-buffer)))
+                                (switch-to-buffer-other-window plantuml-preview-buffer))
+                               (t (switch-to-buffer plantuml-preview-buffer)))
                               (when imagep
                                 (image-mode)
                                 (set-buffer-multibyte t)))))))
 
-(defun puml-preview-buffer (prefix)
+(defun plantuml-preview-buffer (prefix)
   "Preview diagram from the PlantUML sources in the current buffer.
 Uses prefix (as PREFIX) to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
   (interactive "p")
-  (puml-preview-string prefix (buffer-string)))
+  (plantuml-preview-string prefix (buffer-string)))
 
-(defun puml-preview-region (prefix)
+(defun plantuml-preview-region (prefix)
   "Preview diagram from the PlantUML sources in the current region.
 Uses prefix (as PREFIX) to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
   (interactive "p")
-  (puml-preview-string prefix (concat "@startuml\n"
+  (plantuml-preview-string prefix (concat "@startuml\n"
                                       (buffer-substring-no-properties
                                        (region-beginning) (region-end))
                                       "\n@enduml")))
 
-(defun puml-preview (prefix)
+(defun plantuml-preview (prefix)
   "Preview diagram from the PlantUML sources.
 Uses the current region if one is active, or the entire buffer otherwise.
 Uses prefix (as PREFIX) to choose where to display it:
@@ -268,43 +269,43 @@ Uses prefix (as PREFIX) to choose where to display it:
 - else -> new buffer"
   (interactive "p")
   (if (mark)
-      (puml-preview-region prefix)
-      (puml-preview-buffer prefix)))
+      (plantuml-preview-region prefix)
+      (plantuml-preview-buffer prefix)))
 
-(unless puml-plantuml-kwdList
-  (puml-init)
-  (defvar puml-plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt puml-plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
-  (defvar puml-plantuml-keywords-regexp (concat "^\\s *" (regexp-opt puml-plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
-  (defvar puml-plantuml-builtins-regexp (regexp-opt puml-plantuml-builtins 'words))
-  (defvar puml-plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt puml-plantuml-preprocessors 'words)))
+(unless plantuml-kwdList
+  (plantuml-init)
+  (defvar plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
+  (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
+  (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
+  (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
 
-  (setq puml-font-lock-keywords
+  (setq plantuml-font-lock-keywords
         `(
-          (,puml-plantuml-types-regexp . font-lock-type-face)
-          (,puml-plantuml-keywords-regexp . font-lock-keyword-face)
-          (,puml-plantuml-builtins-regexp . font-lock-builtin-face)
-          (,puml-plantuml-preprocessors-regexp . font-lock-preprocessor-face)
+          (,plantuml-types-regexp . font-lock-type-face)
+          (,plantuml-keywords-regexp . font-lock-keyword-face)
+          (,plantuml-builtins-regexp . font-lock-builtin-face)
+          (,plantuml-preprocessors-regexp . font-lock-preprocessor-face)
           ;; note: order matters
           ))
 
-  (setq puml-plantuml-kwdList (make-hash-table :test 'equal))
-  (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-types)
-  (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-keywords)
-  (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-builtins)
-  (mapc (lambda (x) (puthash x t puml-plantuml-kwdList)) puml-plantuml-preprocessors)
-  (put 'puml-plantuml-kwdList 'risky-local-variable t)
+  (setq plantuml-kwdList (make-hash-table :test 'equal))
+  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-types)
+  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-keywords)
+  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-builtins)
+  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-preprocessors)
+  (put 'plantuml-kwdList 'risky-local-variable t)
 
   ;; clear memory
-  (setq puml-plantuml-types nil)
-  (setq puml-plantuml-keywords nil)
-  (setq puml-plantuml-builtins nil)
-  (setq puml-plantuml-preprocessors nil)
-  (setq puml-plantuml-types-regexp nil)
-  (setq puml-plantuml-keywords-regexp nil)
-  (setq puml-plantuml-builtins-regexp nil)
-  (setq puml-plantuml-preprocessors-regexp nil))
+  (setq plantuml-types nil)
+  (setq plantuml-keywords nil)
+  (setq plantuml-builtins nil)
+  (setq plantuml-preprocessors nil)
+  (setq plantuml-types-regexp nil)
+  (setq plantuml-keywords-regexp nil)
+  (setq plantuml-builtins-regexp nil)
+  (setq plantuml-preprocessors-regexp nil))
 
-(defun puml-complete-symbol ()
+(defun plantuml-complete-symbol ()
   "Perform keyword completion on word before cursor."
   (interactive)
   (let ((posEnd (point))
@@ -313,7 +314,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 
     (when (not meat) (setq meat ""))
 
-    (setq maxMatchResult (try-completion meat puml-plantuml-kwdList))
+    (setq maxMatchResult (try-completion meat plantuml-kwdList))
     (cond ((eq maxMatchResult t))
           ((null maxMatchResult)
            (message "Can't find completion for \"%s\"" meat)
@@ -324,35 +325,28 @@ Uses prefix (as PREFIX) to choose where to display it:
           (t (message "Making completion list...")
              (with-output-to-temp-buffer "*Completions*"
                (display-completion-list
-                (all-completions meat puml-plantuml-kwdList)))
+                (all-completions meat plantuml-kwdList)))
              (message "Making completion list...%s" "done")))))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.(plantuml|pum|puml|plu)$" . puml-mode))
+(add-to-list 'auto-mode-alist '("\\.(plantuml|pum|plantuml|plu)$" . plantuml-mode))
 
 ;;;###autoload
-(define-derived-mode puml-mode prog-mode "puml"
+(define-derived-mode plantuml-mode prog-mode "plantuml"
   "Major mode for plantuml.
 
 Shortcuts             Command Name
-\\[puml-complete-symbol]      `puml-complete-symbol'"
-  (make-local-variable 'puml-output-type)
+\\[plantuml-complete-symbol]      `plantuml-complete-symbol'"
+  (make-local-variable 'plantuml-output-type)
   (set (make-local-variable 'comment-start-skip) "\\('+\\|/'+\\)\\s *")
   (set (make-local-variable 'comment-start) "/'")
   (set (make-local-variable 'comment-end) "'/")
   (set (make-local-variable 'comment-multi-line) t)
   (set (make-local-variable 'comment-style) 'extra-line)
-  (setq font-lock-defaults '((puml-font-lock-keywords) nil t))
+  (setq font-lock-defaults '((plantuml-font-lock-keywords) nil t))
 
   ; Run hooks:
-  (run-mode-hooks 'puml-mode-hook))
+  (run-mode-hooks 'plantuml-mode-hook))
 
-(defun puml-deprecation-warning ()
-  "Warns the user about the deprecation of the `puml-mode' project."
-  (display-warning :warning
-                   "`puml-mode' is now deprecated and no longer updated, you should move your configuration to use `plantuml-mode'. See https://github.com/sytac/plantuml-mode."))
-
-(add-hook 'puml-mode-hook 'puml-deprecation-warning)
-
-(provide 'puml-mode)
-;;; puml-mode.el ends here
+(provide 'plantuml-mode)
+;;; plantuml-mode.el ends here
