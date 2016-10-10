@@ -28,7 +28,7 @@
 
 ;;; Change log:
 ;;
-;; version 0.6.8, 2016-10-11 Moved the mode to plantuml-mode
+;; version 0.6.8, 2016-10-11 Moved the mode to plantuml-mode, superseding zwz/plantuml-mode
 ;; version 0.6.7, 2016-10-11 Added deprecation warning in favor of plantuml-mode
 ;; version 0.6.6, 2016-07-19 Added autoload, minor bug fixes
 ;; version 0.6.5, 2016-03-24 Added UTF8 support and open in new window / frame shortcuts
