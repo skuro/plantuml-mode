@@ -61,10 +61,20 @@
 (defvar puml-font-lock-keywords nil)
 
 (defvar puml-mode-map
-  (let ((keymap (make-keymap)))
+  (let ((keymap (make-sparse-keymap)))
     (define-key keymap (kbd "C-c C-c") 'puml-preview)
     keymap)
   "Keymap for puml-mode.")
+
+(defvar puml-run-command "java -jar %s")
+
+(defun puml-render-command (&rest arguments)
+  "Returns a nicely escaped command string for executing the plantuml JAR file."
+
+  ;; (shell-command (format "") (concat plantuml-run-command " " buffer-file-name))
+  (let ((cmd (format puml-run-command (shell-quote-argument puml-plantuml-jar-path)))
+        (argstring (mapconcat 'shell-quote-argument arguments " ")))
+    (concat cmd " " argstring)))
 
 ;;; syntax table
 (defvar puml-mode-syntax-table
@@ -113,9 +123,7 @@
   (unless (file-exists-p puml-plantuml-jar-path)
     (error "Could not find plantuml.jar at %s" puml-plantuml-jar-path))
   (with-temp-buffer
-    (shell-command (concat "java -jar "
-                           (shell-quote-argument puml-plantuml-jar-path)
-                           " -charset UTF-8 -language") (current-buffer))
+    (shell-command (puml-render-command "-charset UTF-8 -language") (current-buffer))
     (goto-char (point-min))
     (let ((found (search-forward ";" nil t))
           (word "")
@@ -285,7 +293,7 @@ default output type for new buffers."
              (message "Making completion list...%s" "done")))))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.pum$" . puml-mode))
+(add-to-list 'auto-mode-alist '("\\.(plantuml|pum|puml|plu)$" . puml-mode))
 
 ;;;###autoload
 (define-derived-mode puml-mode prog-mode "puml"
