@@ -69,7 +69,7 @@
 (defvar puml-run-command "java -jar %s")
 
 (defun puml-render-command (&rest arguments)
-  "Returns a nicely escaped command string for executing the plantuml JAR file."
+  "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
 
   ;; (shell-command (format "") (concat plantuml-run-command " " buffer-file-name))
   (let ((cmd (format puml-run-command (shell-quote-argument puml-plantuml-jar-path)))
@@ -133,30 +133,30 @@
         (forward-char)
         (setq word (current-word))
         (if (string= word "EOF") (setq found nil)
-            ;; else
-            (forward-line)
-            (setq count (string-to-number (current-word)))
-            (beginning-of-line 2)
-            (setq pos (point))
-            (forward-line count)
-            (cond ((string= word "type")
-                   (setq puml-plantuml-types
-                     (split-string
-                      (buffer-substring-no-properties pos (point)))))
-                  ((string= word "keyword")
-                   (setq puml-plantuml-keywords
-                     (split-string
-                      (buffer-substring-no-properties pos (point)))))
-                  ((string= word "preprocessor")
-                   (setq puml-plantuml-preprocessors
-                     (split-string
-                      (buffer-substring-no-properties pos (point)))))
-                  (t (setq puml-plantuml-builtins
-                           (append
-                            puml-plantuml-builtins
-                            (split-string
-                             (buffer-substring-no-properties pos (point)))))))
-            (setq found (search-forward ";" nil nil)))))))
+          ;; else
+          (forward-line)
+          (setq count (string-to-number (current-word)))
+          (beginning-of-line 2)
+          (setq pos (point))
+          (forward-line count)
+          (cond ((string= word "type")
+                 (setq puml-plantuml-types
+                       (split-string
+                        (buffer-substring-no-properties pos (point)))))
+                ((string= word "keyword")
+                 (setq puml-plantuml-keywords
+                       (split-string
+                        (buffer-substring-no-properties pos (point)))))
+                ((string= word "preprocessor")
+                 (setq puml-plantuml-preprocessors
+                       (split-string
+                        (buffer-substring-no-properties pos (point)))))
+                (t (setq puml-plantuml-builtins
+                         (append
+                          puml-plantuml-builtins
+                          (split-string
+                           (buffer-substring-no-properties pos (point)))))))
+          (setq found (search-forward ";" nil nil)))))))
 
 (defconst puml-preview-buffer "*PUML Preview*")
 
@@ -200,12 +200,12 @@ default output type for new buffers."
   "Create the flag to pass to PlantUML to produce the selected output format."
   (concat "-t" puml-output-type))
 
-(defun puml-preview (prefix)
-  "Preview diagram, using prefix (as PREFIX) to choose where to display it:
+(defun puml-preview-string (prefix string)
+  "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
+to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
-  (interactive "p")
   (let ((b (get-buffer puml-preview-buffer)))
     (when b
       (kill-buffer b)))
@@ -220,7 +220,7 @@ default output type for new buffers."
     (let ((ps (start-process "PUML" buf
                              "java" "-jar" (shell-quote-argument puml-plantuml-jar-path)
                              (puml-output-type-opt) "-p")))
-      (process-send-region ps (point-min) (point-max))
+      (process-send-string ps string)
       (process-send-eof ps)
       (set-process-sentinel ps
                             (lambda (_ps event)
@@ -235,6 +235,39 @@ default output type for new buffers."
                               (when imagep
                                 (image-mode)
                                 (set-buffer-multibyte t)))))))
+
+(defun puml-preview-buffer (prefix)
+  "Preview diagram from the PlantUML sources in the current buffer.
+Uses prefix (as PREFIX) to choose where to display it:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (interactive "p")
+  (puml-preview-string prefix (buffer-string)))
+
+(defun puml-preview-region (prefix)
+  "Preview diagram from the PlantUML sources in the current region.
+Uses prefix (as PREFIX) to choose where to display it:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (interactive "p")
+  (puml-preview-string prefix (concat "@startuml\n"
+                                      (buffer-substring-no-properties
+                                       (region-beginning) (region-end))
+                                      "\n@enduml")))
+
+(defun puml-preview (prefix)
+  "Preview diagram from the PlantUML sources.
+Uses the current region if one is active, or the entire buffer otherwise.
+Uses prefix (as PREFIX) to choose where to display it:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (interactive "p")
+  (if (mark)
+      (puml-preview-region prefix)
+      (puml-preview-buffer prefix)))
 
 (unless puml-plantuml-kwdList
   (puml-init)
