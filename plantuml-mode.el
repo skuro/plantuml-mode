@@ -266,7 +266,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
   (interactive "p")
-  (if (mark)
+  (if mark-active
       (plantuml-preview-region prefix)
       (plantuml-preview-buffer prefix)))
 
