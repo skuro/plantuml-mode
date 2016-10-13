@@ -72,8 +72,6 @@
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
-
-  ;; (shell-command (format "") (concat plantuml-run-command " " buffer-file-name))
   (let ((cmd (format plantuml-run-command (shell-quote-argument plantuml-jar-path)))
         (argstring (mapconcat 'shell-quote-argument arguments " ")))
     (concat cmd " " argstring)))
