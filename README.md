@@ -1,3 +1,7 @@
+# Deprecation notice
+
+After [the decision to merge](https://github.com/zwz/plantuml-mode/issues/8) together `puml-mode` and `plantuml-mode`, this repository and the code herein have been deprecated in favor of [skuro/plantuml-mode](https://github.com/skuro/plantuml-mode).
+
 [![MELPA](http://melpa.org/packages/puml-mode-badge.svg)](http://melpa.org/#/puml-mode) [![MELPA Stable](http://stable.melpa.org/packages/puml-mode-badge.svg)](http://stable.melpa.org/#/puml-mode)
 
 # PlantUML mode for Emacs
@@ -43,9 +47,9 @@ Of course, you can always enable manually the major mode by typing `M-x puml-mod
 
 # Usage
 
-You can either tell `puml-mode` to autocomplete the word before the cursor by typing `M-x puml-complete-symbol`. This will open a popup with all the available completions as found in the list of keywords given by running PlantUML with the `-language` flag.
+You can tell `puml-mode` to autocomplete the word before the cursor by typing `M-x puml-complete-symbol`. This will open a popup with all the available completions as found in the list of keywords given by running PlantUML with the `-language` flag.
 
-To render the PlantUML diagram within Emacs, you can also hit `M-x puml-preview`. This will run PlantUML and display the result in the `*PUML-Preview*` buffer. The format used to render the diagram is automagically chosen from what's supported by your Emacs. It will be one of the following, in order of preference:
+To render the PlantUML diagram within Emacs, you can hit `M-x puml-preview`. This will run PlantUML and display the result in the `*PUML-Preview*` buffer. The format used to render the diagram is automagically chosen from what's supported by your Emacs. It will be one of the following, in order of preference:
 
 - SVG
 - PNG
