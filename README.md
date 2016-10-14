@@ -43,15 +43,17 @@ Of course, you can always enable manually the major mode by typing `M-x plantuml
 
 # Usage
 
-You can either tell `plantuml-mode` to autocomplete the word before the cursor by typing `M-x plantuml-complete-symbol`. This will open a popup with all the available completions as found in the list of keywords given by running PlantUML with the `-language` flag.
+You can tell `plantuml-mode` to autocomplete the word before the cursor by typing `M-x plantuml-complete-symbol`. This will open a popup with all the available completions as found in the list of keywords given by running PlantUML with the `-language` flag.
 
-To render the PlantUML diagram within Emacs, you can also hit `M-x plantuml-preview`. This will run PlantUML and display the result in the `*PLANTUML-Preview*` buffer. The format used to render the diagram is automagically chosen from what's supported by your Emacs. It will be one of the following, in order of preference:
+To render the PlantUML diagram within Emacs, you can hit `M-x plantuml-preview`. This will run PlantUML and display the result in the `*PLANTUML-Preview*` buffer. The format used to render the diagram is automagically chosen from what's supported by your Emacs. It will be one of the following, in order of preference:
 
 - SVG
 - PNG
 - Unicode ASCII art
 
 The diagram will be either created from the selected region if one is available in the current buffer, or using the whole buffer otherwise.
+
+If you want to force a specific output format, you can customize the variable `plantuml-output-type` to the value you prefer.
 
 ## Default key bindings
 
@@ -82,7 +84,17 @@ Then you can edit a `plantuml` code block with `plantuml-mode` by hitting `C-'` 
 
 When in the `plantuml-mode` buffer you can then hit again `C-'` to return to the original `org-mode` document.
 
+# Migration from `puml-mode`
+
+If you were previously using `puml-mode`, you should change any reference to a `puml-..` variable or function to its `plantuml-..` counterpart. Most notably, `puml-plantuml-jar-path` is now just `plantuml-jar-path`.
+
+## Deprecation warning
+
+If `puml-mode` is still being loaded by your Emacs, a Warning will be shown any time you open a PlantUML file. This is to remind you that you are running deprecated software. If you want to suppress the (intentionally) annoying warning, you can customize the variable `plantuml-suppress-deprecation-warning`.
+
 # Troubleshooting
+
+## Debug messages
 
 As of `v0.6.2` the following commands have been added to help resolving problems:
 
@@ -92,6 +104,10 @@ plantuml-disable-debug
 ```
 
 With debug enabled, the actual command used to invoke PlantUML is printed into a buffer called `*PLANTUML Messages*`. You can inspect that buffer to make sure that PlantUML is properly set up, or use it to supply extra information when opening [issues](https://github.com/skuro/plantuml-mode/issues).
+
+## Blank previews
+
+If you are using SVG rendering and `plantuml-preview` shows you an empty buffer, chances are something is wrong with the PlantUML output. While inside the preview buffer, hit `C-c C-c` to switch to the textual mode and see if the output is valid SVG.
 
 # Credits
 
