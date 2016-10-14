@@ -111,7 +111,6 @@
 
 (defun puml-init ()
   "Initialize the keywords or builtins from the cmdline language output."
-  (display-warning :warning "`puml-mode' is deprecated in favor of `plantuml-mode', make sure to update your configuration")
   (unless (file-exists-p puml-plantuml-jar-path)
     (error "Could not find plantuml.jar at %s" puml-plantuml-jar-path))
   (with-temp-buffer
