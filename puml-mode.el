@@ -310,7 +310,9 @@ Shortcuts             Command Name
   "Warns the user about the deprecation of the `puml-mode' project."
   (if (featurep 'puml-mode)
       (display-warning :warning
-                       "`puml-mode' is now deprecated and no longer updated, you should move your configuration to use `plantuml-mode'. See https://github.com/sytac/plantuml-mode.")))
+                       "`puml-mode' is now deprecated and no longer updated, but it's still present in your system.\
+You should move your configuration to use `plantuml-mode'. See https://github.com/sytac/plantuml-mode. \
+See more at https://github.com/skuro/puml-mode/issues/26")))
 
 (add-hook 'puml-mode-hook 'puml-deprecation-warning)
 
