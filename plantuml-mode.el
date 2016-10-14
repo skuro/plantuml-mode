@@ -70,6 +70,8 @@
 
 (defcustom plantuml-java-command "java" "The java command used to execute PlantUML.")
 
+(defcustom plantuml-suppress-deprecation-warning t "To silence the deprecation warning when `puml-mode' is found upon loading.")
+
 (defvar plantuml-run-command (concat plantuml-java-command " -jar %s"))
 
 (defun plantuml-render-command (&rest arguments)
@@ -349,7 +351,8 @@ Shortcuts             Command Name
 
 (defun plantuml-deprecation-warning ()
   "Warns the user about the deprecation of the `puml-mode' project."
-  (if (featurep 'puml-mode)
+  (if (and plantuml-suppress-deprecation-warning
+           (featurep 'puml-mode))
       (display-warning :warning
                        "`puml-mode' is now deprecated and no longer updated, but it's still present in your system.\
 You should move your configuration to use `plantuml-mode'. See https://github.com/sytac/plantuml-mode. \
