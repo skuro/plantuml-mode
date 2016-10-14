@@ -122,7 +122,6 @@
 
 (defun plantuml-init ()
   "Initialize the keywords or builtins from the cmdline language output."
-  (display-warning :warning "`plantuml-mode' is deprecated in favor of `plantuml-mode', make sure to update your configuration")
   (unless (file-exists-p plantuml-jar-path)
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
@@ -347,6 +346,16 @@ Shortcuts             Command Name
 
   ; Run hooks:
   (run-mode-hooks 'plantuml-mode-hook))
+
+(defun plantuml-deprecation-warning ()
+  "Warns the user about the deprecation of the `puml-mode' project."
+  (if (featurep 'puml-mode)
+      (display-warning :warning
+                       "`puml-mode' is now deprecated and no longer updated, but it's still present in your system.\
+You should move your configuration to use `plantuml-mode'. See https://github.com/sytac/plantuml-mode. \
+See more at https://github.com/skuro/puml-mode/issues/26")))
+
+(add-hook 'plantuml-mode-hook 'plantuml-deprecation-warning)
 
 (provide 'plantuml-mode)
 ;;; plantuml-mode.el ends here
