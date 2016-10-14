@@ -1,6 +1,6 @@
 # Deprecation notice
 
-After [the decision to merge](https://github.com/zwz/plantuml-mode/issues/8) together `puml-mode` and `plantuml-mode`, this repository and the code herein have been deprecated in favor of [skuro/plantuml-mode](https://github.com/skuro/plantuml-mode).
+After [the decision to merge](https://github.com/zwz/plantuml-mode/issues/8) together `puml-mode` and `plantuml-mode`, this branch and the code herein have been deprecated and are here for historical reasons only.
 
 [![MELPA](http://melpa.org/packages/puml-mode-badge.svg)](http://melpa.org/#/puml-mode) [![MELPA Stable](http://stable.melpa.org/packages/puml-mode-badge.svg)](http://stable.melpa.org/#/puml-mode)
 
