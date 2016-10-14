@@ -53,6 +53,8 @@
   (expand-file-name "~/plantuml.jar")
   "The location of the PlantUML executable JAR.")
 
+(defcustom puml-suppress-deprecation-warning t "To silence the deprecation warning when `puml-mode' is found upon loading.")
+
 (defvar puml-mode-hook nil "Standard hook for puml-mode.")
 
 (defconst puml-mode-version "0.6.7" "The puml-mode version string.")
@@ -307,7 +309,8 @@ Shortcuts             Command Name
 
 (defun puml-deprecation-warning ()
   "Warns the user about the deprecation of the `puml-mode' project."
-  (if (featurep 'puml-mode)
+  (if (and puml-suppress-deprecation-warning
+           (featurep 'puml-mode))
       (display-warning :warning
                        "`puml-mode' is now deprecated and no longer updated, but it's still present in your system.\
 You should move your configuration to use `plantuml-mode'. See https://github.com/sytac/plantuml-mode. \
