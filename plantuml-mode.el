@@ -68,7 +68,9 @@
     keymap)
   "Keymap for plantuml-mode.")
 
-(defvar plantuml-run-command "java -jar %s")
+(defcustom plantuml-java-command "java" "The java command used to execute PlantUML.")
+
+(defvar plantuml-run-command (concat plantuml-java-command " -jar %s"))
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
@@ -219,7 +221,7 @@ to choose where to display it:
          (coding-system-for-write (and imagep 'binary)))
 
     (let ((ps (start-process "PLANTUML" buf
-                             "java" "-jar" (shell-quote-argument plantuml-jar-path)
+                             plantuml-java-command "-jar" (shell-quote-argument plantuml-jar-path)
                              (plantuml-output-type-opt) "-p")))
       (process-send-string ps string)
       (process-send-eof ps)
