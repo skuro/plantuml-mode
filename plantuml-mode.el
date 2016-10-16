@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 0.6.5
+;; Version: 0.6.8
 ;; Package-Requires: ((emacs "24"))
 
 ;; You can redistribute this program and/or modify it under the terms
@@ -28,20 +28,20 @@
 
 ;;; Change log:
 ;;
-;; version 0.6.8, 2016-10-11 Moved the mode to plantuml-mode, superseding zwz/plantuml-mode
-;; version 0.6.7, 2016-10-11 Added deprecation warning in favor of plantuml-mode
-;; version 0.6.6, 2016-07-19 Added autoload, minor bug fixes
-;; version 0.6.5, 2016-03-24 Added UTF8 support and open in new window / frame shortcuts
-;; version 0.6.4, 2015-12-12 Added support for comments (single and multiline) -- thanks to https://github.com/nivekuil
-;; version 0.6.3, 2015-11-07 Added per-buffer configurability of output type (thanks to https://github.com/davazp)
-;; version 0.6.2, 2015-11-07 Added debugging capabilities to improve issue analysis
-;; version 0.6.1, 2015-09-26 Bugfix: use eq to compare symbols instead of cl-equalp
-;; version 0.6, 2015-09-26 Fixed PNG preview
-;; version 0.5, 2015-09-21 Added preview capabilities
-;; version 0.4, 2015-06-14 Use a puml- prefix to distinguish from the other plantuml-mode
-;; version 0.3, 2015-06-13 Compatibility with Emacs 24.x
-;; version 0.2, 2010-09-20 Initialize the keywords from the -language output of plantuml.jar instead of the hard-coded way.
-;; version 0.1, 2010-08-25 First version
+;; version 0.6.8, 2016-10-16 Moved the mode to plantuml-mode, superseding zwz/plantuml-mode and skuro/puml-mode. Added preview for the currently selected region.
+;; version 0.6.7, 2016-10-11 [from puml-mode] Added deprecation warning in favor of plantuml-mode
+;; version 0.6.6, 2016-07-19 [from puml-mode] Added autoload, minor bug fixes
+;; version 0.6.5, 2016-03-24 [from puml-mode] Added UTF8 support and open in new window / frame shortcuts
+;; version 0.6.4, 2015-12-12 [from puml-mode] Added support for comments (single and multiline) -- thanks to https://github.com/nivekuil
+;; version 0.6.3, 2015-11-07 [from puml-mode] Added per-buffer configurability of output type (thanks to https://github.com/davazp)
+;; version 0.6.2, 2015-11-07 [from puml-mode] Added debugging capabilities to improve issue analysis
+;; version 0.6.1, 2015-09-26 [from puml-mode] Bugfix: use eq to compare symbols instead of cl-equalp
+;; version 0.6, 2015-09-26 [from puml-mode] Fixed PNG preview
+;; version 0.5, 2015-09-21 [from puml-mode] Added preview capabilities
+;; version 0.4, 2015-06-14 [from puml-mode] Use a puml- prefix to distinguish from the other plantuml-mode
+;; version 0.3, 2015-06-13 [from puml-mode] Compatibility with Emacs 24.x
+;; version 0.2, 2010-09-20 [from puml-mode] Initialize the keywords from the -language output of plantuml.jar instead of the hard-coded way.
+;; version 0.1, 2010-08-25 [from puml-mode] First version
 
 ;;; Code:
 (require 'thingatpt)
