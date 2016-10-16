@@ -1,6 +1,8 @@
+<img src="http://blog.sqlauthority.com/wp-content/uploads/2010/05/deprecated.png" alt="Deprecated!" style="height=100px" />
+
 # Deprecation notice
 
-After [the decision to merge](https://github.com/zwz/plantuml-mode/issues/8) together `puml-mode` and `plantuml-mode`, this branch and the code herein have been deprecated and are here for historical reasons only.
+After [the decision to merge](https://github.com/zwz/plantuml-mode/issues/8) together `puml-mode` and `plantuml-mode`, this branch and the code herein have been deprecated and are here for historical reasons only. Please migrate to [skuro/plantuml-mode](https://github.com/skuro/plantuml-mode).
 
 [![MELPA](http://melpa.org/packages/puml-mode-badge.svg)](http://melpa.org/#/puml-mode) [![MELPA Stable](http://stable.melpa.org/packages/puml-mode-badge.svg)](http://stable.melpa.org/#/puml-mode)
 
