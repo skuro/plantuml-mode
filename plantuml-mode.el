@@ -344,10 +344,7 @@ Shortcuts             Command Name
   (set (make-local-variable 'comment-end) "'/")
   (set (make-local-variable 'comment-multi-line) t)
   (set (make-local-variable 'comment-style) 'extra-line)
-  (setq font-lock-defaults '((plantuml-font-lock-keywords) nil t))
-
-  ; Run hooks:
-  (run-mode-hooks 'plantuml-mode-hook))
+  (setq font-lock-defaults '((plantuml-font-lock-keywords) nil t)))
 
 (defun plantuml-deprecation-warning ()
   "Warns the user about the deprecation of the `puml-mode' project."
