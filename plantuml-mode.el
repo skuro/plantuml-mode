@@ -273,38 +273,39 @@ Uses prefix (as PREFIX) to choose where to display it:
       (plantuml-preview-region prefix)
       (plantuml-preview-buffer prefix)))
 
-(unless plantuml-kwdList
-  (plantuml-init)
-  (defvar plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
-  (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
-  (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
-  (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
+(defun plantuml-init-once ()
+  (unless plantuml-kwdList
+    (plantuml-init)
+    (defvar plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
+    (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
+    (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
+    (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
 
-  (setq plantuml-font-lock-keywords
-        `(
-          (,plantuml-types-regexp . font-lock-type-face)
-          (,plantuml-keywords-regexp . font-lock-keyword-face)
-          (,plantuml-builtins-regexp . font-lock-builtin-face)
-          (,plantuml-preprocessors-regexp . font-lock-preprocessor-face)
-          ;; note: order matters
-          ))
+    (setq plantuml-font-lock-keywords
+          `(
+            (,plantuml-types-regexp . font-lock-type-face)
+            (,plantuml-keywords-regexp . font-lock-keyword-face)
+            (,plantuml-builtins-regexp . font-lock-builtin-face)
+            (,plantuml-preprocessors-regexp . font-lock-preprocessor-face)
+            ;; note: order matters
+            ))
 
-  (setq plantuml-kwdList (make-hash-table :test 'equal))
-  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-types)
-  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-keywords)
-  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-builtins)
-  (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-preprocessors)
-  (put 'plantuml-kwdList 'risky-local-variable t)
+    (setq plantuml-kwdList (make-hash-table :test 'equal))
+    (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-types)
+    (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-keywords)
+    (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-builtins)
+    (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-preprocessors)
+    (put 'plantuml-kwdList 'risky-local-variable t)
 
-  ;; clear memory
-  (setq plantuml-types nil)
-  (setq plantuml-keywords nil)
-  (setq plantuml-builtins nil)
-  (setq plantuml-preprocessors nil)
-  (setq plantuml-types-regexp nil)
-  (setq plantuml-keywords-regexp nil)
-  (setq plantuml-builtins-regexp nil)
-  (setq plantuml-preprocessors-regexp nil))
+    ;; clear memory
+    (setq plantuml-types nil)
+    (setq plantuml-keywords nil)
+    (setq plantuml-builtins nil)
+    (setq plantuml-preprocessors nil)
+    (setq plantuml-types-regexp nil)
+    (setq plantuml-keywords-regexp nil)
+    (setq plantuml-builtins-regexp nil)
+    (setq plantuml-preprocessors-regexp nil)))
 
 (defun plantuml-complete-symbol ()
   "Perform keyword completion on word before cursor."
@@ -338,6 +339,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 
 Shortcuts             Command Name
 \\[plantuml-complete-symbol]      `plantuml-complete-symbol'"
+  (plantuml-init-once)
   (make-local-variable 'plantuml-output-type)
   (set (make-local-variable 'comment-start-skip) "\\('+\\|/'+\\)\\s *")
   (set (make-local-variable 'comment-start) "/'")
