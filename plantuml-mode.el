@@ -280,23 +280,23 @@ Uses prefix (as PREFIX) to choose where to display it:
     (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
     (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
     (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
-    
+
     (setq plantuml-font-lock-keywords
-	  `(
-	    (,plantuml-types-regexp . font-lock-type-face)
-	    (,plantuml-keywords-regexp . font-lock-keyword-face)
-	    (,plantuml-builtins-regexp . font-lock-builtin-face)
-	    (,plantuml-preprocessors-regexp . font-lock-preprocessor-face)
-	    ;; note: order matters
-	    ))
-    
+          `(
+            (,plantuml-types-regexp . font-lock-type-face)
+            (,plantuml-keywords-regexp . font-lock-keyword-face)
+            (,plantuml-builtins-regexp . font-lock-builtin-face)
+            (,plantuml-preprocessors-regexp . font-lock-preprocessor-face)
+            ;; note: order matters
+            ))
+
     (setq plantuml-kwdList (make-hash-table :test 'equal))
     (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-types)
     (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-keywords)
     (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-builtins)
     (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-preprocessors)
     (put 'plantuml-kwdList 'risky-local-variable t)
-    
+
     ;; clear memory
     (setq plantuml-types nil)
     (setq plantuml-keywords nil)
@@ -331,7 +331,7 @@ Uses prefix (as PREFIX) to choose where to display it:
              (message "Making completion list...%s" "done")))))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.\\(plantuml\\|pum\\|plantuml\\|plu\\)$" . plantuml-mode))
+(add-to-list 'auto-mode-alist '("\\.(plantuml\\|pum\\|plantuml\\|plu)\\'" . plantuml-mode))
 
 ;;;###autoload
 (define-derived-mode plantuml-mode prog-mode "plantuml"
