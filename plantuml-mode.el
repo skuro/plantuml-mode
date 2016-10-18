@@ -82,9 +82,7 @@
 (defun plantuml-command-line ()
   "Compose the PlantUML command line as a string."
   (apply 'concat plantuml-java-command
-         (map 'list (lambda(s)
-                      "Add spaces around a given Java argument (as S)."
-                      (format " %s " s)) plantuml-java-args)))
+         (mapconcat 'identity (cons plantuml-java-command plantuml-java-args) " ")))
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
