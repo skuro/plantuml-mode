@@ -71,7 +71,7 @@
 
 (defcustom plantuml-java-command "java" "The java command used to execute PlantUML.")
 
-(defcustom plantuml-suppress-deprecation-warning t "To silence the deprecation warning when `puml-mode' is found upon loading.")
+(defcustom plantuml-suppress-deprecation-warning t "To silence the deprecation warning when `plantuml-mode' is found upon loading.")
 
 (defvar plantuml-run-command (concat plantuml-java-command " -jar %s"))
 
