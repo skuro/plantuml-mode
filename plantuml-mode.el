@@ -28,6 +28,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.1.1, 2016-10-18 Make PlantUML run headless by default; introduced custom variable `plantuml-java-args' to control which arguments are passed to Plantuml.
 ;; version 1.0.1, 2016-10-17 Bugfix release: proper auto-mode-alist regex; init delayed at mode load; avoid calling hooks twice.
 ;; version 1.0.0, 2016-10-16 Moved the mode to plantuml-mode, superseding zwz/plantuml-mode and skuro/puml-mode. Added preview for the currently selected region.
 ;; version 0.6.7, 2016-10-11 [from puml-mode] Added deprecation warning in favor of plantuml-mode
@@ -69,16 +70,28 @@
     keymap)
   "Keymap for plantuml-mode.")
 
-(defcustom plantuml-java-command "java" "The java command used to execute PlantUML.")
+(defcustom plantuml-java-command "java"
+  "The java command used to execute PlantUML.")
 
-(defcustom plantuml-suppress-deprecation-warning t "To silence the deprecation warning when `puml-mode' is found upon loading.")
+(defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
+  "The parameters passed to `plantuml-java-command' when executing PlantUML.")
 
-(defvar plantuml-run-command (concat plantuml-java-command " -jar %s"))
+(defcustom plantuml-suppress-deprecation-warning t
+  "To silence the deprecation warning when `puml-mode' is found upon loading.")
+
+(defun plantuml-command-line ()
+  "Compose the PlantUML command line as a string."
+  (apply 'concat plantuml-java-command
+         (map 'list (lambda(s)
+                      "Add spaces around a given Java argument (as S)."
+                      (format " %s " s)) plantuml-java-args)))
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
-  (let ((cmd (format plantuml-run-command (shell-quote-argument plantuml-jar-path)))
-        (argstring (mapconcat 'shell-quote-argument arguments " ")))
+  (let ((cmd (concat (plantuml-command-line) " " (shell-quote-argument plantuml-jar-path)))
+        (argstring (mapconcat (lambda (s)
+                                "Identity function. Must already exist for Emacs somewhere."
+                                s) arguments " ")))
     (concat cmd " " argstring)))
 
 ;;; syntax table
@@ -128,8 +141,10 @@
   (unless (file-exists-p plantuml-jar-path)
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
-    (shell-command (plantuml-render-command "-charset UTF-8 -language") (current-buffer))
-    (goto-char (point-min))
+    (let ((cmd (plantuml-render-command "-charset UTF-8 -language")))
+      (plantuml-debug (concat "Command is: " cmd))
+      (shell-command cmd (current-buffer))
+      (goto-char (point-min)))
     (let ((found (search-forward ";" nil t))
           (word "")
           (count 0)
@@ -205,6 +220,14 @@ default output type for new buffers."
   "Create the flag to pass to PlantUML to produce the selected output format."
   (concat "-t" plantuml-output-type))
 
+(defmacro plantuml-start-process (buf)
+  "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
+  `(start-process "PLANTUML" ,buf
+                  plantuml-java-command
+                  ,@plantuml-java-args
+                  (shell-quote-argument plantuml-jar-path)
+                  (plantuml-output-type-opt) "-p"))
+
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
 to choose where to display it:
@@ -222,9 +245,7 @@ to choose where to display it:
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
 
-    (let ((ps (start-process "PLANTUML" buf
-                             plantuml-java-command "-jar" (shell-quote-argument plantuml-jar-path)
-                             (plantuml-output-type-opt) "-p")))
+    (let ((ps (plantuml-start-process buf)))
       (process-send-string ps string)
       (process-send-eof ps)
       (set-process-sentinel ps
@@ -275,6 +296,7 @@ Uses prefix (as PREFIX) to choose where to display it:
       (plantuml-preview-buffer prefix)))
 
 (defun plantuml-init-once ()
+  "Ensure initialization only happens once."
   (unless plantuml-kwdList
     (plantuml-init)
     (defvar plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
