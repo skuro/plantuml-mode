@@ -89,9 +89,7 @@
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
   (let ((cmd (concat (plantuml-command-line) " " (shell-quote-argument plantuml-jar-path)))
-        (argstring (mapconcat (lambda (s)
-                                "Identity function. Must already exist for Emacs somewhere."
-                                s) arguments " ")))
+        (argstring (mapconcat 'identity arguments " ")))
     (concat cmd " " argstring)))
 
 ;;; syntax table
