@@ -81,13 +81,13 @@
 
 (defun plantuml-command-line ()
   "Compose the PlantUML command line as a string."
-  (apply 'concat plantuml-java-command
-         (mapconcat 'identity (cons plantuml-java-command plantuml-java-args) " ")))
+  (mapconcat 'identity (cons plantuml-java-command plantuml-java-args) " "))
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
   (let ((cmd (concat (plantuml-command-line) " " (shell-quote-argument plantuml-jar-path)))
         (argstring (mapconcat 'identity arguments " ")))
+    (plantuml-debug (format "Command is %s" cmd))
     (concat cmd " " argstring)))
 
 ;;; syntax table
@@ -138,7 +138,6 @@
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
     (let ((cmd (plantuml-render-command "-charset UTF-8 -language")))
-      (plantuml-debug (concat "Command is: " cmd))
       (shell-command cmd (current-buffer))
       (goto-char (point-min)))
     (let ((found (search-forward ";" nil t))
