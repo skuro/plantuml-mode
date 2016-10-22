@@ -361,7 +361,7 @@ Uses prefix (as PREFIX) to choose where to display it:
              (message "Making completion list...%s" "done")))))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.(plantuml\\|pum\\|plantuml\\|plu)\\'" . plantuml-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(plantuml\\|pum\\|plu\\)\\'" . plantuml-mode))
 
 ;;;###autoload
 (define-derived-mode plantuml-mode prog-mode "plantuml"
