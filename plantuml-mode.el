@@ -220,7 +220,7 @@ default output type for new buffers."
   `(start-process "PLANTUML" ,buf
                   plantuml-java-command
                   ,@plantuml-java-args
-                  (shell-quote-argument plantuml-jar-path)
+                  plantuml-jar-path
                   (plantuml-output-type-opt) "-p"))
 
 (defun plantuml-preview-string (prefix string)
