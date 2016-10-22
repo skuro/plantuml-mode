@@ -79,16 +79,12 @@
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading.")
 
-(defun plantuml-command-line ()
-  "Compose the PlantUML command line as a string."
-  (mapconcat 'identity (cons plantuml-java-command plantuml-java-args) " "))
-
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
-  (let ((cmd (concat (plantuml-command-line) " " (shell-quote-argument plantuml-jar-path)))
-        (argstring (mapconcat 'identity arguments " ")))
-    (plantuml-debug (format "Command is %s" cmd))
-    (concat cmd " " argstring)))
+  (let* ((cmd-list (append plantuml-java-args (list plantuml-jar-path) arguments))
+	 (cmd (mapconcat 'identity cmd-list "|")))
+    (plantuml-debug (format "Command is [%s]" cmd))
+    cmd-list))
 
 ;;; syntax table
 (defvar plantuml-mode-syntax-table
@@ -134,11 +130,12 @@
 
 (defun plantuml-init ()
   "Initialize the keywords or builtins from the cmdline language output."
-  (unless (file-exists-p plantuml-jar-path)
+  (unless (or (eq system-type 'cygwin) (file-exists-p plantuml-jar-path))
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
-    (let ((cmd (plantuml-render-command "-charset UTF-8 -language")))
-      (shell-command cmd (current-buffer))
+    (let ((cmd-args (append (list plantuml-java-command nil t nil)
+			    (plantuml-render-command "-charset" "UTF-8" "-language"))))
+      (apply 'call-process cmd-args)
       (goto-char (point-min)))
     (let ((found (search-forward ";" nil t))
           (word "")
