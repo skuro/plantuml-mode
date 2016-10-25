@@ -278,6 +278,18 @@ Uses prefix (as PREFIX) to choose where to display it:
                                        (region-beginning) (region-end))
                                       "\n@enduml")))
 
+(defun plantuml-preview-current-block (prefix)
+  "Preview diagram from the PlantUML sources from the previous @startuml to the next @enduml.
+Uses prefix (as PREFIX) to choose where to display it:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (interactive "p")
+  (save-restriction
+    (narrow-to-region
+     (search-backward "@startuml") (search-forward "@enduml"))
+    (plantuml-preview-buffer prefix)))
+
 (defun plantuml-preview (prefix)
   "Preview diagram from the PlantUML sources.
 Uses the current region if one is active, or the entire buffer otherwise.
