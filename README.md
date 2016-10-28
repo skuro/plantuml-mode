@@ -33,10 +33,9 @@ Also, to enable preview you need to tell `plantuml-mode` where to locate the Pla
 
 # Enable the major mode
 
-You can automatically enable `plantuml-mode` for files with extension `.plantuml` or `plantuml` by adding the following to your `.emacsrc`:
+You can automatically enable `plantuml-mode` for files with extension `.plantuml` by adding the following to your `.emacsrc`:
 
     ;; Enable plantuml-mode for PlantUML files
-    (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
     (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
 
 Of course, you can always enable manually the major mode by typing `M-x plantuml-mode` once in the desired PlantUML file buffer.
