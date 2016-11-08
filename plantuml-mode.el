@@ -28,6 +28,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.1.1, 2016-11-08 Fix process handling with Windows native emacs; better file extention match for autoloading the mode
 ;; version 1.1.0, 2016-10-18 Make PlantUML run headless by default; introduced custom variable `plantuml-java-args' to control which arguments are passed to Plantuml.
 ;; version 1.0.1, 2016-10-17 Bugfix release: proper auto-mode-alist regex; init delayed at mode load; avoid calling hooks twice.
 ;; version 1.0.0, 2016-10-16 Moved the mode to plantuml-mode, superseding zwz/plantuml-mode and skuro/puml-mode. Added preview for the currently selected region.
@@ -58,7 +59,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "0.6.8" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.1.1" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
@@ -82,7 +83,7 @@
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
   (let* ((cmd-list (append plantuml-java-args (list plantuml-jar-path) arguments))
-	 (cmd (mapconcat 'identity cmd-list "|")))
+         (cmd (mapconcat 'identity cmd-list "|")))
     (plantuml-debug (format "Command is [%s]" cmd))
     cmd-list))
 
@@ -134,7 +135,7 @@
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
     (let ((cmd-args (append (list plantuml-java-command nil t nil)
-			    (plantuml-render-command "-charset" "UTF-8" "-language"))))
+                            (plantuml-render-command "-charset" "UTF-8" "-language"))))
       (apply 'call-process cmd-args)
       (goto-char (point-min)))
     (let ((found (search-forward ";" nil t))
