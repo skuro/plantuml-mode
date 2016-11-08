@@ -90,6 +90,11 @@
     (plantuml-debug (format "Command is %s" cmd))
     (concat cmd " " argstring)))
 
+(defcustom plantuml-external-browser-path nil "The location of external browser.")
+(defcustom plantuml-external-browser-args nil "Arguments to pass to of external browser.")
+(defcustom plantuml-file-output-type nil "type of output file - set to an atom type out of 'text 'png 'svg")
+(defcustom plantuml-file-output-path nil "A string containing an absolute file path where ouptut is saved.")
+
 ;;; syntax table
 (defvar plantuml-mode-syntax-table
   (let ((synTable (make-syntax-table)))
@@ -278,6 +283,55 @@ Uses prefix (as PREFIX) to choose where to display it:
                                        (region-beginning) (region-end))
                                       "\n@enduml")))
 
+(defun plantuml-start-external-browser ()
+  "Start external browswer"
+  (interactive)
+  (if plantuml-external-browser-path
+      (let* ((browser-buffer "*PLANTUML External Browser*")
+	     (buf (get-buffer-create browser-buffer))
+	     (start-process-args (list "PLANTUML External Browser" buf plantuml-external-browser-path)))
+	(apply 'start-process (append start-process-args plantuml-external-browser-args)))))
+
+(defconst plantuml-file-output-buffer-name "*PLANTUML File Output*")
+(defun plantuml-file-output-type ()
+  (cond ((eq plantuml-file-output-type 'text) "utxt")
+	((eq plantuml-file-output-type 'utxt) "utxt")
+	((eq plantuml-file-output-type 'png) "png")
+	((eq plantuml-file-output-type 'svg) "svg")
+	(t nil)))
+
+(defun plantuml-file-output-p ()
+  "t if necessary conditions for file output are satisfied"
+  (and (plantuml-file-output-type) (stringp plantuml-file-output-path)))
+
+(defun plantuml-file-output ()
+  "Write generated diagram into a file."
+  (if (plantuml-file-output-p)
+      (progn
+	(let ((buffer (get-buffer plantuml-file-output-buffer-name)))
+	  (when buffer
+	    (kill-buffer buffer)))
+	(let* ((process-connection-type nil)
+	       (buffer (get-buffer-create plantuml-file-output-buffer-name))
+	       (coding-system-for-read 'binary)
+	       (coding-system-for-write 'binary)
+	       (ps (apply 'start-process
+			  (append (list "PLANTUML File Output" buffer plantuml-java-command)
+				  plantuml-java-args
+				  (list plantuml-jar-path
+					(concat "-t" (plantuml-file-output-type))
+					"-p")))))
+	  (process-send-string ps (buffer-string))
+	  (process-send-eof ps)
+	  (set-process-sentinel ps
+				(lambda (_ps event)
+				  (unless (equal event "finished\n")
+				    (error "PLANTUML Preview failed: %s" event))
+				  (save-excursion
+				    (with-current-buffer plantuml-file-output-buffer-name
+				      (write-region (point-min) (point-max)
+						    plantuml-file-output-path)))))))))
+
 (defun plantuml-preview (prefix)
   "Preview diagram from the PlantUML sources.
 Uses the current region if one is active, or the entire buffer otherwise.
@@ -286,9 +340,11 @@ Uses prefix (as PREFIX) to choose where to display it:
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
   (interactive "p")
-  (if mark-active
-      (plantuml-preview-region prefix)
-      (plantuml-preview-buffer prefix)))
+  (if (plantuml-file-output-p)
+      (plantuml-file-output)
+    (if mark-active
+	(plantuml-preview-region prefix)
+      (plantuml-preview-buffer prefix))))
 
 (defun plantuml-init-once ()
   "Ensure initialization only happens once."
