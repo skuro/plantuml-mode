@@ -81,7 +81,7 @@
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
-  (let* ((cmd-list (append plantuml-java-args (list plantuml-jar-path) arguments))
+  (let* ((cmd-list (append plantuml-java-args (list (expand-file-name plantuml-jar-path)) arguments))
          (cmd (mapconcat 'identity cmd-list "|")))
     (plantuml-debug (format "Command is [%s]" cmd))
     cmd-list))
@@ -217,7 +217,7 @@ default output type for new buffers."
   `(start-process "PLANTUML" ,buf
                   plantuml-java-command
                   ,@plantuml-java-args
-                  (shell-quote-argument plantuml-jar-path)
+                  (shell-quote-argument (expand-file-name plantuml-jar-path))
                   (plantuml-output-type-opt) "-p"))
 
 (defun plantuml-preview-string (prefix string)
