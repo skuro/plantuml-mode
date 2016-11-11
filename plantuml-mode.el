@@ -82,7 +82,7 @@
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
   (let* ((cmd-list (append plantuml-java-args (list plantuml-jar-path) arguments))
-	 (cmd (mapconcat 'identity cmd-list "|")))
+         (cmd (mapconcat 'identity cmd-list "|")))
     (plantuml-debug (format "Command is [%s]" cmd))
     cmd-list))
 
@@ -134,7 +134,7 @@
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
     (let ((cmd-args (append (list plantuml-java-command nil t nil)
-			    (plantuml-render-command "-charset" "UTF-8" "-language"))))
+                            (plantuml-render-command "-charset" "UTF-8" "-language"))))
       (apply 'call-process cmd-args)
       (goto-char (point-min)))
     (let ((found (search-forward ";" nil t))
