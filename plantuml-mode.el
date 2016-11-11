@@ -28,6 +28,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.2.1, 2016-11-11 Support for paths like `~/.plantuml/plantuml.jar' for `plantuml-jar-path' (the tilde was previously unsupported)
 ;; version 1.2.0, 2016-11-09 Added `plantuml-preview-current-buffer', courtesy of @7mamu4
 ;; version 1.1.1, 2016-11-08 Fix process handling with Windows native emacs; better file extention match for autoloading the mode
 ;; version 1.1.0, 2016-10-18 Make PlantUML run headless by default; introduced custom variable `plantuml-java-args' to control which arguments are passed to Plantuml.
@@ -60,7 +61,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.2.0" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.2.1" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
