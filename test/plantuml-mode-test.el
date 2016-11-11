@@ -12,4 +12,6 @@
   (should (equal (expand-file-name "~/plantuml.jar")
                  plantuml-jar-path)))
 
+(provide 'plantuml-mode-test)
+
 ;;; plantuml-mode-test.el ends here
