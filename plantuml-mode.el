@@ -83,7 +83,7 @@
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
-  (let* ((cmd-list (append plantuml-java-args (list plantuml-jar-path) arguments))
+  (let* ((cmd-list (append plantuml-java-args (list (expand-file-name plantuml-jar-path)) arguments))
          (cmd (mapconcat 'identity cmd-list "|")))
     (plantuml-debug (format "Command is [%s]" cmd))
     cmd-list))
@@ -219,7 +219,7 @@ default output type for new buffers."
   `(start-process "PLANTUML" ,buf
                   plantuml-java-command
                   ,@plantuml-java-args
-                  (shell-quote-argument plantuml-jar-path)
+                  (shell-quote-argument (expand-file-name plantuml-jar-path))
                   (plantuml-output-type-opt) "-p"))
 
 (defun plantuml-preview-string (prefix string)
@@ -276,6 +276,18 @@ Uses prefix (as PREFIX) to choose where to display it:
                                       (buffer-substring-no-properties
                                        (region-beginning) (region-end))
                                       "\n@enduml")))
+
+(defun plantuml-preview-current-block (prefix)
+  "Preview diagram from the PlantUML sources from the previous @startuml to the next @enduml.
+Uses prefix (as PREFIX) to choose where to display it:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (interactive "p")
+  (save-restriction
+    (narrow-to-region
+     (search-backward "@startuml") (search-forward "@enduml"))
+    (plantuml-preview-buffer prefix)))
 
 (defun plantuml-preview (prefix)
   "Preview diagram from the PlantUML sources.
