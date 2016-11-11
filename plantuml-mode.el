@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 1.2.0
+;; Version: 1.2.2
 ;; Package-Requires: ((emacs "24"))
 
 ;; You can redistribute this program and/or modify it under the terms
@@ -28,6 +28,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.2.2, 2016-11-11 Fixed java commands handling under windows; support spaces in `plantuml-jar-path'
 ;; version 1.2.1, 2016-11-11 Support for paths like `~/.plantuml/plantuml.jar' for `plantuml-jar-path' (the tilde was previously unsupported)
 ;; version 1.2.0, 2016-11-09 Added `plantuml-preview-current-buffer', courtesy of @7mamu4
 ;; version 1.1.1, 2016-11-08 Fix process handling with Windows native emacs; better file extention match for autoloading the mode
@@ -61,7 +62,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.2.1" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.2.2" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
