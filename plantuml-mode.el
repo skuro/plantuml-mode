@@ -281,20 +281,41 @@ Uses prefix (as PREFIX) to choose where to display it:
                                       "\n@enduml")))
 
 (defun plantuml-preview-current-block (prefix)
-  "Preview diagram from the PlantUML sources from the previous @startuml to the next @enduml.
+  "Preview diagram from the PlantUML sources of the current block.
+The current block starts with:
+a) Previous newpage ('newpage' excluded)
+b) Previous @startuml ('@startuml' excluded)
+c) Beginning of the accessible portion of the buffer
+
+The current block ends with:
+a) Next newpage ('newpage' excluded)
+b) Next @enduml ('@enduml' excluded)
+c) End of the accessible portion of the buffer
+
+The priority in the block start and end slection is a) then b) then c).
+
 Uses prefix (as PREFIX) to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
   (interactive "p")
-  (save-restriction
-    (narrow-to-region
-     (search-backward "@startuml") (search-forward "@enduml"))
-    (plantuml-preview-buffer prefix)))
+  (save-excursion
+    (forward-char (length "@startuml"))  ;; match also @startuml and newpage under point
+    (plantuml-preview-region
+     prefix
+     (if (not (search-backward-regexp "\\(^\s*\\(@startuml\\|newpage\\)\\)" nil t))
+         (point-min)
+       (forward-char (length (match-string 1)))
+       (point))
+     (if (not (search-forward-regexp "\\(^\s*\\(@enduml\\|newpage\\)\\)" nil t))
+         (point-max)
+       (backward-char (length (match-string 1)))
+       (point)))
+    ))
 
 (defun plantuml-preview (prefix)
   "Preview diagram from the PlantUML sources.
-Uses the current region if one is active, or the entire buffer otherwise.
+Uses the current region if one is active, or the current block otherwise.
 Uses prefix (as PREFIX) to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
@@ -302,7 +323,7 @@ Uses prefix (as PREFIX) to choose where to display it:
   (interactive "p")
   (if mark-active
       (plantuml-preview-region prefix (region-beginning) (region-end))
-      (plantuml-preview-buffer prefix)))
+    (plantuml-preview-current-block prefix)))
 
 (defun plantuml-init-once ()
   "Ensure initialization only happens once."
