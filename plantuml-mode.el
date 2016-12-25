@@ -222,7 +222,7 @@ default output type for new buffers."
                   plantuml-java-command
                   ,@plantuml-java-args
                   (expand-file-name plantuml-jar-path)
-                  (plantuml-output-type-opt) "-p"))
+                  (plantuml-output-type-opt) "-charset" "UTF-8" "-p"))
 
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
