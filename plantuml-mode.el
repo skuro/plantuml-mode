@@ -263,16 +263,17 @@ Uses prefix (as PREFIX) to choose where to display it:
   (interactive "p")
   (plantuml-preview-string prefix (buffer-string)))
 
-(defun plantuml-preview-region (prefix)
-  "Preview diagram from the PlantUML sources in the current region.
+(defun plantuml-preview-region (prefix begin end)
+  "Preview diagram from the PlantUML sources in from BEGIN to END.
+Uses the current region when called interactively.
 Uses prefix (as PREFIX) to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
-  (interactive "p")
+  (interactive "p\nr")
   (plantuml-preview-string prefix (concat "@startuml\n"
                                       (buffer-substring-no-properties
-                                       (region-beginning) (region-end))
+                                       begin end)
                                       "\n@enduml")))
 
 (defun plantuml-preview-current-block (prefix)
@@ -296,7 +297,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 - else -> new buffer"
   (interactive "p")
   (if mark-active
-      (plantuml-preview-region prefix)
+      (plantuml-preview-region prefix (region-beginning) (region-end))
       (plantuml-preview-buffer prefix)))
 
 (defun plantuml-init-once ()
