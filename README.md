@@ -115,6 +115,11 @@ and the current code still borrows a lot from it.
 
 Thanks to [Pavel G. Koukoushkin](https://github.com/svargellin) for implementing the preview functionality.
 
+# See also
+
+- [PlantUML](http://plantuml.com/)
+- [`flycheck-plantuml`](https://github.com/alexmurray/flycheck-plantuml)
+
 # License
 
 Released under the terms of [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html). See [LICENSE.txt](https://github.com/skuro/plantuml-mode/blob/master/LICENSE.txt).
