@@ -14,10 +14,17 @@
   (should (equal (replace-regexp-in-string " " "~" (read-test-file output))
                  (replace-regexp-in-string " " "~" (read-preview-buffer)))))
 
-(ert-deftest preview-test ()
+(ert-deftest preview-utxt-test ()
+  (setq-local plantuml-jar-path plantuml-test-jar-path)
+  (setq-local plantuml-output-type "utxt")
+
+  (assert-preview "a-b.puml" "a-b.txt"))
+
+(ert-deftest preview-unicode-test ()
   (setq-local plantuml-jar-path plantuml-test-jar-path)
   (setq-local plantuml-output-type "utxt")
   (assert-preview "a-b.puml" "a-b.txt"))
+  (assert-preview "unicode.puml" "unicode.txt"))
 
 (provide 'plantuml-mode-preview-test)
 
