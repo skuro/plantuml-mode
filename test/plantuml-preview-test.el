@@ -8,15 +8,18 @@
 
 ;;; Code:
 
-(defun assert-preview (puml output)
+(defun assert-preview (puml output &optional format)
+  (unless format (setq-local plantuml-output-type "utxt"))
   (plantuml-preview-string 42 (read-test-file puml))
-  (sleep-for 2)
+  (sleep-for 3)
   (should (equal (read-test-file output) (read-preview-buffer))))
 
 (ert-deftest preview-test ()
   (setq-local plantuml-jar-path plantuml-test-jar-path)
   (setq-local plantuml-output-type "utxt")
-  (assert-preview "a-b.puml" "a-b.txt"))
+
+  (assert-preview "a-b.puml" "a-b.txt")
+  (assert-preview "unicode.puml" "unicode.txt"))
 
 (provide 'plantuml-mode-preview-test)
 
