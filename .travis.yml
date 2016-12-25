@@ -5,7 +5,7 @@ before_install:
   - evm install $EVM_EMACS --use --skip
   - cask
 env:
-  - EVM_EMACS=emacs-24.5-travis
+#  - EVM_EMACS=emacs-24.5-travis
   - EVM_EMACS=emacs-25.1-travis
 script:
   - emacs --version
