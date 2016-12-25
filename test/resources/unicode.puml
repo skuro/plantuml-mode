@@ -1,0 +1,5 @@
+@startuml
+
+lang -> 日本語
+
+@enduml
