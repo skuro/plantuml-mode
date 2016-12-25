@@ -10,8 +10,9 @@
 
 (defun assert-preview (puml output)
   (plantuml-preview-string 42 (read-test-file puml))
-  (sleep-for 2)
-  (should (equal (read-test-file output) (read-preview-buffer))))
+  (sleep-for 3)
+  (should (equal (replace-regexp-in-string " " "~" (read-test-file output))
+                 (replace-regexp-in-string " " "~" (read-preview-buffer)))))
 
 (ert-deftest preview-test ()
   (setq-local plantuml-jar-path plantuml-test-jar-path)
