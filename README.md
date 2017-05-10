@@ -78,7 +78,7 @@ Then you can edit a `plantuml` code block with `plantuml-mode` by hitting `C-'` 
 
 ```elisp
 #+BEGIN_SRC plantuml
-  <hit C-' here to open a plantuml-mode buffer>
+  <hit C-c ' here to open a plantuml-mode buffer>
 #+END_SRC
 ```
 
