@@ -32,6 +32,9 @@
 (defun read-test-file (path)
   (f-read (f-join plantuml-test-resources-path path) 'utf-8))
 
-(require 'plantuml-mode (f-expand "plantuml-mode.el" package-code-path))
+(defun load-plantuml-mode ()
+  (require 'plantuml-mode (f-expand "plantuml-mode.el" package-code-path)))
+
+(load-plantuml-mode)
 
 ;;; test-helper.el ends here
