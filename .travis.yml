@@ -9,4 +9,5 @@ before_install:
 script:
   - emacs --version
   - make test
+  - mkdir "$(cask package-directory)/../testing"
   - emacs -q --batch --load test/resources/init.el
