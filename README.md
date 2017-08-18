@@ -123,4 +123,4 @@ Thanks to [Pavel G. Koukoushkin](https://github.com/svargellin) for implementing
 
 # License
 
-Released under the terms of [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html). See [LICENSE.txt](https://github.com/skuro/plantuml-mode/blob/master/LICENSE.txt).
+Released under the terms of [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) or (at your option) any later version. See [LICENSE.txt](https://github.com/skuro/plantuml-mode/blob/master/LICENSE.txt).
