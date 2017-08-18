@@ -22,3 +22,6 @@
 
 (package-install 'plantuml-mode)
 (require 'plantuml-mode)
+
+(message
+ (concat "Successfully installed plantuml-mode v" plantuml-mode-version))

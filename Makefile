@@ -15,4 +15,10 @@ unit:
 install:
 	${CASK} install
 
+clean:
+	rm -Rf .emacs.d
+	eval $(foo := $(CASK package-directory))
+	echo $(foo)
+	#rm -Rf ${dir}/../testing
+
 .PHONY:	all test unit ecukes install
