@@ -23,6 +23,10 @@
 
 (ert-deftest preview-unicode-test ()
   (setq-local plantuml-jar-path plantuml-test-jar-path)
+<<<<<<< HEAD
+=======
+  (setq-local plantuml-output-type "utxt")
+>>>>>>> develop
   (assert-preview "unicode.puml" "unicode.txt"))
 
 (provide 'plantuml-mode-preview-test)

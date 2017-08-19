@@ -7,7 +7,6 @@
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
 ;; Version: 1.2.3
-;; Package-Requires: ((emacs "24"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -88,8 +87,9 @@
 (defcustom plantuml-java-command "java"
   "The java command used to execute PlantUML.")
 
-(defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
-  "The parameters passed to `plantuml-java-command' when executing PlantUML.")
+(eval-and-compile
+  (defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
+    "The parameters passed to `plantuml-java-command' when executing PlantUML."))
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading.")
@@ -278,16 +278,17 @@ Uses prefix (as PREFIX) to choose where to display it:
   (interactive "p")
   (plantuml-preview-string prefix (buffer-string)))
 
-(defun plantuml-preview-region (prefix)
-  "Preview diagram from the PlantUML sources in the current region.
+(defun plantuml-preview-region (prefix begin end)
+  "Preview diagram from the PlantUML sources in from BEGIN to END.
+Uses the current region when called interactively.
 Uses prefix (as PREFIX) to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
-  (interactive "p")
+  (interactive "p\nr")
   (plantuml-preview-string prefix (concat "@startuml\n"
                                       (buffer-substring-no-properties
-                                       (region-beginning) (region-end))
+                                       begin end)
                                       "\n@enduml")))
 
 (defun plantuml-preview-current-block (prefix)
@@ -311,7 +312,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 - else -> new buffer"
   (interactive "p")
   (if mark-active
-      (plantuml-preview-region prefix)
+      (plantuml-preview-region prefix (region-beginning) (region-end))
       (plantuml-preview-buffer prefix)))
 
 (defun plantuml-init-once ()
