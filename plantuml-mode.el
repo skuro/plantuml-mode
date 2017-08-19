@@ -36,6 +36,8 @@
 
 ;;; Change log:
 ;;
+;; version 1.2.5, 2017-08-19 #53 Fixed installation warnings
+;; version 1.2.4, 2017-08-18 #60 Licensed with GPLv3+ to be compatible with Emacs
 ;; version 1.2.3, 2016-12-25 #50 unicode support in generated output
 ;; version 1.2.2, 2016-11-11 Fixed java commands handling under windows; support spaces in `plantuml-jar-path'
 ;; version 1.2.1, 2016-11-11 Support for paths like `~/.plantuml/plantuml.jar' for `plantuml-jar-path' (the tilde was previously unsupported)
