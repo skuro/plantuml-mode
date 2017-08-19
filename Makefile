@@ -1,5 +1,6 @@
 CASK ?= cask
 EMACS ?= emacs
+CASK_DIR ?= `${CASK} package-directory`
 
 all: test
 
@@ -14,5 +15,9 @@ unit:
 
 install:
 	${CASK} install
+
+clean:
+	rm -Rf .emacs.d
+	rm -Rf .cask
 
 .PHONY:	all test unit ecukes install

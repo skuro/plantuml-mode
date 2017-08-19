@@ -7,7 +7,6 @@
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
 ;; Version: 1.2.3
-;; Package-Requires: ((emacs "24"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -86,8 +85,9 @@
 (defcustom plantuml-java-command "java"
   "The java command used to execute PlantUML.")
 
-(defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
-  "The parameters passed to `plantuml-java-command' when executing PlantUML.")
+(eval-and-compile
+  (defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
+    "The parameters passed to `plantuml-java-command' when executing PlantUML."))
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading.")
