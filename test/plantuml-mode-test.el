@@ -12,8 +12,6 @@
   (should (equal (expand-file-name "~/plantuml.jar")
                  plantuml-jar-path)))
 
-<<<<<<< HEAD
-=======
 (ert-deftest can-unload-plantuml ()
   (unload-feature 'plantuml-mode t)
   (should (eq nil (boundp 'plantuml-jar-path)))
@@ -32,7 +30,6 @@
 
   (load-plantuml-mode))
 
->>>>>>> develop
 (provide 'plantuml-mode-test)
 
 ;;; plantuml-mode-test.el ends here
