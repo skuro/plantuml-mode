@@ -77,8 +77,9 @@
 (defcustom plantuml-java-command "java"
   "The java command used to execute PlantUML.")
 
-(defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
-  "The parameters passed to `plantuml-java-command' when executing PlantUML.")
+(eval-and-compile
+  (defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
+    "The parameters passed to `plantuml-java-command' when executing PlantUML."))
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading.")

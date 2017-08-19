@@ -18,6 +18,6 @@ install:
 
 clean:
 	rm -Rf .emacs.d
-	rm -Rf ${CASK_DIR}/../testing
+	rm -Rf .cask
 
 .PHONY:	all test unit ecukes install
