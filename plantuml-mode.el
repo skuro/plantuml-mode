@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 1.2.3
+;; Version: 1.2.5
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -93,6 +93,9 @@
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading.")
+
+(defcustom plantuml-should-preview-on-save nil
+  "Set to non-nil to automatically refresh the preview buffer upon save.")
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
@@ -400,7 +403,14 @@ Shortcuts             Command Name
 You should move your configuration to use `plantuml-mode'. See https://github.com/sytac/plantuml-mode. \
 See more at https://github.com/skuro/puml-mode/issues/26")))
 
+(defun plantuml-autopreview-on-save ()
+  "Automatically refreshes the preview buffer on save if `plantuml-should-preview-on-save' is non-nil."
+  (if (and (eq major-mode 'plantuml-mode)
+           plantuml-should-preview-on-save)
+      (plantuml-preview-buffer 42)))
+
 (add-hook 'plantuml-mode-hook 'plantuml-deprecation-warning)
+(add-hook 'after-save-hook 'plantuml-autopreview-on-save)
 
 (provide 'plantuml-mode)
 ;;; plantuml-mode.el ends here
