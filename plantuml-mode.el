@@ -247,8 +247,8 @@ to choose where to display it:
   (let ((b (get-buffer plantuml-preview-buffer)))
     (when b
       (with-current-buffer b
-	(setq buffer-read-only nil)
-	(erase-buffer))))
+        (setq buffer-read-only nil)
+        (erase-buffer))))
 
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
@@ -264,13 +264,13 @@ to choose where to display it:
                             (lambda (_ps event)
                               (unless (equal event "finished\n")
                                 (error "PLANTUML Preview failed: %s" event))
-
-                              (cond
-                               ((= prefix 16)
-                                (switch-to-buffer-other-frame plantuml-preview-buffer))
-                               ((= prefix 4)
-                                (switch-to-buffer plantuml-preview-buffer))
-                               (t (switch-to-buffer-other-window plantuml-preview-buffer)))
+                              (if (numberp prefix)
+                                  (cond
+                                   ((= prefix 16)
+                                    (switch-to-buffer-other-frame plantuml-preview-buffer))
+                                   ((= prefix 4)
+                                    (switch-to-buffer plantuml-preview-buffer)))
+                                (switch-to-buffer-other-window plantuml-preview-buffer))
                               (when imagep
                                 (image-mode)
                                 (set-buffer-multibyte t)))))))
