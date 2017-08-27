@@ -246,7 +246,9 @@ to choose where to display it:
 - else -> new window"
   (let ((b (get-buffer plantuml-preview-buffer)))
     (when b
-      (kill-buffer b)))
+      (with-current-buffer b
+	(setq buffer-read-only nil)
+	(erase-buffer))))
 
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))

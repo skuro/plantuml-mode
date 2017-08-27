@@ -9,6 +9,8 @@
 ;;; Code:
 
 (defun assert-preview (puml output &optional format)
+  "Run PlantUML on the source PUML and asserts the result to be
+equal to OUTPUT. Can choose the output FORMAT (default: utxt)."
   (if format
     (setq plantuml-output-type format)
     (setq plantuml-output-type "utxt"))
@@ -18,13 +20,19 @@
                  (replace-regexp-in-string " " "~" (read-preview-buffer)))))
 
 (ert-deftest preview-utxt-test ()
-  (setq-local plantuml-jar-path plantuml-test-jar-path)
-  (assert-preview "a-b.puml" "a-b.txt"))
+  (unwind-protect
+      (progn
+        (setq-local plantuml-jar-path plantuml-test-jar-path)
+        (assert-preview "a-b.puml" "a-b.txt"))
+    (cleanup-preview)))
 
 (ert-deftest preview-unicode-test ()
-  (setq-local plantuml-jar-path plantuml-test-jar-path)
-  (setq-local plantuml-output-type "utxt")
-  (assert-preview "unicode.puml" "unicode.txt"))
+  (unwind-protect
+      (progn
+        (setq-local plantuml-jar-path plantuml-test-jar-path)
+        (setq-local plantuml-output-type "utxt")
+        (assert-preview "unicode.puml" "unicode.txt")))
+  (cleanup-preview))
 
 (provide 'plantuml-mode-preview-test)
 
