@@ -19,20 +19,23 @@ equal to OUTPUT. Can choose the output FORMAT (default: utxt)."
   (should (equal (replace-regexp-in-string " " "~" (read-test-file output))
                  (replace-regexp-in-string " " "~" (read-preview-buffer)))))
 
+(defmacro test-and-cleanup-preview (&rest forms)
+  "Run the test described in FORMS and eventually cleanup the preview buffer."
+  `(unwind-protect
+       (progn
+         ,@forms)
+     (cleanup-preview)))
+
 (ert-deftest preview-utxt-test ()
-  (unwind-protect
-      (progn
-        (setq-local plantuml-jar-path plantuml-test-jar-path)
-        (assert-preview "a-b.puml" "a-b.txt"))
-    (cleanup-preview)))
+  (test-and-cleanup-preview
+   (setq-local plantuml-jar-path plantuml-test-jar-path)
+   (assert-preview "a-b.puml" "a-b.txt")))
 
 (ert-deftest preview-unicode-test ()
-  (unwind-protect
-      (progn
-        (setq-local plantuml-jar-path plantuml-test-jar-path)
-        (setq-local plantuml-output-type "utxt")
-        (assert-preview "unicode.puml" "unicode.txt")))
-  (cleanup-preview))
+  (test-and-cleanup-preview
+   (setq-local plantuml-jar-path plantuml-test-jar-path)
+   (setq-local plantuml-output-type "utxt")
+   (assert-preview "unicode.puml" "unicode.txt")))
 
 (provide 'plantuml-mode-preview-test)
 
