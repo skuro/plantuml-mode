@@ -27,26 +27,14 @@ equal to OUTPUT. Can choose the output FORMAT (default: utxt)."
   "Run the test described in FORMS and eventually cleanup the preview buffer."
   `(unwind-protect
        (progn
+         (setq-local plantuml-jar-path plantuml-test-jar-path)
          ,@forms)
      (cleanup-preview)))
 
 (ert-deftest preview-utxt-test ()
   (test-and-cleanup-preview
-   (setq-local plantuml-jar-path plantuml-test-jar-path)
-   (assert-preview "a-b.puml" "a-b.txt")))
-
-(ert-deftest preview-unicode-test ()
-  (test-and-cleanup-preview
-   (setq-local plantuml-jar-path plantuml-test-jar-path)
-   (setq-local plantuml-output-type "utxt")
+   (assert-preview "a-b.puml" "a-b.txt")
    (assert-preview "unicode.puml" "unicode.txt")))
-
-(ert-deftest preview-new-window()
-  (test-and-cleanup-preview
-   (save-window-excursion
-     (open-test-file-in-buf "a-b.puml")
-     (plantuml-preview nil)
-     (sleep-for 3))))
 
 (provide 'plantuml-mode-preview-test)
 

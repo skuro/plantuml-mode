@@ -276,21 +276,14 @@ to choose where to display it:
                                 (set-buffer-multibyte t)))))))
 
 (defun plantuml-preview-buffer (prefix)
-  "Preview diagram from the PlantUML sources in the current buffer.
-Uses prefix (as PREFIX) to choose where to display it:
-- 4  (when prefixing the command with C-u) -> new window
-- 16 (when prefixing the command with C-u C-u) -> new frame.
-- else -> new buffer"
+  "Preview diagram from the PlantUML sources in the current
+buffer.  See `plantuml-preview-string' for PREFIX usage."
   (interactive "p")
   (plantuml-preview-string prefix (buffer-string)))
 
 (defun plantuml-preview-region (prefix begin end)
   "Preview diagram from the PlantUML sources in from BEGIN to END.
-Uses the current region when called interactively.
-Uses prefix (as PREFIX) to choose where to display it:
-- 4  (when prefixing the command with C-u) -> new window
-- 16 (when prefixing the command with C-u C-u) -> new frame.
-- else -> new buffer"
+  See `plantuml-preview-string' for PREFIX usage."
   (interactive "p\nr")
   (plantuml-preview-string prefix (concat "@startuml\n"
                                       (buffer-substring-no-properties
@@ -299,10 +292,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 
 (defun plantuml-preview-current-block (prefix)
   "Preview diagram from the PlantUML sources from the previous @startuml to the next @enduml.
-Uses prefix (as PREFIX) to choose where to display it:
-- 4  (when prefixing the command with C-u) -> new window
-- 16 (when prefixing the command with C-u C-u) -> new frame.
-- else -> new buffer"
+  See `plantuml-preview-string' for PREFIX usage."
   (interactive "p")
   (save-restriction
     (narrow-to-region
@@ -312,10 +302,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 (defun plantuml-preview (prefix)
   "Preview diagram from the PlantUML sources.
 Uses the current region if one is active, or the entire buffer otherwise.
-Uses prefix (as PREFIX) to choose where to display it:
-- 4  (when prefixing the command with C-u) -> new window
-- 16 (when prefixing the command with C-u C-u) -> new frame.
-- else -> new buffer"
+  See `plantuml-preview-string' for PREFIX usage."
   (interactive "p")
   (if mark-active
       (plantuml-preview-region prefix (region-beginning) (region-end))
