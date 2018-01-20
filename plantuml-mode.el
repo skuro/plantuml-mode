@@ -87,6 +87,18 @@
 (defcustom plantuml-java-command "java"
   "The java command used to execute PlantUML.")
 
+(defcustom plantuml-server-url "http://www.plantuml.com/plantuml/"
+  "The PlantUML Server URL. Trailing slash is required.
+
+Default server uses plain HTTP, so be careful not to send sensitive data."
+  :type '(string))
+
+(defcustom plantuml-use-server nil
+  "Whether to use a PlantUML Server as a backend.
+
+The feature requires Python."
+  :type '(boolean))
+
 (eval-and-compile
   (defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
     "The parameters passed to `plantuml-java-command' when executing PlantUML."))
@@ -244,30 +256,59 @@ to choose where to display it:
   (let ((b (get-buffer plantuml-preview-buffer)))
     (when b
       (kill-buffer b)))
-
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
          (process-connection-type nil)
          (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
+    (if plantuml-use-server
+        (plantuml--preview-string-with-server prefix string imagep)
+      (let ((ps (plantuml-start-process buf)))
+        (process-send-string ps string)
+        (process-send-eof ps)
+        (set-process-sentinel ps
+                              (lambda (_ps event)
+                                (unless (equal event "finished\n")
+                                  (error "PLANTUML Preview failed: %s" event))
+                                (plantuml--switch-to-preview-buffer prefix imagep)))))))
 
-    (let ((ps (plantuml-start-process buf)))
-      (process-send-string ps string)
-      (process-send-eof ps)
-      (set-process-sentinel ps
-                            (lambda (_ps event)
-                              (unless (equal event "finished\n")
-                                (error "PLANTUML Preview failed: %s" event))
-                              (cond
-                               ((= prefix 16)
-                                (switch-to-buffer-other-frame plantuml-preview-buffer))
-                               ((= prefix 4)
-                                (switch-to-buffer-other-window plantuml-preview-buffer))
-                               (t (switch-to-buffer plantuml-preview-buffer)))
-                              (when imagep
-                                (image-mode)
-                                (set-buffer-multibyte t)))))))
+(defun plantuml--preview-string-with-server (prefix string imagep)
+  (let ((default-directory (file-name-directory (locate-library "plantuml-mode")))
+        (buffer (generate-new-buffer " *PlantUML Compress*")))
+    (let ((process (start-process "PLANTUML COMPRESS" buffer "python" "plantuml-compress.py")))
+      (set-process-sentinel process (lambda (ps _)
+                                      (plantuml--string-compress-handler ps prefix imagep)))
+      (process-send-string process (format "%s\n" string))
+      (process-send-eof process))))
+
+(defun plantuml--string-compress-handler (process prefix imagep)
+  (let ((exit-status (process-exit-status process)))
+    (unless (= 0 exit-status)
+      (error "PLANTUML Preview failed: compression failed with %d" exit-status))
+    (with-current-buffer (process-buffer process)
+      (url-retrieve (format "%s%s/%s" plantuml-server-url plantuml-output-type (buffer-string))
+                    (lambda (&rest _ignore)
+                      (delete-region (point-min)
+                                     (search-forward "\n\n"))
+                      (image-mode)
+                      (let ((result (buffer-string)))
+                        (with-current-buffer plantuml-preview-buffer
+                          (erase-buffer)
+                          (insert result)
+                          (setq buffer-read-only t)))
+                      (plantuml--switch-to-preview-buffer prefix imagep))))))
+
+(defun plantuml--switch-to-preview-buffer (prefix imagep)
+  (cond
+   ((= prefix 16)
+    (switch-to-buffer-other-frame plantuml-preview-buffer))
+   ((= prefix 4)
+    (switch-to-buffer-other-window plantuml-preview-buffer))
+   (t (switch-to-buffer plantuml-preview-buffer)))
+  (when imagep
+    (image-mode)
+    (set-buffer-multibyte t)))
 
 (defun plantuml-preview-buffer (prefix)
   "Preview diagram from the PlantUML sources in the current buffer.
