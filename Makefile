@@ -15,7 +15,7 @@ all: version test
 version:
 	$(EMACS) $(BATCH) --version
 
-test: install unit ecukes
+test: install unit
 
 unit:
 	${CASK} exec ert-runner
