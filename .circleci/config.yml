@@ -4,6 +4,8 @@ version: 2.0
 default: &default-steps
   steps:
     - checkout
+    - apt-get update
+    - apt-get install -y openjdk-8-jre
     - run: make
 
 # Enumerated list of Emacs versions
@@ -32,14 +34,6 @@ jobs:
         entrypoint: bash
     <<: *default-steps
 
-  coverage:
-    docker:
-      - image: silex/emacs:25
-        entrypoint: bash
-    steps:
-      - checkout
-      - run: make clean submit-coverage
-
 # Executing in parallel
 workflows:
   version: 2
@@ -49,9 +43,3 @@ workflows:
       - test-emacs-25
       - test-emacs-26
       - test-emacs-master
-      - coverage:
-          requires:
-          - test-emacs-24
-          - test-emacs-25
-          - test-emacs-26
-          - test-emacs-master
