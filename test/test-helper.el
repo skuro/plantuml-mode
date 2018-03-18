@@ -35,6 +35,10 @@
 (defun load-plantuml-mode ()
   (require 'plantuml-mode (f-expand "plantuml-mode.el" package-code-path)))
 
+(defun format-preview-output (s)
+  "Make the preview output as S more readable in test output."
+  (concat "\n" s))
+
 ;; enable code coverage
 (when (require 'undercover nil t)
   (undercover "plantuml-mode.el"))

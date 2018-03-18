@@ -27,4 +27,4 @@ clean:
 	rm -Rf .emacs.d
 	rm -Rf .cask
 
-.PHONY:	all test unit install clean
+.PHONY: all test unit install clean
