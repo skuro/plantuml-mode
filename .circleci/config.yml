@@ -4,8 +4,8 @@ version: 2.0
 default: &default-steps
   steps:
     - checkout
-    - apt-get update
-    - apt-get install -y openjdk-8-jre
+    - run: apt-get update
+    - run: apt-get install -y openjdk-8-jre
     - run: make
 
 # Enumerated list of Emacs versions
