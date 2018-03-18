@@ -1,17 +1,24 @@
-CASK ?= cask
-EMACS ?= emacs
-CASK_DIR ?= `${CASK} package-directory`
+#
+# Programs used in the make goals
+#
+export CASK ?= cask
+export EMACS ?= emacs
 
-all: test
+#
+# General configuration
+#
+export CASK_DIR ?= `${CASK} package-directory`
+export BATCH     = --batch -q -l .emacs/init.el
 
-test: unit ecukes
+all: version test
+
+version:
+	$(EMACS) $(BATCH) --version
+
+test: install unit ecukes
 
 unit:
 	${CASK} exec ert-runner
-
-# TODO: add BDD style tests
-#ecukes:
-#	${CASK} exec ecukes
 
 install:
 	${CASK} install
@@ -20,4 +27,4 @@ clean:
 	rm -Rf .emacs.d
 	rm -Rf .cask
 
-.PHONY:	all test unit ecukes install
+.PHONY:	all test unit install clean

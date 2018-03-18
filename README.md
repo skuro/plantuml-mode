@@ -1,4 +1,4 @@
-[![MELPA](http://melpa.org/packages/plantuml-mode-badge.svg)](http://melpa.org/#/plantuml-mode) [![MELPA Stable](http://stable.melpa.org/packages/plantuml-mode-badge.svg)](http://stable.melpa.org/#/plantuml-mode) [![Build Status](https://travis-ci.org/skuro/plantuml-mode.svg?branch=master)](https://travis-ci.org/skuro/plantuml-mode)
+[![MELPA](http://melpa.org/packages/plantuml-mode-badge.svg)](http://melpa.org/#/plantuml-mode) [![MELPA Stable](http://stable.melpa.org/packages/plantuml-mode-badge.svg)](http://stable.melpa.org/#/plantuml-mode) [![Build Status](https://travis-ci.org/skuro/plantuml-mode.svg?branch=master)](https://travis-ci.org/skuro/plantuml-mode) [![Coverage Status](https://coveralls.io/repos/github/skuro/plantuml-mode/badge.svg?branch=master)](https://coveralls.io/github/skuro/plantuml-mode?branch=master)
 
 
 # PlantUML mode for Emacs
