@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 1.2.3
+;; Version: 1.2.6
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.2.6, 2018-07-17 Introduced custom variable `plantuml-jar-args' to control which arguments are passed to PlantUML jar. Fix the warning of failing to specify types of 'defcustom' variables
 ;; version 1.2.5, 2017-08-19 #53 Fixed installation warnings
 ;; version 1.2.4, 2017-08-18 #60 Licensed with GPLv3+ to be compatible with Emacs
 ;; version 1.2.3, 2016-12-25 #50 unicode support in generated output
@@ -68,7 +69,9 @@
 
 (defcustom plantuml-jar-path
   (expand-file-name "~/plantuml.jar")
-  "The location of the PlantUML executable JAR.")
+  "The location of the PlantUML executable JAR."
+  :type 'string
+  :group 'plantuml)
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
@@ -85,18 +88,29 @@
   "Keymap for plantuml-mode.")
 
 (defcustom plantuml-java-command "java"
-  "The java command used to execute PlantUML.")
+  "The java command used to execute PlantUML."
+  :type 'string
+  :group 'plantuml)
 
-(eval-and-compile
-  (defcustom plantuml-java-args '("-Djava.awt.headless=true" "-jar")
-    "The parameters passed to `plantuml-java-command' when executing PlantUML."))
+
+(defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar")
+  "The parameters passed to `plantuml-java-command' when executing PlantUML."
+  :type '(repeat string)
+  :group 'plantuml)
+
+(defcustom plantuml-jar-args (list "-charset" "UTF-8" )
+  "The parameters passed to `plantuml.jar', when executing PlantUML."
+  :type '(repeat string)
+  :group 'plantuml)
 
 (defcustom plantuml-suppress-deprecation-warning t
-  "To silence the deprecation warning when `puml-mode' is found upon loading.")
+  "To silence the deprecation warning when `puml-mode' is found upon loading."
+  :type 'boolean
+  :group 'plantuml)
 
 (defun plantuml-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
-  (let* ((cmd-list (append plantuml-java-args (list (expand-file-name plantuml-jar-path)) arguments))
+  (let* ((cmd-list (append plantuml-java-args (list (expand-file-name plantuml-jar-path)) plantuml-jar-args arguments))
          (cmd (mapconcat 'identity cmd-list "|")))
     (plantuml-debug (format "Command is [%s]" cmd))
     cmd-list))
@@ -149,7 +163,7 @@
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
     (let ((cmd-args (append (list plantuml-java-command nil t nil)
-                            (plantuml-render-command "-charset" "UTF-8" "-language"))))
+                            (plantuml-render-command "-language"))))
       (apply 'call-process cmd-args)
       (goto-char (point-min)))
     (let ((found (search-forward ";" nil t))
@@ -233,7 +247,9 @@ default output type for new buffers."
                   plantuml-java-command
                   ,@plantuml-java-args
                   (expand-file-name plantuml-jar-path)
-                  (plantuml-output-type-opt) "-charset" "UTF-8" "-p"))
+                  (plantuml-output-type-opt)
+                  ,@plantuml-jar-args
+                   "-p"))
 
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
