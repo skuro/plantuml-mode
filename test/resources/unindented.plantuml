@@ -1,0 +1,70 @@
+/' This is a manual test for you to test different use-cases '/
+Nobody -> [APIGateway]
+
+package APackage {
+A -> B
+B -> A
+}
+
+package "APP Stack" {
+[APIGateway] --> [Lambda]
+}
+
+package haha {}
+
+package "Streams Stack" {
+database Kinesis
+[Lambda] --> Kinesis
+}
+
+package foo {
+package bar {
+foo --> bar
+}
+
+package bar {
+foo --> bar
+}
+
+}
+
+
+package "Roles And Policies" {
+[Lambda] --> [IAM Roles]
+[APIGateway] --> [IAM Roles]
+}
+
+package "SharedResources" {
+[Lambda] ----> [LambdaCodeBucket]
+
+note as N1
+This belongs to a separate set
+of resources we should clean up
+separately.
+end note
+}
+
+note right of Lambda
+This thing is end of life
+end note
+
+note left of Nobody
+There is no traffic coming
+into the service.
+end note
+
+
+@startuml
+
+participant API
+participant Instance
+
+alt deploy success
+Instance -> API: Deploy successful
+else deploy failure
+Instance -> API: Deploy failed
+else deploy timeout
+Instance -> API: Deploy failed
+end
+
+@enduml
