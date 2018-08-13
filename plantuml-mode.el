@@ -393,7 +393,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 
       (if (= -2 relative-depth)
           0
-        (+ 2 (current-indentation))))))
+        (+ tab-width (current-indentation))))))
 
 (defun plantuml-indent-line ()
   (interactive)
@@ -403,7 +403,7 @@ Uses prefix (as PREFIX) to choose where to display it:
         (indent-line-to 0)
       (let ((offset (plantuml-current-block-indentation)))
         (when (looking-at plantuml-indent-regexp-end)
-          (setq offset (max (- offset 2) 0)))
+          (setq offset (max (- offset tab-width) 0)))
         (indent-line-to offset)))))
 
 
