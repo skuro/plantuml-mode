@@ -397,13 +397,14 @@ Uses prefix (as PREFIX) to choose where to display it:
 
 (defun plantuml-indent-line ()
   (interactive)
-  (beginning-of-line)
-  (if (bobp)
-      (indent-line-to 0)
-    (let ((offset (plantuml-current-block-indentation)))
-      (when (looking-at plantuml-indent-regexp-end)
-        (setq offset (max (- offset 2) 0)))
-      (indent-line-to offset))))
+  (save-excursion
+    (beginning-of-line)
+    (if (bobp)
+        (indent-line-to 0)
+      (let ((offset (plantuml-current-block-indentation)))
+        (when (looking-at plantuml-indent-regexp-end)
+          (setq offset (max (- offset 2) 0)))
+        (indent-line-to offset)))))
 
 
 ;;;###autoload
