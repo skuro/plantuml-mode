@@ -383,7 +383,6 @@ Uses prefix (as PREFIX) to choose where to display it:
   (save-excursion
     (let ((relative-depth 0))
       (while (>= relative-depth 0)
-        ;; (message (concat "got: " (number-to-string relative-depth)))
         (forward-line -1)
         (if (bobp)
             (setq relative-depth -2))   ;end fast
