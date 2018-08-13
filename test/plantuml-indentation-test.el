@@ -27,7 +27,6 @@ values of customisable variables."
   (let ((fname (intern (format "indentation/%s" description))))
     `(ert-deftest ,fname ()
        (let* ((after ,after)
-              (clojure-indent-style :always-align)
               (expected-cursor-pos (1+ (s-index-of "|" after)))
               (expected-state (delete ?| after))
               ,@var-bindings)
