@@ -340,6 +340,8 @@ Uses prefix (as PREFIX) to choose where to display it:
     (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
     (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
     (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
+    (defvar plantuml-indent-regexp-start "^[ \t]*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\\|alt\\|else\\|note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:buttom\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\|\\(?:class\\|enum\\|package\\)\s+.*{\\)")
+    (defvar plantuml-indent-regexp-end "^[ \t]*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\)")
 
     (setq plantuml-font-lock-keywords
           `(
@@ -390,6 +392,38 @@ Uses prefix (as PREFIX) to choose where to display it:
                 (all-completions meat plantuml-kwdList)))
              (message "Making completion list...%s" "done")))))
 
+
+;; indentation
+
+
+(defun plantuml-current-block-indentation ()
+  (save-excursion
+    (let ((relative-depth 0))
+      (while (>= relative-depth 0)
+        (forward-line -1)
+        (if (bobp)
+            (setq relative-depth -2))   ;end fast
+        (if (looking-at plantuml-indent-regexp-end)
+            (setq relative-depth (1+ relative-depth)))
+        (if (looking-at plantuml-indent-regexp-start)
+            (setq relative-depth (1- relative-depth))))
+
+      (if (= -2 relative-depth)
+          0
+        (+ tab-width (current-indentation))))))
+
+(defun plantuml-indent-line ()
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (if (bobp)
+        (indent-line-to 0)
+      (let ((offset (plantuml-current-block-indentation)))
+        (when (looking-at plantuml-indent-regexp-end)
+          (setq offset (max (- offset tab-width) 0)))
+        (indent-line-to offset)))))
+
+
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.\\(plantuml\\|pum\\|plu\\)\\'" . plantuml-mode))
 
@@ -406,6 +440,7 @@ Shortcuts             Command Name
   (set (make-local-variable 'comment-end) "'/")
   (set (make-local-variable 'comment-multi-line) t)
   (set (make-local-variable 'comment-style) 'extra-line)
+  (set (make-local-variable 'indent-line-function) 'plantuml-indent-line)
   (setq font-lock-defaults '((plantuml-font-lock-keywords) nil t)))
 
 (defun plantuml-deprecation-warning ()
