@@ -47,4 +47,5 @@ workflows:
     jobs:
       - test-emacs-25
       - test-emacs-26
-      - test-emacs-master
+      # Testing against master currently hangs on CircleCI
+      #- test-emacs-master
