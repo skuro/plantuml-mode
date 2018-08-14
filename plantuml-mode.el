@@ -2,11 +2,12 @@
 
 ;; Filename: plantuml-mode.el
 ;; Description: Major mode for PlantUML diagrams sources
-;; Compatibility: Tested with Emacs 24.3 through 24.5 on OS X 10.10
+;; Compatibility: Tested with Emacs 25 through 27 (current master)
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
 ;; Version: 1.2.6
+;; Package-Requires: ((emacs "25.0"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
