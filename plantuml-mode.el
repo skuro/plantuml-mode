@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 1.2.6
+;; Version: 1.2.7
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.2.7, 2018-08-15 Fixed the comiling error when installing with melpa
 ;; version 1.2.6, 2018-07-17 Introduced custom variable `plantuml-jar-args' to control which arguments are passed to PlantUML jar. Fix the warning of failing to specify types of 'defcustom' variables
 ;; version 1.2.5, 2017-08-19 #53 Fixed installation warnings
 ;; version 1.2.4, 2017-08-18 #60 Licensed with GPLv3+ to be compatible with Emacs
@@ -75,7 +76,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.2.3" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.2.7" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
@@ -92,16 +93,18 @@
   :type 'string
   :group 'plantuml)
 
+(eval-and-compile
+  (defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar")
+    "The parameters passed to `plantuml-java-command' when executing PlantUML."
+    :type '(repeat string)
+    :group 'plantuml))
 
-(defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar")
-  "The parameters passed to `plantuml-java-command' when executing PlantUML."
-  :type '(repeat string)
-  :group 'plantuml)
 
-(defcustom plantuml-jar-args (list "-charset" "UTF-8" )
-  "The parameters passed to `plantuml.jar', when executing PlantUML."
-  :type '(repeat string)
-  :group 'plantuml)
+(eval-and-compile
+  (defcustom plantuml-jar-args (list "-charset" "UTF-8" )
+    "The parameters passed to `plantuml.jar', when executing PlantUML."
+    :type '(repeat string)
+    :group 'plantuml))
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
