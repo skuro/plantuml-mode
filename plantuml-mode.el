@@ -6,7 +6,7 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 1.2.6
+;; Version: 1.2.7
 ;; Package-Requires: ((emacs "25.0"))
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.2.7, 2018-08-15 Fixed the comiling error when installing with melpa
 ;; version 1.2.6, 2018-07-17 Introduced custom variable `plantuml-jar-args' to control which arguments are passed to PlantUML jar. Fix the warning of failing to specify types of 'defcustom' variables
 ;; version 1.2.5, 2017-08-19 #53 Fixed installation warnings
 ;; version 1.2.4, 2017-08-18 #60 Licensed with GPLv3+ to be compatible with Emacs
@@ -76,7 +77,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.2.3" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.2.7" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
@@ -93,16 +94,18 @@
   :type 'string
   :group 'plantuml)
 
+(eval-and-compile
+  (defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar")
+    "The parameters passed to `plantuml-java-command' when executing PlantUML."
+    :type '(repeat string)
+    :group 'plantuml))
 
-(defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar")
-  "The parameters passed to `plantuml-java-command' when executing PlantUML."
-  :type '(repeat string)
-  :group 'plantuml)
 
-(defcustom plantuml-jar-args (list "-charset" "UTF-8" )
-  "The parameters passed to `plantuml.jar', when executing PlantUML."
-  :type '(repeat string)
-  :group 'plantuml)
+(eval-and-compile
+  (defcustom plantuml-jar-args (list "-charset" "UTF-8" )
+    "The parameters passed to `plantuml.jar', when executing PlantUML."
+    :type '(repeat string)
+    :group 'plantuml))
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
@@ -250,7 +253,7 @@ default output type for new buffers."
                   (expand-file-name plantuml-jar-path)
                   (plantuml-output-type-opt)
                   ,@plantuml-jar-args
-                   "-p"))
+                  "-p"))
 
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
@@ -304,9 +307,9 @@ Uses prefix (as PREFIX) to choose where to display it:
 - else -> new buffer"
   (interactive "p\nr")
   (plantuml-preview-string prefix (concat "@startuml\n"
-                                      (buffer-substring-no-properties
-                                       begin end)
-                                      "\n@enduml")))
+                                          (buffer-substring-no-properties
+                                           begin end)
+                                          "\n@enduml")))
 
 (defun plantuml-preview-current-block (prefix)
   "Preview diagram from the PlantUML sources from the previous @startuml to the next @enduml.
@@ -330,7 +333,7 @@ Uses prefix (as PREFIX) to choose where to display it:
   (interactive "p")
   (if mark-active
       (plantuml-preview-region prefix (region-beginning) (region-end))
-      (plantuml-preview-buffer prefix)))
+    (plantuml-preview-buffer prefix)))
 
 (defun plantuml-init-once ()
   "Ensure initialization only happens once."
