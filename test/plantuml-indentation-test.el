@@ -10,6 +10,44 @@
 
 ;;; Code:
 
+(defun add-text-and-position-cursor (txt)
+  "Add TXT into the buffer, move cursor to the position of the marker | and delete the marker."
+  (insert txt)
+  (goto-char (point-min))
+  (search-forward "|")
+  (delete-char -1))
+
+(defun assert-block-depth (expected txt)
+  "Assert the EXPECTED indentation level for the given TXT."
+  (with-temp-buffer
+    (add-text-and-position-cursor txt)
+    (let ((actual (plantuml-current-block-depth)))
+      (should (equal expected actual)))))
+
+(ert-deftest test-plantuml-current-block-depth ()
+  (setq-local plantuml-jar-path plantuml-test-jar-path)
+  (plantuml-init-once)
+
+  (assert-block-depth 0 "
+A |-> B")
+
+  (assert-block-depth 0 "
+pac|kage Foo {
+A -> B
+}")
+
+  (assert-block-depth 1 "
+package APackage {
+|A -> B
+}")
+
+
+  (assert-block-depth 1 "
+alt choice 1
+|A -> B
+end
+"))
+
 ;; This is taken from https://github.com/clojure-emacs/clojure-mode/blob/master/test/clojure-mode-indentation-test.el
 (defmacro check-indentation (description before after &optional var-bindings)
   "Declare an ert test for indentation behaviour.
@@ -36,11 +74,12 @@ values of customisable variables."
            (setq-local plantuml-jar-path plantuml-test-jar-path)
            (plantuml-init-once)
 
-           (insert ,before)
-           (goto-char (point-min))
-           (search-forward "|")
-           (delete-char -1)
+           (add-text-and-position-cursor ,before)
            (plantuml-mode)
+
+           ;; use 2 spaces instead of one tab for indentation
+           (setq-local indent-tabs-mode nil)
+           (setq-local tab-width 2)
            (indent-according-to-mode)
 
            (should (equal expected-state (buffer-string)))
@@ -53,7 +92,8 @@ values of customisable variables."
 (check-indentation package-block
                    "package APackage {
 |A -> B
-}" "package APackage {
+}"
+                   "package APackage {
   |A -> B
 }")
 

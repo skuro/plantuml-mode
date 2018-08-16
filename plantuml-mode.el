@@ -396,32 +396,41 @@ Uses prefix (as PREFIX) to choose where to display it:
 ;; indentation
 
 
-(defun plantuml-current-block-indentation ()
+(defun plantuml-current-block-depth ()
+  "Trace the current block indentation level by recursively looking back line by line."
   (save-excursion
     (let ((relative-depth 0))
-      (while (>= relative-depth 0)
-        (forward-line -1)
+      (beginning-of-line)
+      (forward-line -1)
+      (setq bob-visited? nil)
+      (while (and (>= relative-depth 0)
+                  (not bob-visited?))
         (if (bobp)
-            (setq relative-depth -2))   ;end fast
+            (setq bob-visited? t))
         (if (looking-at plantuml-indent-regexp-end)
-            (setq relative-depth (1+ relative-depth)))
+            (setq relative-depth (1- relative-depth)))
         (if (looking-at plantuml-indent-regexp-start)
-            (setq relative-depth (1- relative-depth))))
+            (setq relative-depth (1+ relative-depth)))
+        (forward-line -1))
 
-      (if (= -2 relative-depth)
+      (if (<= relative-depth 0)
           0
-        (+ tab-width (current-indentation))))))
+        relative-depth))))
 
 (defun plantuml-indent-line ()
+  "Indent the current line to its desired indentation level."
   (interactive)
-  (save-excursion
-    (beginning-of-line)
-    (if (bobp)
-        (indent-line-to 0)
-      (let ((offset (plantuml-current-block-indentation)))
-        (when (looking-at plantuml-indent-regexp-end)
-          (setq offset (max (- offset tab-width) 0)))
-        (indent-line-to offset)))))
+  (let ((original-indentation (current-indentation)))
+    (save-excursion
+      (beginning-of-line)
+      (if (bobp)
+          (indent-line-to 0)
+        (let ((depth (plantuml-current-block-depth)))
+          (when (looking-at plantuml-indent-regexp-end)
+            (setq depth (max (1- depth) 0)))
+          (indent-line-to (* tab-width depth)))))
+    (forward-char (- (current-indentation)
+                     original-indentation))))
 
 
 ;;;###autoload
