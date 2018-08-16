@@ -31,6 +31,11 @@ values of customisable variables."
               (expected-state (delete ?| after))
               ,@var-bindings)
          (with-temp-buffer
+           ;; fix the JAR location prior to mode initialization
+           ;; for some reason, plantuml-mode disregards the setq-local
+           (setq-local plantuml-jar-path plantuml-test-jar-path)
+           (plantuml-init-once)
+
            (insert ,before)
            (goto-char (point-min))
            (search-forward "|")
@@ -46,7 +51,7 @@ values of customisable variables."
   "|Nobody -> [APIGateway]")
 
 (check-indentation package-block
-  "package APackage {
+                   "package APackage {
 |A -> B
 }" "package APackage {
   |A -> B
