@@ -107,7 +107,16 @@ With debug enabled, the actual command used to invoke PlantUML is printed into a
 
 ## Blank previews
 
-If you are using SVG rendering and `plantuml-preview` shows you an empty buffer, chances are something is wrong with the PlantUML output. While inside the preview buffer, hit `C-c C-c` to switch to the textual mode and see if the output is valid SVG.
+If you are using SVG rendering and `plantuml-preview` shows you an empty buffer, chances are something is wrong with the PlantUML output. While inside the preview buffer, hit `C-c C-c` to switch to
+the textual mode and see if the output is valid SVG.
+
+## Development
+
+In order to contribute to `plantuml-mode` make sure to:
+
+- agree with the [GPLv3+ licencing terms](#License) as they are mandated by Emacs
+- install [`cask`](https://github.com/cask/cask)
+- always test your code and run the full test suite with `cask exec ert-runner` (or just by `make`)
 
 # Credits
 
@@ -115,6 +124,9 @@ This project stemmed from the great work of [Zhang Weize](http://zhangweize.word
 and the current code still borrows a lot from it.
 
 Thanks to [Pavel G. Koukoushkin](https://github.com/svargellin) for implementing the preview functionality.
+Thanks to [Raymond Huang](https://github.com/rymndhng) for implementing the first drop of the indentation support.
+
+Thanks to [all the awesome contributors](https://github.com/skuro/plantuml-mode/graphs/contributors), you rock!
 
 # See also
 
