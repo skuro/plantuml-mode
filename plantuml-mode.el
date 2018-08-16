@@ -398,11 +398,14 @@ Uses prefix (as PREFIX) to choose where to display it:
 
 (defun plantuml-current-block-depth ()
   "Trace the current block indentation level by recursively looking back line by line."
+  ;; forward declare the lazy initialized constants
+  (defvar plantuml-indent-regexp-start)
+  (defvar plantuml-indent-regexp-end)
   (save-excursion
-    (let ((relative-depth 0))
+    (let ((relative-depth 0)
+          (bob-visited? nil))
       (beginning-of-line)
       (forward-line -1)
-      (setq bob-visited? nil)
       (while (and (>= relative-depth 0)
                   (not bob-visited?))
         (if (bobp)
@@ -420,6 +423,9 @@ Uses prefix (as PREFIX) to choose where to display it:
 (defun plantuml-indent-line ()
   "Indent the current line to its desired indentation level."
   (interactive)
+  ;; forward declare the lazy initialized constants
+  (defvar plantuml-indent-regexp-start)
+  (defvar plantuml-indent-regexp-end)
   (let ((original-indentation (current-indentation)))
     (save-excursion
       (beginning-of-line)
