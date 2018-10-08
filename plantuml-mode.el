@@ -343,7 +343,7 @@ Uses prefix (as PREFIX) to choose where to display it:
     (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
     (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
     (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
-    (defvar plantuml-indent-regexp-start "^[ \t]*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\\|alt\\|else\\|note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:buttom\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\|\\(?:class\\|enum\\|package\\)\s+.*{\\)")
+    (defvar plantuml-indent-regexp-start "^[ \t]*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if[ \t]\\|alt\\|else\\|note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:buttom\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\|\\(?:class\\|enum\\|package\\)\s+.*{\\)")
     (defvar plantuml-indent-regexp-end "^[ \t]*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\)")
 
     (setq plantuml-font-lock-keywords
