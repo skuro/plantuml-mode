@@ -194,17 +194,22 @@ else
 |end
 ")
 
-(check-indentation alt-else-body
-  "alt choice 1
-else
-|A -> B
-end
-"
-  "alt choice 1
-else
-  |A -> B
-end
-")
+(check-indentation opt
+  "opt have fun
+|some text
+end"
+  "opt have fun
+  |some text
+end")
+
+(check-indentation activate-deactivate
+  "activate participant_1
+|participant_1 -> participant_2 : f()
+deactivate participant_1"
+  "activate participant_1
+  |participant_1 -> participant_2 : f()
+deactivate participant_1")
+
 
 (provide 'plantuml-indentation-test)
 
