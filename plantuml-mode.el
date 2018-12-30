@@ -343,8 +343,8 @@ Uses prefix (as PREFIX) to choose where to display it:
     (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
     (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
     (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
-    (defvar plantuml-indent-regexp-start "^[ \t]*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\s+.*\\|loop\s+.*\\|group\s+.*\\|par\s+\\|opt\s+.*\\|alt\s+.*\\|else\\|note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:buttom\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\|\\(?:class\\|enum\\|package\\)\s+.*{\\|activate\s+.*\\)")
-    (defvar plantuml-indent-regexp-end "^[ \t]*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\|deactivate\s+.*\\)")
+    (defvar plantuml-indent-regexp-start "^[ \t]*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\s+.*\\|loop\s+.*\\|group\s+.*\\|par\s+\\|opt\s+.*\\|alt\s+.*\\|else\\|note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:buttom\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\|\\(?:class\\|enum\\|package\\)\s+.*{\\|activate\s+.+\\)")
+    (defvar plantuml-indent-regexp-end "^[ \t]*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\|deactivate\s+.+\\)")
 
     (setq plantuml-font-lock-keywords
           `(
@@ -405,40 +405,39 @@ Uses prefix (as PREFIX) to choose where to display it:
   (defvar plantuml-indent-regexp-start)
   (defvar plantuml-indent-regexp-end)
   (save-excursion
-    (let ((relative-depth 0)
-          (bob-visited? nil))
+    (let ((relative-depth 0))
+      ;; current line
       (beginning-of-line)
-      (forward-line -1)
-      (while (not bob-visited?)
-        (if (bobp)
-            (setq bob-visited? t))
+      (if (looking-at plantuml-indent-regexp-end)
+          (setq relative-depth (1- relative-depth)))
+
+      ;; from current line backwards to beginning of buffer
+      (while (not (bobp))
+        (forward-line -1)
         (if (looking-at plantuml-indent-regexp-end)
             (setq relative-depth (1- relative-depth)))
         (if (looking-at plantuml-indent-regexp-start)
-            (setq relative-depth (1+ relative-depth)))
-        (forward-line -1))
+            (setq relative-depth (1+ relative-depth))))
 
       (if (<= relative-depth 0)
           0
         relative-depth))))
 
 (defun plantuml-indent-line ()
-  "Indent the current line to its desired indentation level."
+  "Indent the current line to its desired indentation level.
+Restore point to same position in text of the line as before indentation."
   (interactive)
   ;; forward declare the lazy initialized constants
   (defvar plantuml-indent-regexp-start)
   (defvar plantuml-indent-regexp-end)
-  (let ((original-indentation (current-indentation)))
+  ;; store position of point in line measured from end of line
+  (let ((original-position-eol (- (line-end-position) (point))))
     (save-excursion
       (beginning-of-line)
-      (if (bobp)
-          (indent-line-to 0)
-        (let ((depth (plantuml-current-block-depth)))
-          (when (looking-at plantuml-indent-regexp-end)
-            (setq depth (max (1- depth) 0)))
-          (indent-line-to (* tab-width depth)))))
-    (forward-char (- (current-indentation)
-                     original-indentation))))
+      (indent-line-to (* tab-width (plantuml-current-block-depth))))
+
+    ;; restore position in text of line
+    (goto-char (- (line-end-position) original-position-eol))))
 
 
 ;;;###autoload
