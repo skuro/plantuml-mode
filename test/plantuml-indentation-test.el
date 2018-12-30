@@ -143,224 +143,138 @@ deactivate p1
 |")
   )
 
-;; This is taken from https://github.com/clojure-emacs/clojure-mode/blob/master/test/clojure-mode-indentation-test.el
-(defmacro plantuml-test-line-indentation (description before after &optional var-bindings)
-  "Declare an ert test for line indentation behaviour.
-The test will check that the swift indentation command changes the buffer
-from one state to another.  It will also test that point is moved to an
-expected position.
-DESCRIPTION is a symbol describing the test.
-BEFORE is the buffer string before indenting, where a pipe (|) represents
-point.
-AFTER is the expected buffer string after indenting, where a pipe (|)
-represents the expected position of point.
-VAR-BINDINGS is an optional let-bindings list.  It can be used to set the
-values of customisable variables."
+(defun plantuml-test-indent-line (before after)
+  "The common code for the line indentation tests.
 
-  (declare (indent 1))
-  (let ((fname (intern (format "plantuml-test-line-indentation/%s" description))))
-    `(ert-deftest ,fname ()
-       (let* ((after ,after)
-              (expected-cursor-pos (1+ (s-index-of "|" after)))
-              (expected-state (delete ?| after))
-              ,@var-bindings)
-         (with-temp-buffer
-           ;; fix the JAR location prior to mode initialization
-           ;; for some reason, plantuml-mode disregards the setq-local
-           (setq-local plantuml-jar-path plantuml-test-jar-path)
-           (plantuml-init-once)
+BEFORE is the text to be inserted into a temporary buffer.
+AFTER is the expected text after indentation.
 
-           (plantuml-test-add-text-and-position-cursor ,before)
-           (plantuml-mode)
+Both, BEFORE and AFTER need to specify point with char |. The
+temporary buffer will be put into `plantuml-mode', the char |
+representing point will be removed from text. The line with the
+removed | will be indented (just this line!) with two spaces for each
+level of indentation.
 
-           ;; use 2 spaces instead of one tab for indentation
-           (setq-local indent-tabs-mode nil)
-           (setq-local tab-width 2)
-           (indent-according-to-mode)
+Finally,
+1) the indented line will be compared with the same line in AFTER
+2) the position of point in the indented line will be compared with
+the position of | in AFTER."
 
-           (should (equal expected-state (buffer-string)))
-           (should (equal expected-cursor-pos (point))))))))
+  (let* ( (expected-cursor-pos (1+ (s-index-of "|" after)))
+          (expected-state (delete ?| after))
+          )
+    (with-temp-buffer
+      ;; fix the JAR location prior to mode initialization
+      ;; for some reason, plantuml-mode disregards the setq-local
+      (setq-local plantuml-jar-path plantuml-test-jar-path)
+      (plantuml-init-once)
 
-(plantuml-test-line-indentation toplevel-relationship
-  "|Nobody -> [APIGateway]"
-  "|Nobody -> [APIGateway]")
+      (plantuml-test-add-text-and-position-cursor before)
+      (plantuml-mode)
 
-(plantuml-test-line-indentation package-block
-  "package APackage {
-|A -> B
-}"
-  "package APackage {
-  |A -> B
-}")
+      ;; use 2 spaces instead of one tab for indentation
+      (setq-local indent-tabs-mode nil)
+      (setq-local tab-width 2)
+      (indent-according-to-mode)
 
-(plantuml-test-line-indentation nested-package
-  "package APackage {
-|package AnotherPackage {
-}
-}"
-  "package APackage {
-  |package AnotherPackage {
-}
-}")
+      (should (equal expected-state (buffer-string)))
+      (should (equal expected-cursor-pos (point))))))
 
-(plantuml-test-line-indentation empty-package
-  "|package Foo {}"
-  "|package Foo {}")
+(ert-deftest plantuml-test-line-indentation/empty-line-l0 ()
+  "Test correct indentation of empty line - indentation level 0."
+  (plantuml-test-indent-line "|" "|"))
 
-(plantuml-test-line-indentation relative-indent
-  "package APackage {
-database Foo
-|A --> B
-}
-}"
-  "package APackage {
-database Foo
-  |A --> B
-}
-}"
-  )
+(ert-deftest plantuml-test-line-indentation/bol-notindent-l0 ()
+  "Test correct indentation of a not indented line with point at beginning of line - indentation level 0."
+  (plantuml-test-indent-line "|participant A"
+                             "|participant A"))
 
-(plantuml-test-line-indentation note-as
-  "note as N1
-|This is a note
-end note"
-  "note as N1
-  |This is a note
-end note"
-  )
+(ert-deftest plantuml-test-line-indentation/mol-notindent-l0 ()
+  "Test correct indentation of a not indented line with point at middle of line - indentation level 0."
+  (plantuml-test-indent-line "parti|cipant"
+                             "parti|cipant"))
 
-(plantuml-test-line-indentation note-of
-  "note right of Foo
-|This is a note
-end note"
-  "note right of Foo
-  |This is a note
-end note"
-  )
+(ert-deftest plantuml-test-line-indentation/eol-notindent-l0 ()
+  "Test correct indentation of a not indented line with point at end of line - indentation level 0."
+  (plantuml-test-indent-line "participant A|"
+                             "participant A|"))
 
-(plantuml-test-line-indentation alt
-                                      "alt choice 1
-|A -> B
-end
-"
-                                      "alt choice 1
-  |A -> B
-end
-")
+(ert-deftest plantuml-test-line-indentation/bol-indented-l0 ()
+  "Test correct indentation of an indented line with point at beginning of line - indentation level 0."
+  (plantuml-test-indent-line "          |participant A"
+                             "|participant A"))
 
-(plantuml-test-line-indentation alt-end
-                                "alt choice 1
-  A -> B
-|end
-"
-                                "alt choice 1
-  A -> B
-|end
-")
+(ert-deftest plantuml-test-line-indentation/mol-indented-l0 ()
+  "Test correct indentation of an indented line with point at middle of line - indentation level 0."
+  (plantuml-test-indent-line "          parti|cipant"
+                             "parti|cipant"))
 
-(plantuml-test-line-indentation alt-else
-                                "alt choice 1
-|else
-end
-"
-                                "alt choice 1
-|else
-end
-")
+(ert-deftest plantuml-test-line-indentation/eol-indented-l0 ()
+  "Test correct indentation of an indented line with point at end of line - indentation level 0."
+  (plantuml-test-indent-line "          participant A|"
+                             "participant A|"))
 
-(plantuml-test-line-indentation alt-else-body
-                                "alt choice 1
-else
-|A -> B
-end
-"
-                                "alt choice 1
-else
-  |A -> B
-end
-")
+(ert-deftest plantuml-test-line-indentation/empty-line-l1 ()
+  "Test correct indentation of empty line - indentation level 1."
+  (plantuml-test-indent-line
+   "opt A
+|"
+   "opt A
+  |"))
 
-(plantuml-test-line-indentation alt-else-end
-                                "alt choice 1
-else
-|end
-"
-                                "alt choice 1
-else
-|end
-")
+(ert-deftest plantuml-test-line-indentation/bol-notindent-l1 ()
+  "Test correct indentation of a not indented line with point at beginning of line - indentation level 1."
+  (plantuml-test-indent-line "opt A
+|foofoo"
+                             "opt A
+  |foofoo"))
 
-(plantuml-test-line-indentation opt-body
-                                "opt have fun
-|some text
-end"
-                                "opt have fun
-  |some text
-end")
+(ert-deftest plantuml-test-line-indentation/mol-notindent-l1 ()
+  "Test correct indentation of a not indented line with point at middle of line - indentation level 1."
+  (plantuml-test-indent-line "opt A
+foo|foo"
+                             "opt A
+  foo|foo"))
 
-(plantuml-test-line-indentation opt-end
-                                "opt have fun
-  some text
-|end"
-                                "opt have fun
-  some text
-|end")
+(ert-deftest plantuml-test-line-indentation/eol-notindent-l1 ()
+  "Test correct indentation of a not indented line with point at end of line - indentation level 1."
+  (plantuml-test-indent-line "opt A
+foofoo|"
+                             "opt A
+  foofoo|"))
 
-(plantuml-test-line-indentation activate-activate
-                                "
-|activate participant_1
-"
-                                "
-|activate participant_1
-")
+(ert-deftest plantuml-test-line-indentation/bol-indented-l1 ()
+  "Test correct indentation of an indented line with point at beginning of line - indentation level 1."
+  (plantuml-test-indent-line "            opt A
+                              |foofoo"
+                             "            opt A
+  |foofoo"))
 
-(plantuml-test-line-indentation activate-body
-                                "
-activate participant_1
-|participant_1 -> participant_2 : f()
-"
+(ert-deftest plantuml-test-line-indentation/mol-indented-l1 ()
+  "Test correct indentation of an indented line with point at middle of line - indentation level 1."
+  (plantuml-test-indent-line "   opt A
+                                        foo|foo"
+                             "   opt A
+  foo|foo"))
 
-                                "
-activate participant_1
-  |participant_1 -> participant_2 : f()
-")
+(ert-deftest plantuml-test-line-indentation/eol-indented-l1 ()
+  "Test correct indentation of an indented line with point at end of line - indentation level 1."
+  (plantuml-test-indent-line "               opt A
+                                                          foofoo|"
+                             "               opt A
+  foofoo|"))
 
-(plantuml-test-line-indentation activate-deactivate
-                                "
-activate participant_1
-  participant_1 -> participant_2 : f()
-|deactivate participant_1"
 
-                                "
-activate participant_1
-  participant_1 -> participant_2 : f()
-|deactivate participant_1")
+(defun plantuml-test-indent-block (before after)
+  "The common code for the block indentation tests.
 
-(plantuml-test-line-indentation activate-deactivate-2
-                                "
-               activate participant_1
-participant_1 -> participant_2 : f()
-            |deactivate participant_1"
-                                "
-               activate participant_1
-participant_1 -> participant_2 : f()
-|deactivate participant_1")
+BEFORE is the text block to be inserted into a temporary buffer.
+AFTER is the expected text block after indentation.
 
-(plantuml-test-line-indentation activate-deactivate-3
-                                "
-               activate participant_1
-participant_1 -> participant_2 : f()
-            deactivate| participant_1"
-                                "
-               activate participant_1
-participant_1 -> participant_2 : f()
-deactivate| participant_1")
+The temporary buffer will be put into `plantuml-mode'. The whole buffer
+will be indented with two spaces for each level of indentation.
 
-(defun plantuml-test-indent-block (textblock)
-  "Test helper for `plantuml-mode' indentation tests.
-TEXTBLOCK will be inserted into a new temporary plantuml buffer. The
-whole text will be indented according to the mode. Then, the buffer
-contents is returned as a string."
+Finally, the indented text in the buffer will be compared with AFTER."
 
   (with-temp-buffer
     ;; fix the JAR location prior to mode initialization
@@ -368,7 +282,7 @@ contents is returned as a string."
     (setq-local plantuml-jar-path plantuml-test-jar-path)
     (plantuml-init-once)
 
-    (insert textblock)
+    (insert before)
     (goto-char (point-min))
     (plantuml-mode)
     ;; use 2 spaces instead of one tab for indentation
@@ -376,30 +290,218 @@ contents is returned as a string."
     (setq-local tab-width 2)
 
     (indent-region (point-min) (point-max))
-    (buffer-string)
+    (should (equal (buffer-string) after))
     ))
 
-(ert-deftest plantuml-test-block-indentation/activate-deactivate-unindented ()
-  "test"
-  (should (equal (plantuml-test-indent-block   "
-activate participant_1
-participant_1 -> participant_2 : f()
-deactivate participant_1")
-                 "
-activate participant_1
-  participant_1 -> participant_2 : f()
-deactivate participant_1")))
+(ert-deftest plantuml-test-block-indentation/package-empty ()
+  "Test correct indentation of an empty package block."
+  (plantuml-test-indent-block
+   "
+package APackage ()
+"
+   "
+package APackage ()
+"))
 
-(ert-deftest plantuml-test-block-indentation/activate-deactivate-malformed-indent ()
-  "test"
-  (should (equal (plantuml-test-indent-block   "
-               activate participant_1
+(ert-deftest plantuml-test-block-indentation/package ()
+  "Test correct indentation of a package block."
+  (plantuml-test-indent-block
+   "
+package APackage {
+A -> B
+}
+"
+   "
+package APackage {
+  A -> B
+}
+"))
+
+(ert-deftest plantuml-test-block-indentation/package-database-nested ()
+  "Test correct indentation of two nested blocks, a package and a database.
+Note: currently the inner database is not indented."
+  (plantuml-test-indent-block
+   "
+package APackage {
+  database ADatabase {
+    A -> B
+  }
+}
+"
+   "
+package APackage {
+  database ADatabase {
+    A -> B
+  }
+}
+"))
+
+(ert-deftest plantuml-test-block-indentation/alt-end ()
+  "Test correct indentation of an alt-end block."
+  (plantuml-test-indent-block
+   "
+alt choice 1
+A -> B
+end
+"
+   "
+alt choice 1
+  A -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/alt-else-end ()
+  "Test correct indentation of an alt-else-end block."
+  (plantuml-test-indent-block
+   "
+alt choice 1
+A -> B
+else
+B -> C
+end
+"
+   "
+alt choice 1
+  A -> B
+else
+  B -> C
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/opt ()
+  "Test correct indentation of an opt block."
+  (plantuml-test-indent-block
+   "
+opt event triggered
+A -> B
+end
+"
+   "
+opt event triggered
+  A -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/par ()
+  "Test correct indentation of a par block."
+  (plantuml-test-indent-block
+   "
+par
+A -> B
+else
+C -> B
+end
+"
+   "
+par
+  A -> B
+else
+  C -> B
+end
+" ))
+
+
+(ert-deftest plantuml-test-block-indentation/alt-else-loop-group ()
+  "Test correct indentation of combination of alt-else, loop and group.
+
+This is taken from the plantuml homepage."
+  (plantuml-test-indent-block
+   "
+Alice -> Bob: Authentication Request
+
+alt successful case
+
+Bob -> Alice: Authentication Accepted
+
+else some kind of failure
+
+Bob -> Alice: Authentication Failure
+group My own label
+Alice -> Log : Log attack start
+loop 1000 times
+Alice -> Bob: DNS Attack
+end
+Alice -> Log : Log attack end
+end
+
+else Another type of failure
+
+Bob -> Alice: Please repeat
+
+end
+"
+   "
+Alice -> Bob: Authentication Request
+
+alt successful case
+
+  Bob -> Alice: Authentication Accepted
+
+else some kind of failure
+
+  Bob -> Alice: Authentication Failure
+  group My own label
+    Alice -> Log : Log attack start
+    loop 1000 times
+      Alice -> Bob: DNS Attack
+    end
+    Alice -> Log : Log attack end
+  end
+
+else Another type of failure
+
+  Bob -> Alice: Please repeat
+
+end
+"))
+
+
+(ert-deftest plantuml-test-block-indentation/note-as ()
+  "Test correct indentation of a note-as block."
+  (plantuml-test-indent-block
+   "
+note as N1
+This is a note
+end note
+"
+   "
+note as N1
+  This is a note
+end note
+"
+   ))
+
+(ert-deftest plantuml-test-block-indentation/activate-deactivate ()
+  "Test correct indentation of an activate-deactivate block."
+  (plantuml-test-indent-block
+   "
+activate participant_1
 participant_1 -> participant_2 : f()
-            deactivate participant_1")
-                 "
+deactivate participant_1
+"
+   "
 activate participant_1
   participant_1 -> participant_2 : f()
-deactivate participant_1")))
+deactivate participant_1
+"))
+
+(ert-deftest plantuml-test-block-indentation/activate-deactivate-nested ()
+  "Test correct indentation of two nested activate-deactivate blocks."
+  (plantuml-test-indent-block
+   "
+activate participant_1
+activate participant_2
+participant_1 -> participant_2 : f()
+deactivate participant_2
+deactivate participant_1
+"
+   "
+activate participant_1
+  activate participant_2
+    participant_1 -> participant_2 : f()
+  deactivate participant_2
+deactivate participant_1
+"))
 
 (provide 'plantuml-indentation-test)
 
