@@ -36,6 +36,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.2.8, 2019-01-07 Support indentation for activate / deactivate blocks; allow customization of `plantuml-java-args'
 ;; version 1.2.7, 2018-08-15 Added support for indentation; Fixed the comiling error when installing with melpa
 ;; version 1.2.6, 2018-07-17 Introduced custom variable `plantuml-jar-args' to control which arguments are passed to PlantUML jar. Fix the warning of failing to specify types of 'defcustom' variables
 ;; version 1.2.5, 2017-08-19 #53 Fixed installation warnings
