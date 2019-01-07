@@ -38,8 +38,7 @@ activate p1
     foo
   deactivate p2
 deactivate p1
-")
-  )
+"))
 
 (ert-deftest plantuml-test-current-block-depth_0 ()
   "Test `plantuml-current-block-depth' level 0 at beginning of first line."
@@ -52,8 +51,7 @@ deactivate p1
     foo
   deactivate p2
 deactivate p1
-")
-  )
+"))
 
 (ert-deftest plantuml-test-current-block-depth_1 ()
   "Test `plantuml-current-block-depth' level 0 at middle of first line."
@@ -66,8 +64,7 @@ acti|vate p1
     foo
   deactivate p2
 deactivate p1
-")
-  )
+"))
 
 (ert-deftest plantuml-test-current-block-depth_2 ()
   "Test `plantuml-current-block-depth' level 0 at end of first line"
@@ -80,8 +77,7 @@ activate p1|
     foo
   deactivate p2
 deactivate p1
-")
-  )
+"))
 
 (ert-deftest plantuml-test-current-block-depth_3 ()
   "Test `plantuml-current-block-depth' level 1 at beginning of 2nd line."
@@ -92,8 +88,7 @@ activate p1
     foo
   deactivate p2
 deactivate p1
-")
-  )
+"))
 
 (ert-deftest plantuml-test-current-block-depth_4 ()
   "Test `plantuml-current-block-depth' level 2 at beginning of 3rd line."
@@ -104,8 +99,7 @@ activate p1
     |foo
   deactivate p2
 deactivate p1
-")
-  )
+"))
 
 (ert-deftest plantuml-test-current-block-depth_5 ()
   "Test `plantuml-current-block-depth' level 1 at beginning of 4th line."
@@ -116,8 +110,7 @@ activate p1
     foo
   |deactivate p2
 deactivate p1
-")
-  )
+"))
 
 (ert-deftest plantuml-test-current-block-depth_6 ()
   "Test `plantuml-current-block-depth' level 0 at beginning of 5th line."
@@ -128,8 +121,7 @@ activate p1
     foo
   deactivate p2
 |deactivate p1
-")
-  )
+"))
 
 (ert-deftest plantuml-test-current-block-depth_eob ()
   "Test `plantuml-current-block-depth' level 0 at end of buffer."
@@ -140,8 +132,7 @@ activate p1
     foo
   deactivate p2
 deactivate p1
-|")
-  )
+|"))
 
 (defun plantuml-test-indent-line (before after)
   "The common code for the line indentation tests.
@@ -160,9 +151,8 @@ Finally,
 2) the position of point in the indented line will be compared with
 the position of | in AFTER."
 
-  (let* ( (expected-cursor-pos (1+ (s-index-of "|" after)))
-          (expected-state (delete ?| after))
-          )
+  (let* ((expected-cursor-pos (1+ (s-index-of "|" after)))
+         (expected-state (delete ?| after)))
     (with-temp-buffer
       ;; fix the JAR location prior to mode initialization
       ;; for some reason, plantuml-mode disregards the setq-local
@@ -290,8 +280,7 @@ Finally, the indented text in the buffer will be compared with AFTER."
     (setq-local tab-width 2)
 
     (indent-region (point-min) (point-max))
-    (should (equal (buffer-string) after))
-    ))
+    (should (equal (buffer-string) after))))
 
 (ert-deftest plantuml-test-block-indentation/package-empty ()
   "Test correct indentation of an empty package block."
