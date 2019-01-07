@@ -94,18 +94,15 @@
   :type 'string
   :group 'plantuml)
 
-(eval-and-compile
-  (defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar")
-    "The parameters passed to `plantuml-java-command' when executing PlantUML."
-    :type '(repeat string)
-    :group 'plantuml))
+(defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar")
+  "The parameters passed to `plantuml-java-command' when executing PlantUML."
+  :type '(repeat string)
+  :group 'plantuml)
 
-
-(eval-and-compile
-  (defcustom plantuml-jar-args (list "-charset" "UTF-8" )
-    "The parameters passed to `plantuml.jar', when executing PlantUML."
-    :type '(repeat string)
-    :group 'plantuml))
+(defcustom plantuml-jar-args (list "-charset" "UTF-8" )
+  "The parameters passed to `plantuml.jar', when executing PlantUML."
+  :type '(repeat string)
+  :group 'plantuml)
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
@@ -245,15 +242,15 @@ default output type for new buffers."
   "Create the flag to pass to PlantUML to produce the selected output format."
   (concat "-t" plantuml-output-type))
 
-(defmacro plantuml-start-process (buf)
+(defun plantuml-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
-  `(start-process "PLANTUML" ,buf
-                  plantuml-java-command
-                  ,@plantuml-java-args
-                  (expand-file-name plantuml-jar-path)
-                  (plantuml-output-type-opt)
-                  ,@plantuml-jar-args
-                  "-p"))
+  (apply #'start-process
+         "PLANTUML" buf plantuml-java-command
+         `(,@plantuml-java-args
+           ,(expand-file-name plantuml-jar-path)
+           ,(plantuml-output-type-opt)
+           ,@plantuml-jar-args
+           "-p")))
 
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
