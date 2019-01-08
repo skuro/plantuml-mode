@@ -306,8 +306,33 @@ package APackage {
 }
 "))
 
+(ert-deftest platuml-test-block-indentation/class ()
+  "Test correct indentation of a class block"
+  (plantuml-test-indent-block
+   "
+class Foo {
++bar()
+}
+"
+   "
+class Foo {
+  +bar()
+}
+")
+  (plantuml-test-indent-block
+   "
+abstract class Foo {
++bar()
+}
+"
+   "
+abstract class Foo {
+  +bar()
+}
+"))
+
 (ert-deftest plantuml-test-block-indentation/various-keywords ()
-  "Test correct indentation of a package block."
+  "Test correct indentation of block keywords."
   (plantuml-test-indent-block
    "
 cloud \"mycloud\"  {
