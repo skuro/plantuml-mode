@@ -6,7 +6,8 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 1.2.7
+;; Version: 1.2.9
+;; Package-Version: 1.2.9pre2
 ;; Package-Requires: ((emacs "25.0"))
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -79,7 +80,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.2.7" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.2.9pre2" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
