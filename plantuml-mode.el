@@ -334,6 +334,15 @@ Uses prefix (as PREFIX) to choose where to display it:
       (plantuml-preview-region prefix (region-beginning) (region-end))
     (plantuml-preview-buffer prefix)))
 
+(defun plantuml-save-to-file ()
+  (interactive)
+  (clipboard-kill-ring-save (point-min) (point-max))
+  (generate-new-buffer "untitled")
+  (switch-to-buffer "untitled")
+  (yank)
+  (save-buffer)
+)
+
 (defun plantuml-init-once ()
   "Ensure initialization only happens once."
   (unless plantuml-kwdList
