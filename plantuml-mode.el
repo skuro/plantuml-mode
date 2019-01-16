@@ -335,6 +335,10 @@ Uses prefix (as PREFIX) to choose where to display it:
     (plantuml-preview-buffer prefix)))
 
 (defun plantuml-save-to-file ()
+  "Save the generated image to a file.
+This command will as for the path and filename to which the image
+should be saved. 
+This command should be executed from the *PLANTUML Preview* buffer only"
   (interactive)
   (clipboard-kill-ring-save (point-min) (point-max))
   (generate-new-buffer "untitled")
