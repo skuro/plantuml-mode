@@ -352,12 +352,16 @@ The opening { or [ has to be the last visible character in the line (whitespace
 might follow).")
     (defvar plantuml-indent-regexp-note-start "^\s*\\(note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:button\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\)"
       "Indentation regex for all plantuml note elements")
-    (defvar plantuml-indent-regexp-group-start "^\s*\\(loop\s+.*\\|group\s+.*\\|par\s*$\\|opt\s+.*\\|alt\s+.*\\|else\\|activate\s+.+\\)"
-      "Indentation regex for plantuml group elements that are defined for sequence diagrams.")
+    (defvar plantuml-indent-regexp-group-start "^\s*\\(alt\\|else\\|opt\\|loop\\|par\\|break\\|critical\\|group\\)\\(?:\s+.+\\|$\\)"
+      "Indentation regex for plantuml group elements that are defined for sequence diagrams.
+Two variants for groups: keyword is either followed by whitespace and some text
+or it is followed by line end.")
+    (defvar plantuml-indent-regexp-activate-start "^\s*activate\s+.+$")
     (defvar plantuml-indent-regexp-if-start "^\s*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\s+.*\\)")
     (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
                                                plantuml-indent-regexp-note-start
                                                plantuml-indent-regexp-group-start
+                                               plantuml-indent-regexp-activate-start
                                                plantuml-indent-regexp-if-start))
     (defvar plantuml-indent-regexp-end "^\s*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\|deactivate\s+.+\\)")
 

@@ -1,4 +1,79 @@
 /' This is a manual test for you to test different use-cases '/
+
+participant API
+participant Instance
+
+alt deploy success
+Instance -> API: Deploy successful
+else deploy failure
+Instance -> API: Deploy failed
+else deploy timeout
+Instance -> API: Deploy failed
+end
+
+
+package "kuaishow-common-proto" {
+component Kwai
+component KwaiGo
+component AcFun
+}
+
+package "kwaigo-log-proto" {
+[KwaiGo] ..> [KwaiGo Client->Data] : split
+}
+
+package "kwaigo-api-proto" {
+[KwaiGo] ..> [KwaiGo Client->Server] : split
+}
+
+cloud "log server\n" {
+[KwaiGo Client->Data] -->[KwaiGo Log Server] : upload
+}
+
+cloud "api server\n" {
+[KwaiGo Api Server]
+}
+
+[KwaiGo Client->Server] --> [KwaiGo Api Server] : request
+[KwaiGo Api Server] --> [KwaiGo Client->Server] : response
+
+database "LogSql" {
+folder "Log" {
+[ReportEvent]
+}
+frame "event" {
+[EventPackage]
+}
+
+frame "stat" {
+[StatPackage]
+}
+}
+
+[KwaiGo Log Server] --> [ReportEvent] : save
+[ReportEvent] --> [EventPackage]
+[ReportEvent] --> [StatPackage]
+
+database "ApiSql" {
+folder "kwaigo" {
+[KwaiGoData]
+}
+frame "user" {
+[UserData]
+}
+
+frame "photo" {
+[PhotoData]
+}
+}
+
+[KwaiGo Api Server] --> [KwaiGoData] : request
+[KwaiGoData] --> [KwaiGo Api Server] : compute
+
+[KwaiGoData] --> [UserData]
+[KwaiGoData] --> [PhotoData]
+
+
 Nobody -> [APIGateway]
 
 package APackage {

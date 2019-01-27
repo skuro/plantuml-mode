@@ -387,7 +387,23 @@ package APackage {
 "))
 
 (ert-deftest plantuml-test-block-indentation/alt-end ()
-  "Test correct indentation of an alt-end block."
+  "Test correct indentation of an alt-end block.
+The alt-keyword is NOT followed by some text."
+  (plantuml-test-indent-block
+   "
+alt
+A -> B
+end
+"
+   "
+alt
+  A -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/alt-end-with-label ()
+  "Test correct indentation of an alt-end block.
+The alt-keyword is followed by some text."
   (plantuml-test-indent-block
    "
 alt choice 1
@@ -419,7 +435,23 @@ end
 " ))
 
 (ert-deftest plantuml-test-block-indentation/opt ()
-  "Test correct indentation of an opt block."
+  "Test correct indentation of an opt block.
+The opt-keyword is NOT followed by some text."
+  (plantuml-test-indent-block
+   "
+opt
+A -> B
+end
+"
+   "
+opt
+  A -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/opt-with-label ()
+  "Test correct indentation of an opt block.
+The opt-keyword is followed by some text."
   (plantuml-test-indent-block
    "
 opt event triggered
@@ -433,7 +465,8 @@ end
 " ))
 
 (ert-deftest plantuml-test-block-indentation/par ()
-  "Test correct indentation of a par block."
+  "Test correct indentation of a par block.
+The par-keyword is NOT followed by some text."
   (plantuml-test-indent-block
    "
 par
@@ -444,6 +477,101 @@ end
 "
    "
 par
+  A -> B
+else
+  C -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/par-with-label ()
+  "Test correct indentation of a par block.
+The par-keyword is followed by some text."
+  (plantuml-test-indent-block
+   "
+par a text label
+A -> B
+else
+C -> B
+end
+"
+   "
+par a text label
+  A -> B
+else
+  C -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/group ()
+  "Test correct indentation of a group block.
+The group-keyword is NOT followed by some text."
+  (plantuml-test-indent-block
+   "
+group
+A -> B
+else
+C -> B
+end
+"
+   "
+group
+  A -> B
+else
+  C -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/group-with-label ()
+  "Test correct indentation of a group block.
+The group-keyword is followed by some text."
+  (plantuml-test-indent-block
+   "
+group my own label
+A -> B
+else
+C -> B
+end
+"
+   "
+group my own label
+  A -> B
+else
+  C -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/critical ()
+  "Test correct indentation of a critical block.
+The critical-keyword is NOT followed by some text."
+  (plantuml-test-indent-block
+   "
+critical
+A -> B
+else
+C -> B
+end
+"
+   "
+critical
+  A -> B
+else
+  C -> B
+end
+" ))
+
+(ert-deftest plantuml-test-block-indentation/critical-with-label ()
+  "Test correct indentation of a critical block.
+The critical-keyword is followed by some text."
+  (plantuml-test-indent-block
+   "
+critical my own label
+A -> B
+else
+C -> B
+end
+"
+   "
+critical my own label
   A -> B
 else
   C -> B
