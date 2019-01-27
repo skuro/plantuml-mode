@@ -67,6 +67,7 @@
 
 ;;; Code:
 (require 'thingatpt)
+(require 'dash)
 
 (defgroup plantuml-mode nil
   "Major mode for editing plantuml file."
@@ -343,8 +344,22 @@ Uses prefix (as PREFIX) to choose where to display it:
     (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
     (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
     (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
-    (defvar plantuml-indent-regexp-start "^[ \t]*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\s+.*\\|loop\s+.*\\|group\s+.*\\|par\s*$\\|opt\s+.*\\|alt\s+.*\\|else\\|note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:button\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\|\\(?:\\(abstract \\)?class\\|enum\\|package\\|database\\|frame\\|cloud\\|folder\\)\s+.*{\\|activate\s+.+\\)")
-    (defvar plantuml-indent-regexp-end "^[ \t]*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\|deactivate\s+.+\\)")
+
+    (defvar plantuml-indent-regexp-block-start "^.*{\s*$"
+      "Indentation regex for all plantuml elements that might define a {} or [] block.
+Plantuml elements like skinparam, rectangle, sprite, package, ….
+The opening { or [ has to be the last visible character in the line (whitespace
+might follow).")
+    (defvar plantuml-indent-regexp-note-start "^\s*\\(note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:button\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\)"
+      "Indentation regex for all plantuml note elements")
+    (defvar plantuml-indent-regexp-group-start "^\s*\\(loop\s+.*\\|group\s+.*\\|par\s*$\\|opt\s+.*\\|alt\s+.*\\|else\\|activate\s+.+\\)"
+      "Indentation regex for plantuml group elements that are defined for sequence diagrams.")
+    (defvar plantuml-indent-regexp-if-start "^\s*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\s+.*\\)")
+    (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
+                                               plantuml-indent-regexp-note-start
+                                               plantuml-indent-regexp-group-start
+                                               plantuml-indent-regexp-if-start))
+    (defvar plantuml-indent-regexp-end "^\s*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\|deactivate\s+.+\\)")
 
     (setq plantuml-font-lock-keywords
           `(
@@ -401,9 +416,6 @@ Uses prefix (as PREFIX) to choose where to display it:
 
 (defun plantuml-current-block-depth ()
   "Trace the current block indentation level by recursively looking back line by line."
-  ;; forward declare the lazy initialized constants
-  (defvar plantuml-indent-regexp-start)
-  (defvar plantuml-indent-regexp-end)
   (save-excursion
     (let ((relative-depth 0))
       ;; current line
@@ -416,7 +428,7 @@ Uses prefix (as PREFIX) to choose where to display it:
         (forward-line -1)
         (if (looking-at plantuml-indent-regexp-end)
             (setq relative-depth (1- relative-depth)))
-        (if (looking-at plantuml-indent-regexp-start)
+        (if (-any? 'looking-at plantuml-indent-regexp-start)
             (setq relative-depth (1+ relative-depth))))
 
       (if (<= relative-depth 0)
@@ -427,9 +439,6 @@ Uses prefix (as PREFIX) to choose where to display it:
   "Indent the current line to its desired indentation level.
 Restore point to same position in text of the line as before indentation."
   (interactive)
-  ;; forward declare the lazy initialized constants
-  (defvar plantuml-indent-regexp-start)
-  (defvar plantuml-indent-regexp-end)
   ;; store position of point in line measured from end of line
   (let ((original-position-eol (- (line-end-position) (point))))
     (save-excursion
@@ -472,3 +481,4 @@ See more at https://github.com/skuro/puml-mode/issues/26")))
 
 (provide 'plantuml-mode)
 ;;; plantuml-mode.el ends here
+()
