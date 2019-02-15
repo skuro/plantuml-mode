@@ -357,13 +357,15 @@ might follow).")
 Two variants for groups: keyword is either followed by whitespace and some text
 or it is followed by line end.")
     (defvar plantuml-indent-regexp-activate-start "^\s*activate\s+.+$")
+    (defvar plantuml-indent-regexp-box-start "^\s*box\s+.+$")
     (defvar plantuml-indent-regexp-if-start "^\s*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\s+.*\\)")
     (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
                                                plantuml-indent-regexp-note-start
                                                plantuml-indent-regexp-group-start
                                                plantuml-indent-regexp-activate-start
+                                               plantuml-indent-regexp-box-start
                                                plantuml-indent-regexp-if-start))
-    (defvar plantuml-indent-regexp-end "^\s*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\|deactivate\s+.+\\)")
+    (defvar plantuml-indent-regexp-end "^\s*\\(endif\\|else\\|end\\|end\s+note\\|end\s+box\\|.*}\\|deactivate\s+.+\\)")
 
     (setq plantuml-font-lock-keywords
           `(

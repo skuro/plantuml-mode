@@ -331,6 +331,22 @@ abstract class Foo {
 }
 "))
 
+(ert-deftest platuml-test-block-indentation/box ()
+  "Test correct indentation of a box block"
+  (plantuml-test-indent-block
+   "
+box \"Device with USB connector\"
+actor Human
+participant UsbDetector
+end box
+"
+   "
+box \"Device with USB connector\"
+  actor Human
+  participant UsbDetector
+end box
+" ))
+
 (ert-deftest plantuml-test-block-indentation/various-keywords ()
   "Test correct indentation of block keywords."
   (plantuml-test-indent-block
