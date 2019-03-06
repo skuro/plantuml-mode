@@ -402,6 +402,24 @@ package APackage {
 }
 "))
 
+(ert-deftest platuml-test-block-indentation/package-interface-nested ()
+  "Test correct indentation of two nested blocks, a package and an interface"
+  (plantuml-test-indent-block
+   "
+package foo {
+interface Bar {
+baz
+}
+}
+"
+   "
+package foo {
+  interface Bar {
+    baz
+  }
+}
+"))
+
 (ert-deftest plantuml-test-block-indentation/alt-end ()
   "Test correct indentation of an alt-end block.
 The alt-keyword is NOT followed by some text."
