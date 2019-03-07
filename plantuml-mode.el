@@ -487,4 +487,3 @@ See more at https://github.com/skuro/puml-mode/issues/26")))
 
 (provide 'plantuml-mode)
 ;;; plantuml-mode.el ends here
-()
