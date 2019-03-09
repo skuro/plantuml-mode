@@ -255,32 +255,9 @@ foofoo|"
   foofoo|"))
 
 
-(defun plantuml-test-indent-block (before after)
-  "The common code for the block indentation tests.
 
-BEFORE is the text block to be inserted into a temporary buffer.
-AFTER is the expected text block after indentation.
 
-The temporary buffer will be put into `plantuml-mode'. The whole buffer
-will be indented with two spaces for each level of indentation.
 
-Finally, the indented text in the buffer will be compared with AFTER."
-
-  (with-temp-buffer
-    ;; fix the JAR location prior to mode initialization
-    ;; for some reason, plantuml-mode disregards the setq-local
-    (setq-local plantuml-jar-path plantuml-test-jar-path)
-    (plantuml-init-once)
-
-    (insert before)
-    (goto-char (point-min))
-    (plantuml-mode)
-    ;; use 2 spaces instead of one tab for indentation
-    (setq-local indent-tabs-mode nil)
-    (setq-local tab-width 2)
-
-    (indent-region (point-min) (point-max))
-    (should (equal (buffer-string) after))))
 
 (ert-deftest plantuml-test-block-indentation/package-empty ()
   "Test correct indentation of an empty package block."
