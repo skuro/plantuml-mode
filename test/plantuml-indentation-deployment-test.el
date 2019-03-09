@@ -6,7 +6,7 @@
 
 ;;; Commentary:
 
-;; Test indentation for class diagrams.
+;; Test indentation for deployment diagrams.
 ;; Most plantuml code examples are taken from www.plantuml.com
 
 ;;; Code:
@@ -49,15 +49,6 @@
     storage Foo7 {
     storage Foo8
     }
-
-skinparam rectangle {
-roundCorner<<Concept>> 25
-}
-
-rectangle \"Concept Model\" <<Concept>> {
-rectangle \"Example 1\" <<Concept>> as ex1
-rectangle \"Another rectangle\"
-}
 "
    "
 artifact Foo1 {
@@ -92,15 +83,6 @@ database Foo5  {
 
 storage Foo7 {
   storage Foo8
-}
-
-skinparam rectangle {
-  roundCorner<<Concept>> 25
-}
-
-rectangle \"Concept Model\" <<Concept>> {
-  rectangle \"Example 1\" <<Concept>> as ex1
-  rectangle \"Another rectangle\"
 }
 "))
 

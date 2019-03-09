@@ -358,15 +358,22 @@ Two variants for groups: keyword is either followed by whitespace and some text
 or it is followed by line end.")
     (defvar plantuml-indent-regexp-activate-start "^\s*activate\s+.+$")
     (defvar plantuml-indent-regexp-box-start "^\s*box\s+.+$")
+    (defvar plantuml-indent-regexp-title-start "^\s*title$")
+    (defvar plantuml-indent-regexp-header-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+header\\|header\\)$")
+    (defvar plantuml-indent-regexp-footer-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+footer\\|footer\\)$")
+    (defvar plantuml-indent-regexp-legend-start "^\s*\\(?:legend\\|legend\s+\\(?:bottom\\|top\\)\\|legend\s+\\(?:center\\|left\\|right\\)\\|legend\s+\\(?:bottom\\|top\\)\s+\\(?:center\\|left\\|right\\)\\)$")
     (defvar plantuml-indent-regexp-if-start "^\s*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\s+.*\\)")
     (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
                                                plantuml-indent-regexp-note-start
                                                plantuml-indent-regexp-group-start
                                                plantuml-indent-regexp-activate-start
                                                plantuml-indent-regexp-box-start
+                                               plantuml-indent-regexp-title-start
+                                               plantuml-indent-regexp-header-start
+                                               plantuml-indent-regexp-footer-start
+                                               plantuml-indent-regexp-legend-start
                                                plantuml-indent-regexp-if-start))
-    (defvar plantuml-indent-regexp-end "^\s*\\(endif\\|else\\|end\\|end\s+note\\|end\s+box\\|.*}\\|deactivate\s+.+\\)")
-
+    (defvar plantuml-indent-regexp-end "^\s*\\(?:endif\\|else\s*.*\\|end\\|end\s+note\\|end\s+box\\|.*}\\|deactivate\s+.+\\|end\s+title\\|endheader\\|endfooter\\|endlegend\\)")
     (setq plantuml-font-lock-keywords
           `(
             (,plantuml-types-regexp . font-lock-type-face)
