@@ -324,41 +324,6 @@ box \"Device with USB connector\"
 end box
 " ))
 
-(ert-deftest plantuml-test-block-indentation/various-keywords ()
-  "Test correct indentation of block keywords."
-  (plantuml-test-indent-block
-   "
-cloud \"mycloud\"  {
-[Cloud]
-}
-"
-   "
-cloud \"mycloud\"  {
-  [Cloud]
-}
-")
-  (plantuml-test-indent-block
-   "
-folder \"myfolder\"  {
-[Folder]
-}
-"
-   "
-folder \"myfolder\"  {
-  [Folder]
-}
-")
-  (plantuml-test-indent-block
-   "
-frame \"myframe\"  {
-[Frame]
-}
-"
-   "
-frame \"myframe\"  {
-  [Frame]
-}
-"))
 
 (ert-deftest plantuml-test-block-indentation/package-database-nested ()
   "Test correct indentation of two nested blocks, a package and a database.
