@@ -346,9 +346,9 @@ Uses prefix (as PREFIX) to choose where to display it:
     (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
 
     (defvar plantuml-indent-regexp-block-start "^.*{\s*$"
-      "Indentation regex for all plantuml elements that might define a {} or [] block.
+      "Indentation regex for all plantuml elements that might define a {} block.
 Plantuml elements like skinparam, rectangle, sprite, package, ….
-The opening { or [ has to be the last visible character in the line (whitespace
+The opening { has to be the last visible character in the line (whitespace
 might follow).")
     (defvar plantuml-indent-regexp-note-start "^\s*\\(note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:button\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\)"
       "Indentation regex for all plantuml note elements")
@@ -373,7 +373,7 @@ or it is followed by line end.")
                                                plantuml-indent-regexp-footer-start
                                                plantuml-indent-regexp-legend-start
                                                plantuml-indent-regexp-if-start))
-    (defvar plantuml-indent-regexp-end "^\s*\\(?:endif\\|else\s*.*\\|end\\|end\s+note\\|end\s+box\\|.*}\\|deactivate\s+.+\\|end\s+title\\|endheader\\|endfooter\\|endlegend\\)")
+    (defvar plantuml-indent-regexp-end "^\s*\\(?:endif\\|else\s*.*\\|end\\|end\s+note\\|end\s+box\\|}\\|deactivate\s+.+\\|end\s+title\\|endheader\\|endfooter\\|endlegend\\)$")
     (setq plantuml-font-lock-keywords
           `(
             (,plantuml-types-regexp . font-lock-type-face)
