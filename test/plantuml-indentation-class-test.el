@@ -89,6 +89,14 @@ These code examples are taken from www.plantuml.com"
             int size()
             }
 
+            abtract class AbstractC {
+            int size()
+            }
+
+            interface InterfaceC {
+            int size()
+            }
+
             package \"Classic Collections\" #DDDDDD {
             Object <|-- ArrayList
             }
@@ -226,6 +234,14 @@ class Dummy4 <<Serializable>> {
 }
 
 class Foo<? extends Element> {
+  int size()
+}
+
+abtract class AbstractC {
+  int size()
+}
+
+interface InterfaceC {
   int size()
 }
 
