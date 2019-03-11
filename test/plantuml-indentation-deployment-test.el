@@ -86,6 +86,26 @@ storage Foo7 {
 }
 "))
 
+(ert-deftest plantuml-test-block-indentation/package-database-nested ()
+  "Test correct indentation of two nested blocks, a package and a database.
+Note: package is used in class and object diagrams as well, see there for more tests."
+  (plantuml-test-indent-block
+   "
+package APackage {
+  database ADatabase {
+    A -> B
+  }
+}
+"
+   "
+package APackage {
+  database ADatabase {
+    A -> B
+  }
+}
+"))
+
+
 (provide 'plantuml-indentation-deployment-test)
 
 ;;; plantuml-indentation-deployment-test.el ends here

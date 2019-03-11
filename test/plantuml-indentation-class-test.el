@@ -312,6 +312,28 @@ together {
 }
 "))
 
+
+
+(ert-deftest platuml-test-block-indentation/package-interface-nested ()
+  "Test correct indentation of two nested blocks, a package and an interface
+Note: package is used in deployment and object diagrams as well, see there for more tests."
+  (plantuml-test-indent-block
+   "
+package foo {
+interface Bar {
+baz
+}
+}
+"
+   "
+package foo {
+  interface Bar {
+    baz
+  }
+}
+"))
+
+
 (provide 'plantuml-indentation-class-test)
 
 ;;; plantuml-indentation-class-test.el ends here

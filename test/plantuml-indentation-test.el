@@ -269,44 +269,6 @@ package APackage ()
 package APackage ()
 "))
 
-(ert-deftest plantuml-test-block-indentation/package ()
-  "Test correct indentation of a package block."
-  (plantuml-test-indent-block
-   "
-package APackage {
-A -> B
-}
-"
-   "
-package APackage {
-  A -> B
-}
-"))
-
-(ert-deftest platuml-test-block-indentation/class ()
-  "Test correct indentation of a class block"
-  (plantuml-test-indent-block
-   "
-class Foo {
-+bar()
-}
-"
-   "
-class Foo {
-  +bar()
-}
-")
-  (plantuml-test-indent-block
-   "
-abstract class Foo {
-+bar()
-}
-"
-   "
-abstract class Foo {
-  +bar()
-}
-"))
 
 (ert-deftest platuml-test-block-indentation/box ()
   "Test correct indentation of a box block"
@@ -324,43 +286,6 @@ box \"Device with USB connector\"
 end box
 " ))
 
-
-(ert-deftest plantuml-test-block-indentation/package-database-nested ()
-  "Test correct indentation of two nested blocks, a package and a database.
-Note: currently the inner database is not indented."
-  (plantuml-test-indent-block
-   "
-package APackage {
-  database ADatabase {
-    A -> B
-  }
-}
-"
-   "
-package APackage {
-  database ADatabase {
-    A -> B
-  }
-}
-"))
-
-(ert-deftest platuml-test-block-indentation/package-interface-nested ()
-  "Test correct indentation of two nested blocks, a package and an interface"
-  (plantuml-test-indent-block
-   "
-package foo {
-interface Bar {
-baz
-}
-}
-"
-   "
-package foo {
-  interface Bar {
-    baz
-  }
-}
-"))
 
 (ert-deftest plantuml-test-block-indentation/alt-end ()
   "Test correct indentation of an alt-end block.
