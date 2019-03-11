@@ -314,6 +314,21 @@ endlegend
 "))
 
 
+(ert-deftest plantuml-test-block-indentation/note-as ()
+  "Test correct indentation of a note-as block."
+  (plantuml-test-indent-block
+   "
+note as N1
+This is a note
+end note
+"
+   "
+note as N1
+  This is a note
+end note
+"
+   ))
+
 (provide 'plantuml-indentation-commons-test)
 
 ;;; plantuml-indentation-commons-test.el ends here

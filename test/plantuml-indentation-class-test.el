@@ -313,8 +313,20 @@ together {
 "))
 
 
+(ert-deftest plantuml-test-block-indentation/class/package-empty ()
+  "Test correct indentation of an empty package block."
+  (plantuml-test-indent-block
+   "
+package APackage ()
+interface Inter
+"
+   "
+package APackage ()
+interface Inter
+"))
 
-(ert-deftest platuml-test-block-indentation/package-interface-nested ()
+
+(ert-deftest platuml-test-block-indentation/class/package-interface-nested ()
   "Test correct indentation of two nested blocks, a package and an interface
 Note: package is used in deployment and object diagrams as well, see there for more tests."
   (plantuml-test-indent-block
