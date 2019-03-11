@@ -1,4 +1,4 @@
-;;; plantuml-indentation-test.el --- PlantUML Mode indentation tests   -*- lexical-binding: t; -*-
+;;; plantuml-indentation-basics-test.el --- PlantUML Mode indentation tests   -*- lexical-binding: t; -*-
 
 ;; Author: Raymond Huang (rymndhng)
 ;; Maintainer: Carlo Sciolla (skuro)
@@ -6,6 +6,8 @@
 
 ;;; Commentary:
 
+;; Test basics like single correct indentation depth etc. Focus is not on diagram contents
+;; and context; such things are tested in the diagram specific indentation tests.
 ;; Test setup is inspired/taken from clojure-mode-indentation-tests
 
 ;;; Code:
@@ -582,6 +584,6 @@ activate participant_1
 deactivate participant_1
 "))
 
-(provide 'plantuml-indentation-test)
+(provide 'plantuml-indentation-basics-test)
 
-;;; plantuml-indentation-test.el ends here
+;;; plantuml-indentation-basics-test.el ends here
