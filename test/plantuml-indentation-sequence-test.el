@@ -33,27 +33,46 @@ end box
    "
 participant Alice
 actor Bob
+participant \"Great Cesar\"
 
 ref over Alice, Bob : init
 
 Alice -> Bob : hello
 
-ref over Bob
+ref over Bob, \"Great Cesar\"
 This can be on
 several lines
 end ref
+
+ref over Bob
+This is a ref over Bob
+end ref
+
+ref over \"Great Cesar\"
+This is a ref over \"Great Cesar\"
+end ref
 "
+
    "
 participant Alice
 actor Bob
+participant \"Great Cesar\"
 
 ref over Alice, Bob : init
 
 Alice -> Bob : hello
 
-ref over Bob
+ref over Bob, \"Great Cesar\"
   This can be on
   several lines
+end ref
+
+ref over Bob
+  This is a ref over Bob
+end ref
+
+ref over \"Great Cesar\"
+  This is a ref over \"Great Cesar\"
 end ref
 " ))
 
