@@ -27,6 +27,36 @@ box \"Device with USB connector\"
 end box
 " ))
 
+(ert-deftest platuml-test-block-indentation/sequence/ref ()
+  "Test correct indentation of a ref block"
+  (plantuml-test-indent-block
+   "
+participant Alice
+actor Bob
+
+ref over Alice, Bob : init
+
+Alice -> Bob : hello
+
+ref over Bob
+This can be on
+several lines
+end ref
+"
+   "
+participant Alice
+actor Bob
+
+ref over Alice, Bob : init
+
+Alice -> Bob : hello
+
+ref over Bob
+  This can be on
+  several lines
+end ref
+" ))
+
 
 (ert-deftest plantuml-test-block-indentation/sequence/alt-end ()
   "Test correct indentation of an alt-end block.
