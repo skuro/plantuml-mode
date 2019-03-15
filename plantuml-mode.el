@@ -350,15 +350,6 @@ Uses prefix (as PREFIX) to choose where to display it:
 Plantuml elements like skinparam, rectangle, sprite, package, ….
 The opening { has to be the last visible character in the line (whitespace
 might follow).")
-    ;; (defconst plantuml-indent-regexp-note-color "\\(?:\s+#\\w+\\)?" "optional color specification")
-    ;; (defconst plantuml-indent-regexp-note-position "\\(?:\s+\\(?:left\\|right\\|top\\|bottom\\)\\)?" "optional position specification")
-    ;; (defconst plantuml-indent-regexp-note-floating "\\(floating\s+\\)?" "optional floating specification")
-    ;; (defvar plantuml-indent-regexp-base-note-start (concat "^\s*" plantuml-indent-regexp-note-floating "note" plantuml-indent-regexp-note-position "\\(?:\s+of\s+[^:]+?\\)?" plantuml-indent-regexp-note-color "$")
-    ;;   "Indentation regex for plantuml: note, note right, note left, note bottom, note top, note xxx of")
-    ;; (defvar plantuml-indent-regexp-note-on-link-start (concat "^\s*note" plantuml-indent-regexp-note-position "\s+on\s+link" plantuml-indent-regexp-note-color "$")
-    ;;   "Indentation regex for plantuml: note on link")
-    ;; (defvar plantuml-indent-regexp-note-over-start "^\s*note\s+over[^:]+?$"
-    ;;   "Indentation regex for plantuml: note over")
     (defvar plantuml-indent-regexp-note-start "^\s*\\(floating\s+\\)?[hr]?note[^:]*?$" "simplyfied regex; note syntax is especially inconsistent across diagrams")
     (defvar plantuml-indent-regexp-group-start "^\s*\\(alt\\|else\\|opt\\|loop\\|par\\|break\\|critical\\|group\\)\\(?:\s+.+\\|$\\)"
       "Indentation regex for plantuml group elements that are defined for sequence diagrams.
