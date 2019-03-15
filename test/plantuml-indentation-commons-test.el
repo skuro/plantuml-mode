@@ -311,6 +311,30 @@ endlegend
 legend right left
 this is no correct legend
 endlegend
-"))
+"
+   ))
 
+(ert-deftest plantuml-test-indentation/commons/multiline-macro ()
+  "Test the indentation of multiline macro elements."
+  (plantuml-test-indent-block
+
+   "
+!define DOUBLE(x) x x
+!definelong AUTHEN(x,y)
+x -> y : DOUBLE(hello)
+y -> x : ok
+!enddefinelong
+
+AUTHEN(Bob,Alice)
+"
+   "
+!define DOUBLE(x) x x
+!definelong AUTHEN(x,y)
+  x -> y : DOUBLE(hello)
+  y -> x : ok
+!enddefinelong
+
+AUTHEN(Bob,Alice)
+"
+   ))
 ;;; plantuml-indentation-commons-test.el ends here
