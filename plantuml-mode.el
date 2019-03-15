@@ -350,32 +350,41 @@ Uses prefix (as PREFIX) to choose where to display it:
 Plantuml elements like skinparam, rectangle, sprite, package, ….
 The opening { has to be the last visible character in the line (whitespace
 might follow).")
-    (defvar plantuml-indent-regexp-note-start "^\s*\\(note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:button\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\)"
-      "Indentation regex for all plantuml note elements")
+    ;; (defconst plantuml-indent-regexp-note-color "\\(?:\s+#\\w+\\)?" "optional color specification")
+    ;; (defconst plantuml-indent-regexp-note-position "\\(?:\s+\\(?:left\\|right\\|top\\|bottom\\)\\)?" "optional position specification")
+    ;; (defconst plantuml-indent-regexp-note-floating "\\(floating\s+\\)?" "optional floating specification")
+    ;; (defvar plantuml-indent-regexp-base-note-start (concat "^\s*" plantuml-indent-regexp-note-floating "note" plantuml-indent-regexp-note-position "\\(?:\s+of\s+[^:]+?\\)?" plantuml-indent-regexp-note-color "$")
+    ;;   "Indentation regex for plantuml: note, note right, note left, note bottom, note top, note xxx of")
+    ;; (defvar plantuml-indent-regexp-note-on-link-start (concat "^\s*note" plantuml-indent-regexp-note-position "\s+on\s+link" plantuml-indent-regexp-note-color "$")
+    ;;   "Indentation regex for plantuml: note on link")
+    ;; (defvar plantuml-indent-regexp-note-over-start "^\s*note\s+over[^:]+?$"
+    ;;   "Indentation regex for plantuml: note over")
+    (defvar plantuml-indent-regexp-note-start "^\s*\\(floating\s+\\)?[hr]?note[^:]*?$" "simplyfied regex; note syntax is especially inconsistent across diagrams")
     (defvar plantuml-indent-regexp-group-start "^\s*\\(alt\\|else\\|opt\\|loop\\|par\\|break\\|critical\\|group\\)\\(?:\s+.+\\|$\\)"
       "Indentation regex for plantuml group elements that are defined for sequence diagrams.
 Two variants for groups: keyword is either followed by whitespace and some text
 or it is followed by line end.")
     (defvar plantuml-indent-regexp-activate-start "^\s*activate\s+.+$")
     (defvar plantuml-indent-regexp-box-start "^\s*box\s+.+$")
-    (defvar plantuml-indent-regexp-ref-start "^ref +over +[^:]+?$")
+    (defvar plantuml-indent-regexp-ref-start "^ref\s+over\s+[^:]+?$")
     (defvar plantuml-indent-regexp-title-start "^\s*title$")
     (defvar plantuml-indent-regexp-header-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+header\\|header\\)$")
     (defvar plantuml-indent-regexp-footer-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+footer\\|footer\\)$")
     (defvar plantuml-indent-regexp-legend-start "^\s*\\(?:legend\\|legend\s+\\(?:bottom\\|top\\)\\|legend\s+\\(?:center\\|left\\|right\\)\\|legend\s+\\(?:bottom\\|top\\)\s+\\(?:center\\|left\\|right\\)\\)$")
-    (defvar plantuml-indent-regexp-oldif-start "^.*if\s+\".*\"\s+then$")
+    (defvar plantuml-indent-regexp-oldif-start "^.*if\s+\".*\"\s+then$" "current activity diagram, sometimes already mentioned as deprecated")
     (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
-                                               plantuml-indent-regexp-note-start
                                                plantuml-indent-regexp-group-start
                                                plantuml-indent-regexp-activate-start
                                                plantuml-indent-regexp-box-start
                                                plantuml-indent-regexp-ref-start
+                                               plantuml-indent-regexp-legend-start
+                                               plantuml-indent-regexp-note-start
+                                               plantuml-indent-regexp-oldif-start
                                                plantuml-indent-regexp-title-start
                                                plantuml-indent-regexp-header-start
                                                plantuml-indent-regexp-footer-start
-                                               plantuml-indent-regexp-legend-start
                                                plantuml-indent-regexp-oldif-start))
-    (defvar plantuml-indent-regexp-end "^\s*\\(?:}\\|endif\\|else\s*.*\\|end\\|end\s+note\\|end\s+box\\|end\s+ref\\|deactivate\s+.+\\|end\s+title\\|endheader\\|endfooter\\|endlegend\\)$")
+    (defvar plantuml-indent-regexp-end "^\s*\\(?:}\\|endif\\|else\s*.*\\|end\\|end\s+note\\|endhnote\\|endrnote\\|end\s+box\\|end\s+ref\\|deactivate\s+.+\\|end\s+title\\|endheader\\|endfooter\\|endlegend\\)$")
     (setq plantuml-font-lock-keywords
           `(
             (,plantuml-types-regexp . font-lock-type-face)
