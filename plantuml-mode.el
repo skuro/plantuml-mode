@@ -6,7 +6,8 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
-;; Version: 1.2.7
+;; Version: 1.2.9
+;; Package-Version: 1.2.9pre2
 ;; Package-Requires: ((emacs "25.0"))
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -66,6 +67,7 @@
 
 ;;; Code:
 (require 'thingatpt)
+(require 'dash)
 
 (defgroup plantuml-mode nil
   "Major mode for editing plantuml file."
@@ -79,7 +81,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.2.7" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.2.9pre2" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
@@ -342,9 +344,40 @@ Uses prefix (as PREFIX) to choose where to display it:
     (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
     (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
     (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
-    (defvar plantuml-indent-regexp-start "^[ \t]*\\(\\(?:.*\\)?\s*\\(?:[<>.*a-z-|]+\\)?\s*\\(?:\\[[a-zA-Z]+\\]\\)?\s+if\s+.*\\|loop\s+.*\\|group\s+.*\\|par\s*$\\|opt\s+.*\\|alt\s+.*\\|else\\|note\s+over\\|note\sas\s.*\\|note\s+\\(\\(?:\\(?:button\\|left\\|right\\|top\\)\\)\\)\\(?:\s+of\\)?\\|\\(?:\\(abstract \\)?class\\|enum\\|package\\|database\\|frame\\|cloud\\|folder\\)\s+.*{\\|activate\s+.+\\)")
-    (defvar plantuml-indent-regexp-end "^[ \t]*\\(endif\\|else\\|end\\|end\s+note\\|.*}\\|deactivate\s+.+\\)")
 
+    (defvar plantuml-indent-regexp-block-start "^.*{\s*$"
+      "Indentation regex for all plantuml elements that might define a {} block.
+Plantuml elements like skinparam, rectangle, sprite, package, etc.
+The opening { has to be the last visible character in the line (whitespace
+might follow).")
+    (defvar plantuml-indent-regexp-note-start "^\s*\\(floating\s+\\)?[hr]?note[^:]*?$" "simplyfied regex; note syntax is especially inconsistent across diagrams")
+    (defvar plantuml-indent-regexp-group-start "^\s*\\(alt\\|else\\|opt\\|loop\\|par\\|break\\|critical\\|group\\)\\(?:\s+.+\\|$\\)"
+      "Indentation regex for plantuml group elements that are defined for sequence diagrams.
+Two variants for groups: keyword is either followed by whitespace and some text
+or it is followed by line end.")
+    (defvar plantuml-indent-regexp-activate-start "^\s*activate\s+.+$")
+    (defvar plantuml-indent-regexp-box-start "^\s*box\s+.+$")
+    (defvar plantuml-indent-regexp-ref-start "^ref\s+over\s+[^:]+?$")
+    (defvar plantuml-indent-regexp-title-start "^\s*title$")
+    (defvar plantuml-indent-regexp-header-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+header\\|header\\)$")
+    (defvar plantuml-indent-regexp-footer-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+footer\\|footer\\)$")
+    (defvar plantuml-indent-regexp-legend-start "^\s*\\(?:legend\\|legend\s+\\(?:bottom\\|top\\)\\|legend\s+\\(?:center\\|left\\|right\\)\\|legend\s+\\(?:bottom\\|top\\)\s+\\(?:center\\|left\\|right\\)\\)$")
+    (defvar plantuml-indent-regexp-oldif-start "^.*if\s+\".*\"\s+then$" "used in current activity diagram, sometimes already mentioned as deprecated")
+    (defvar plantuml-indent-regexp-macro-start "^\s*!definelong.*$")
+    (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
+                                               plantuml-indent-regexp-group-start
+                                               plantuml-indent-regexp-activate-start
+                                               plantuml-indent-regexp-box-start
+                                               plantuml-indent-regexp-ref-start
+                                               plantuml-indent-regexp-legend-start
+                                               plantuml-indent-regexp-note-start
+                                               plantuml-indent-regexp-oldif-start
+                                               plantuml-indent-regexp-title-start
+                                               plantuml-indent-regexp-header-start
+                                               plantuml-indent-regexp-footer-start
+                                               plantuml-indent-regexp-macro-start
+                                               plantuml-indent-regexp-oldif-start))
+    (defvar plantuml-indent-regexp-end "^\s*\\(?:}\\|endif\\|else\s*.*\\|end\\|end\s+note\\|endhnote\\|endrnote\\|end\s+box\\|end\s+ref\\|deactivate\s+.+\\|end\s+title\\|endheader\\|endfooter\\|endlegend\\|!enddefinelong\\)$")
     (setq plantuml-font-lock-keywords
           `(
             (,plantuml-types-regexp . font-lock-type-face)
@@ -400,9 +433,6 @@ Uses prefix (as PREFIX) to choose where to display it:
 
 (defun plantuml-current-block-depth ()
   "Trace the current block indentation level by recursively looking back line by line."
-  ;; forward declare the lazy initialized constants
-  (defvar plantuml-indent-regexp-start)
-  (defvar plantuml-indent-regexp-end)
   (save-excursion
     (let ((relative-depth 0))
       ;; current line
@@ -415,7 +445,7 @@ Uses prefix (as PREFIX) to choose where to display it:
         (forward-line -1)
         (if (looking-at plantuml-indent-regexp-end)
             (setq relative-depth (1- relative-depth)))
-        (if (looking-at plantuml-indent-regexp-start)
+        (if (-any? 'looking-at plantuml-indent-regexp-start)
             (setq relative-depth (1+ relative-depth))))
 
       (if (<= relative-depth 0)
@@ -426,9 +456,6 @@ Uses prefix (as PREFIX) to choose where to display it:
   "Indent the current line to its desired indentation level.
 Restore point to same position in text of the line as before indentation."
   (interactive)
-  ;; forward declare the lazy initialized constants
-  (defvar plantuml-indent-regexp-start)
-  (defvar plantuml-indent-regexp-end)
   ;; store position of point in line measured from end of line
   (let ((original-position-eol (- (line-end-position) (point))))
     (save-excursion
