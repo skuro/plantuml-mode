@@ -108,6 +108,11 @@
   :type '(repeat string)
   :group 'plantuml)
 
+(defcustom plantuml-tab-width tab-width
+  "The number of spaces used for indentation."
+  :type 'integer
+  :group 'plantuml)
+
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
   :type 'boolean
@@ -460,7 +465,7 @@ Restore point to same position in text of the line as before indentation."
   (let ((original-position-eol (- (line-end-position) (point))))
     (save-excursion
       (beginning-of-line)
-      (indent-line-to (* tab-width (plantuml-current-block-depth))))
+      (indent-line-to (* plantuml-tab-width (plantuml-current-block-depth))))
 
     ;; restore position in text of line
     (goto-char (- (line-end-position) original-position-eol))))

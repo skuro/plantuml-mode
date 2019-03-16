@@ -61,7 +61,7 @@ Finally, the indented text in the buffer will be compared with AFTER."
     (plantuml-mode)
     ;; use 2 spaces instead of one tab for indentation
     (setq-local indent-tabs-mode nil)
-    (setq-local tab-width 2)
+    (setq-local plantuml-tab-width 2)
 
     (indent-region (point-min) (point-max))
     (should (equal (buffer-string) after))))
