@@ -7,7 +7,7 @@
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: uml plantuml ascii
 ;; Version: 1.2.9
-;; Package-Version: 1.2.9pre2
+;; Package-Version: 1.2.9
 ;; Package-Requires: ((emacs "25.0"))
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@
 
 ;;; Change log:
 ;;
-;; version 1.2.9, ?????????? Support more keywords for block indentation
+;; version 1.2.9, Revamped indentation support, now working with a greater number of keywords
 ;; version 1.2.8, 2019-01-07 Support indentation for activate / deactivate blocks; allow customization of `plantuml-java-args'
 ;; version 1.2.7, 2018-08-15 Added support for indentation; Fixed the comiling error when installing with melpa
 ;; version 1.2.6, 2018-07-17 Introduced custom variable `plantuml-jar-args' to control which arguments are passed to PlantUML jar. Fix the warning of failing to specify types of 'defcustom' variables
