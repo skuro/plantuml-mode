@@ -347,7 +347,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 
     (defvar plantuml-indent-regexp-block-start "^.*{\s*$"
       "Indentation regex for all plantuml elements that might define a {} block.
-Plantuml elements like skinparam, rectangle, sprite, package, ….
+Plantuml elements like skinparam, rectangle, sprite, package, etc.
 The opening { has to be the last visible character in the line (whitespace
 might follow).")
     (defvar plantuml-indent-regexp-note-start "^\s*\\(floating\s+\\)?[hr]?note[^:]*?$" "simplyfied regex; note syntax is especially inconsistent across diagrams")
