@@ -93,6 +93,16 @@
     keymap)
   "Keymap for plantuml-mode.")
 
+(defcustom plantuml-run-as-executable nil
+  "Run plantuml as normal executable. Not as a jar."
+  :type 'boolean
+  :group 'plantuml)
+
+(defcustom plantuml-executable-path "plantuml"
+  "Path to the plantuml executable."
+  :type 'string
+  :group 'plantuml)
+
 (defcustom plantuml-java-command "java"
   "The java command used to execute PlantUML."
   :type 'string
@@ -164,7 +174,7 @@
 
 (defun plantuml-init ()
   "Initialize the keywords or builtins from the cmdline language output."
-  (unless (or (eq system-type 'cygwin) (file-exists-p plantuml-jar-path))
+  (unless (or (eq system-type 'cygwin) (file-exists-p plantuml-jar-path) plantuml-run-as-executable)
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
   (with-temp-buffer
     (let ((cmd-args (append (list plantuml-java-command nil t nil)
@@ -248,13 +258,18 @@ default output type for new buffers."
 
 (defun plantuml-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
-  (apply #'start-process
-         "PLANTUML" buf plantuml-java-command
-         `(,@plantuml-java-args
-           ,(expand-file-name plantuml-jar-path)
-           ,(plantuml-output-type-opt)
-           ,@plantuml-jar-args
-           "-p")))
+  (if plantuml-run-as-executable
+      (apply #'start-process
+             "PLANTUML" buf plantuml-executable-path
+             `(,(plantuml-output-type-opt)
+               "-p"))
+    (apply #'start-process
+           "PLANTUML" buf plantuml-java-command
+           `(,@plantuml-java-args
+             ,(expand-file-name plantuml-jar-path)
+             ,(plantuml-output-type-opt)
+             ,@plantuml-jar-args
+             "-p"))))
 
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
