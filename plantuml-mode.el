@@ -262,26 +262,32 @@ to choose where to display it:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
+  (let ((b (get-buffer plantuml-preview-buffer)))
+    (when b
+      (kill-buffer b)))
+
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
          (process-connection-type nil)
+         (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
 
-    (with-output-to-temp-buffer plantuml-preview-buffer
-      (let* ((buf (get-buffer-create plantuml-preview-buffer)) (ps (plantuml-start-process buf)))
-        (process-send-string ps string)
-        (process-send-eof ps)
-        (set-process-sentinel ps
-                              (lambda (_ps event)
-                                (unless (equal event "finished\n")
-                                  (error "PLANTUML Preview failed: %s" event))
-                                (cond
-                                 ((= prefix 16)
-                                  (switch-to-buffer-other-frame plantuml-preview-buffer))
-                                 ((= prefix 4)
-                                  (switch-to-buffer-other-window plantuml-preview-buffer)))
-                                (when imagep
+    (let ((ps (plantuml-start-process buf)))
+      (process-send-string ps string)
+      (process-send-eof ps)
+      (set-process-sentinel ps
+                            (lambda (_ps event)
+                              (unless (equal event "finished\n")
+                                (error "PLANTUML Preview failed: %s" event))
+                              (cond
+                               ((= prefix 16)
+                                (switch-to-buffer-other-frame plantuml-preview-buffer))
+                               ((= prefix 4)
+                                (switch-to-buffer-other-window plantuml-preview-buffer))
+                               (t (display-buffer plantuml-preview-buffer)))
+                              (when imagep
+                                (with-current-buffer plantuml-preview-buffer
                                   (image-mode)
                                   (set-buffer-multibyte t))))))))
 
