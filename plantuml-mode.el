@@ -285,10 +285,11 @@ to choose where to display it:
                                 (switch-to-buffer-other-frame plantuml-preview-buffer))
                                ((= prefix 4)
                                 (switch-to-buffer-other-window plantuml-preview-buffer))
-                               (t (switch-to-buffer plantuml-preview-buffer)))
+                               (t (display-buffer plantuml-preview-buffer)))
                               (when imagep
-                                (image-mode)
-                                (set-buffer-multibyte t)))))))
+                                (with-current-buffer plantuml-preview-buffer
+                                  (image-mode)
+                                  (set-buffer-multibyte t))))))))
 
 (defun plantuml-preview-buffer (prefix)
   "Preview diagram from the PlantUML sources in the current buffer.
