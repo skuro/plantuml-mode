@@ -37,6 +37,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.2.10, 2019-04-03 Avoid messing with window layouts and buffers -- courtesy of https://github.com/wailo
 ;; version 1.2.9, Revamped indentation support, now working with a greater number of keywords
 ;; version 1.2.8, 2019-01-07 Support indentation for activate / deactivate blocks; allow customization of `plantuml-java-args'
 ;; version 1.2.7, 2018-08-15 Added support for indentation; Fixed the comiling error when installing with melpa
