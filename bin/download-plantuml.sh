@@ -16,4 +16,5 @@ LATEST_VERSION="$(curl "${VERSIONS_URL}" | grep -oP) '(?<=<str name=\"v\">).*?(?
 DOWNLOAD_URL="https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/${LATEST_VERSION}/plantuml-${LATEST_VERSION}.jar"
 
 # finally, download the JAR file
-curl -o "${OUTPUT_PATH}" "${DOWNLOAD_URL}"
+echo "Downloading PlantUML v${LATEST_VERSION} into ${OUTPUT_PATH}"
+curl -so "${OUTPUT_PATH}" "${DOWNLOAD_URL}"
