@@ -5,6 +5,11 @@ default: &default-steps
   steps:
     - checkout
     - run:
+        # Note: this makes it hard to reproduce builds but easier to spot incompatibilities with
+        # newer PlantUML releases. Current trade off seems acceptable.
+        name: Download the latest PlantUML release
+        command: sh ./bin/download-plantuml.sh
+    - run:
         name: Update APT packages
         command: apt-get update
     - run:
