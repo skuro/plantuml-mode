@@ -26,6 +26,10 @@ Also, to enable preview you need to tell `plantuml-mode` where to locate the Pla
     M-x customize-variable<RET>
     plantuml-jar-path<RET>
 
+You can also download the latest version of PlantUML straight into `plantuml-jar-path`:
+
+    M-x plantuml-download-jar<RET>
+
 # Features
 
 - Syntax highlight
