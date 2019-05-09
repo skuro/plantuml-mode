@@ -69,6 +69,7 @@
 ;;; Code:
 (require 'thingatpt)
 (require 'dash)
+(require 'xml)
 
 (defgroup plantuml-mode nil
   "Major mode for editing plantuml file."
@@ -162,6 +163,32 @@
             (goto-char (point-max))
             (insert msg)
             (insert "\n"))))))
+
+(defun plantuml-download-jar ()
+  "Download the latest PlantUML JAR file and install it into `plantuml-jar-path'."
+  (interactive)
+  (if (y-or-n-p (format "Download the latest PlantUML JAR file into %s? " plantuml-jar-path))
+      (if (or (not (file-exists-p plantuml-jar-path))
+              (y-or-n-p (format "The PlantUML jar file already exists at %s, overwrite? " plantuml-jar-path)))
+          (with-current-buffer (url-retrieve-synchronously "https://search.maven.org/solrsearch/select?q=g:net.sourceforge.plantuml+AND+a:plantuml&core=gav&start=0&rows=1&wt=xml")
+            (mkdir (file-name-directory plantuml-jar-path) t)
+            (let* ((parse-tree (xml-parse-region))
+                   (doc        (->> parse-tree
+                                    (assq 'response)
+                                    (assq 'result)
+                                    (assq 'doc)))
+                   (strs       (xml-get-children doc 'str))
+                   (version    (->> strs
+                                    (--filter (string-equal "v" (xml-get-attribute it 'name)))
+                                    (first)
+                                    (xml-node-children)
+                                    (first))))
+              ;; (message (-filter (lambda (node) (string-equal "v" (xml-get-attribute node 'name))) strs))
+              (message (concat "Downloading PlantUML v" version " into " plantuml-jar-path))
+              (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path)
+              (kill-buffer))
+            (message "Aborted.")))
+    (message "Aborted.")))
 
 (defun plantuml-init ()
   "Initialize the keywords or builtins from the cmdline language output."
