@@ -183,7 +183,6 @@
                                     (first)
                                     (xml-node-children)
                                     (first))))
-              ;; (message (-filter (lambda (node) (string-equal "v" (xml-get-attribute node 'name))) strs))
               (message (concat "Downloading PlantUML v" version " into " plantuml-jar-path))
               (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path)
               (kill-buffer))
