@@ -8,7 +8,7 @@
 ;; Keywords: uml plantuml ascii
 ;; Version: 1.2.9
 ;; Package-Version: 1.2.9
-;; Package-Requires: ((emacs "25.0"))
+;; Package-Requires: ((dash "2.0.0") (emacs "25.0"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
