@@ -111,7 +111,7 @@
   :type '(repeat string)
   :group 'plantuml)
 
-(defcustom plantuml-default-exec-mode
+(defcustom plantuml-default-exec-mode 'jar
   "Default execution mode for PlantUML. Valid values are:
    - `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
   :type 'symbol
@@ -123,7 +123,7 @@
   :type 'boolean
   :group 'plantuml)
 
-(defun plantuml-render-command (&rest arguments)
+(defun plantuml-jar-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
   (let* ((cmd-list (append plantuml-java-args (list (expand-file-name plantuml-jar-path)) plantuml-jar-args arguments))
          (cmd (mapconcat 'identity cmd-list "|")))
@@ -201,15 +201,28 @@
         (message "Aborted."))
     (message "Aborted.")))
 
-(defun plantuml-init ()
-  "Initialize the keywords or builtins from the cmdline language output."
+(defun plantuml-jar-get-language (buf)
+  "Retrieve the language specification from the PlantUML JAR file and paste it into BUF."
   (unless (or (eq system-type 'cygwin) (file-exists-p plantuml-jar-path))
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
-  (with-temp-buffer
+  (with-current-buffer buf
     (let ((cmd-args (append (list plantuml-java-command nil t nil)
-                            (plantuml-render-command "-language"))))
+                            (plantuml-jar-render-command "-language"))))
       (apply 'call-process cmd-args)
-      (goto-char (point-min)))
+      (goto-char (point-min)))))
+
+(defun plantuml-get-language (mode buf)
+  "Retrieve the language spec using the preferred PlantUML execution mode MODE.  Paste the result into BUF."
+  (let ((get-fn (case mode
+                  ('jar #'plantuml-jar-get-language))))
+    (if get-fn
+        (funcall get-fn buf)
+      (error "Unsupported execution mode %s" mode))))
+
+(defun plantuml-init ()
+  "Initialize the keywords or builtins from the cmdline language output."
+  (with-temp-buffer
+    (plantuml-get-language plantuml-exec-mode (current-buffer))
     (let ((found (search-forward ";" nil t))
           (word "")
           (count 0)
@@ -278,14 +291,14 @@ default output type for new buffers."
   (setq plantuml-output-type type))
 
 (defun plantuml-is-image-output-p ()
-  "Return true if the diagram output format is an image, false if it's text based."
+  "Return non-nil if the diagram output format is an image, false if it's text based."
   (not (equal "utxt" plantuml-output-type)))
 
 (defun plantuml-output-type-opt ()
   "Create the flag to pass to PlantUML to produce the selected output format."
   (concat "-t" plantuml-output-type))
 
-(defun plantuml-start-process (buf)
+(defun plantuml-jar-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
   (apply #'start-process
          "PLANTUML" buf plantuml-java-command
@@ -295,40 +308,55 @@ default output type for new buffers."
            ,@plantuml-jar-args
            "-p")))
 
-(defun plantuml-preview-string (prefix string)
-  "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
-to choose where to display it:
+(defun plantuml-jar-preview-string (prefix string buf)
+  "Preview the diagram from STRING by running the PlantUML JAR and put the result into buffer BUF."
+  (let* ((imagep (and (display-images-p)
+                      (plantuml-is-image-output-p)))
+         (process-connection-type nil)
+         (ps (plantuml-jar-start-process buf)))
+    (process-send-string ps string)
+    (process-send-eof ps)
+    (set-process-sentinel ps
+                          (lambda (_ps event)
+                            (unless (equal event "finished\n")
+                              (error "PLANTUML Preview failed: %s" event))
+                            (cond
+                             ((= prefix 16)
+                              (switch-to-buffer-other-frame plantuml-preview-buffer))
+                             ((= prefix 4)
+                              (switch-to-buffer-other-window plantuml-preview-buffer))
+                             (t (display-buffer plantuml-preview-buffer)))
+                            (when imagep
+                              (with-current-buffer plantuml-preview-buffer
+                                (image-mode)
+                                (set-buffer-multibyte t)))))))
+
+(defun plantuml-exec-mode-preview-string (prefix mode string buf)
+  "Preview the diagram from STRING using the execution mode MODE.
+Put the result into buffer BUF, selecting the window according to PREFIX:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
+  (let ((preview-fn (case mode
+                      ('jar #'plantuml-jar-preview-string))))
+    (if preview-fn
+        (funcall preview-fn prefix string buf)
+      (error "Unsupported execution mode %s" mode))))
+
+(defun plantuml-preview-string (prefix string)
+  "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
+to choose where to display it."
   (let ((b (get-buffer plantuml-preview-buffer)))
     (when b
       (kill-buffer b)))
 
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
-         (process-connection-type nil)
          (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
 
-    (let ((ps (plantuml-start-process buf)))
-      (process-send-string ps string)
-      (process-send-eof ps)
-      (set-process-sentinel ps
-                            (lambda (_ps event)
-                              (unless (equal event "finished\n")
-                                (error "PLANTUML Preview failed: %s" event))
-                              (cond
-                               ((= prefix 16)
-                                (switch-to-buffer-other-frame plantuml-preview-buffer))
-                               ((= prefix 4)
-                                (switch-to-buffer-other-window plantuml-preview-buffer))
-                               (t (display-buffer plantuml-preview-buffer)))
-                              (when imagep
-                                (with-current-buffer plantuml-preview-buffer
-                                  (image-mode)
-                                  (set-buffer-multibyte t))))))))
+    (plantuml-exec-mode-preview-string prefix plantuml-exec-mode string buf)))
 
 (defun plantuml-preview-buffer (prefix)
   "Preview diagram from the PlantUML sources in the current buffer.
