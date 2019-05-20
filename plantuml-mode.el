@@ -111,6 +111,13 @@
   :type '(repeat string)
   :group 'plantuml)
 
+(defcustom plantuml-default-exec-mode
+  "Default execution mode for PlantUML. Valid values are:
+   - `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
+  :type 'symbol
+  :group 'plantuml
+  :options '(jar))
+
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
   :type 'boolean
@@ -143,6 +150,10 @@
 
 ;; keyword completion
 (defvar plantuml-kwdList nil "The plantuml keywords.")
+
+;; PlantUML execution mode
+(defvar-local plantuml-exec-mode plantuml-default-exec-mode
+  "The Plantuml execution mode. See `plantuml-default-exec-mode' for acceptable values.")
 
 (defun plantuml-enable-debug ()
   "Enables debug messages into the *PLANTUML Messages* buffer."
@@ -185,9 +196,9 @@
                                     (xml-node-children)
                                     (first))))
               (message (concat "Downloading PlantUML v" version " into " plantuml-jar-path))
-              (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path)
-              (kill-buffer))
-            (message "Aborted.")))
+              (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path t)
+              (kill-buffer)))
+        (message "Aborted."))
     (message "Aborted.")))
 
 (defun plantuml-init ()
