@@ -111,12 +111,17 @@
   :type '(repeat string)
   :group 'plantuml)
 
+(defcustom plantuml-server-url "http://www.plantuml.com/plantuml"
+  "The base URL of the PlantUML server."
+  :type 'string
+  :group 'plantuml)
+
 (defcustom plantuml-default-exec-mode 'jar
-  "Default execution mode for PlantUML. Valid values are:
-   - `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
+  "Default execution mode for PlantUML.  Valid values are:
+- `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
   :type 'symbol
   :group 'plantuml
-  :options '(jar))
+  :options '(jar server))
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
@@ -211,10 +216,18 @@
       (apply 'call-process cmd-args)
       (goto-char (point-min)))))
 
+(defun plantuml-server-get-language (buf)
+  "Retrieve the language specification from the PlantUML server and paste it into BUF."
+  ;; Currently waiting on https://github.com/plantuml/plantuml-server/pull/106 for a proper implementation
+  (let ((lang-url (concat plantuml-server-url "/language")))
+    (with-current-buffer buf
+      (url-insert-file-contents lang-url))))
+
 (defun plantuml-get-language (mode buf)
   "Retrieve the language spec using the preferred PlantUML execution mode MODE.  Paste the result into BUF."
   (let ((get-fn (pcase mode
-                  ('jar #'plantuml-jar-get-language))))
+                  ('jar #'plantuml-jar-get-language)
+                  ('server #'plantuml-server-get-language))))
     (if get-fn
         (funcall get-fn buf)
       (error "Unsupported execution mode %s" mode))))
@@ -330,6 +343,10 @@ default output type for new buffers."
                               (with-current-buffer plantuml-preview-buffer
                                 (image-mode)
                                 (set-buffer-multibyte t)))))))
+
+(defun plantuml-server-preview-string (prefix string buf)
+  "Preview the diagram from STRING as rendered by the PlantUML server.
+Put the result into buffer BUF and place it according to PREFIX.")
 
 (defun plantuml-exec-mode-preview-string (prefix mode string buf)
   "Preview the diagram from STRING using the execution mode MODE.
