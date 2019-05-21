@@ -213,7 +213,7 @@
 
 (defun plantuml-get-language (mode buf)
   "Retrieve the language spec using the preferred PlantUML execution mode MODE.  Paste the result into BUF."
-  (let ((get-fn (case mode
+  (let ((get-fn (pcase mode
                   ('jar #'plantuml-jar-get-language))))
     (if get-fn
         (funcall get-fn buf)
@@ -337,7 +337,7 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
-  (let ((preview-fn (case mode
+  (let ((preview-fn (pcase mode
                       ('jar #'plantuml-jar-preview-string))))
     (if preview-fn
         (funcall preview-fn prefix string buf)
