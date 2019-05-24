@@ -218,7 +218,6 @@
 
 (defun plantuml-server-get-language (buf)
   "Retrieve the language specification from the PlantUML server and paste it into BUF."
-  ;; Currently waiting on https://github.com/plantuml/plantuml-server/pull/106 for a proper implementation
   (let ((lang-url (concat plantuml-server-url "/language")))
     (with-current-buffer buf
       (url-insert-file-contents lang-url))))
@@ -322,7 +321,11 @@ default output type for new buffers."
            "-p")))
 
 (defun plantuml-jar-preview-string (prefix string buf)
-  "Preview the diagram from STRING by running the PlantUML JAR and put the result into buffer BUF."
+  "Preview the diagram from STRING by running the PlantUML JAR.
+Put the result into buffer BUF.  Window is selected according to PREFIX:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
          (process-connection-type nil)
@@ -334,13 +337,11 @@ default output type for new buffers."
                             (unless (equal event "finished\n")
                               (error "PLANTUML Preview failed: %s" event))
                             (cond
-                             ((= prefix 16)
-                              (switch-to-buffer-other-frame plantuml-preview-buffer))
-                             ((= prefix 4)
-                              (switch-to-buffer-other-window plantuml-preview-buffer))
-                             (t (display-buffer plantuml-preview-buffer)))
+                             ((= prefix 16) (switch-to-buffer-other-frame buf))
+                             ((= prefix 4)  (switch-to-buffer-other-window buf))
+                             (t             (display-buffer buf)))
                             (when imagep
-                              (with-current-buffer plantuml-preview-buffer
+                              (with-current-buffer buf
                                 (image-mode)
                                 (set-buffer-multibyte t)))))))
 
