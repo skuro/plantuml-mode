@@ -8,10 +8,13 @@
 
 ;;; Code:
 
-(defun assert-preview (puml output &optional format)
+(defun assert-preview (puml output &optional format mode)
   (if format
       (setq plantuml-output-type format)
     (setq plantuml-output-type "txt"))
+  (if mode
+      (setq plantuml-exec-mode mode)
+    (setq plantuml-exec-mode 'jar))
   (plantuml-preview-string 42 (read-test-file puml))
   (sleep-for 3)
   (should (equal (format-preview-output (replace-regexp-in-string " " "~" (read-test-file output)))
