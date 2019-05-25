@@ -116,7 +116,7 @@
   :type 'string
   :group 'plantuml)
 
-(defcustom plantuml-default-exec-mode 'jar
+(defcustom plantuml-default-exec-mode 'server
   "Default execution mode for PlantUML.  Valid values are:
 - `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
   :type 'symbol
@@ -227,6 +227,8 @@
   (let ((get-fn (pcase mode
                   ('jar #'plantuml-jar-get-language)
                   ('server #'plantuml-server-get-language))))
+    (message (symbol-name get-fn))
+    (message (concat "MODE" (symbol-name mode) (symbol-name plantuml-exec-mode)))
     (if get-fn
         (funcall get-fn buf)
       (error "Unsupported execution mode %s" mode))))
@@ -320,15 +322,30 @@ default output type for new buffers."
            ,@plantuml-jar-args
            "-p")))
 
+(defun plantuml-update-preview-buffer (prefix buf)
+  "Show the preview in the preview buffer BUF.
+Window is selected according to PREFIX:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (let ((imagep (and (display-images-p)
+                     (plantuml-is-image-output-p))))
+    (cond
+     ((= prefix 16) (switch-to-buffer-other-frame buf))
+     ((= prefix 4)  (switch-to-buffer-other-window buf))
+     (t             (display-buffer buf)))
+    (when imagep
+      (with-current-buffer buf
+        (image-mode)
+        (set-buffer-multibyte t)))))
+
 (defun plantuml-jar-preview-string (prefix string buf)
   "Preview the diagram from STRING by running the PlantUML JAR.
 Put the result into buffer BUF.  Window is selected according to PREFIX:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
-  (let* ((imagep (and (display-images-p)
-                      (plantuml-is-image-output-p)))
-         (process-connection-type nil)
+  (let* ((process-connection-type nil)
          (ps (plantuml-jar-start-process buf)))
     (process-send-string ps string)
     (process-send-eof ps)
@@ -336,18 +353,27 @@ Put the result into buffer BUF.  Window is selected according to PREFIX:
                           (lambda (_ps event)
                             (unless (equal event "finished\n")
                               (error "PLANTUML Preview failed: %s" event))
-                            (cond
-                             ((= prefix 16) (switch-to-buffer-other-frame buf))
-                             ((= prefix 4)  (switch-to-buffer-other-window buf))
-                             (t             (display-buffer buf)))
-                            (when imagep
-                              (with-current-buffer buf
-                                (image-mode)
-                                (set-buffer-multibyte t)))))))
+                            (plantuml-update-preview-buffer prefix buf)))))
 
 (defun plantuml-server-preview-string (prefix string buf)
   "Preview the diagram from STRING as rendered by the PlantUML server.
-Put the result into buffer BUF and place it according to PREFIX.")
+Put the result into buffer BUF and place it according to PREFIX:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (let* ((url-request-location (concat plantuml-server-url "/" plantuml-output-type "/-base64-" (base64-encode-string string))))
+    (save-current-buffer
+      (save-match-data
+        (url-retrieve url-request-location
+                      (lambda (status)
+                        ;; TODO: error check
+                        (goto-char (point-min))
+                        ;; skip the HTTP headers
+                        (while (not (looking-at "\n"))
+                          (forward-line))
+                        (kill-region (point-min) (+ 1 (point)))
+                        (copy-to-buffer buf (point-min) (point-max))
+                        (plantuml-update-preview-buffer prefix buf)))))))
 
 (defun plantuml-exec-mode-preview-string (prefix mode string buf)
   "Preview the diagram from STRING using the execution mode MODE.
@@ -356,7 +382,8 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
   (let ((preview-fn (pcase mode
-                      ('jar #'plantuml-jar-preview-string))))
+                      ('jar    #'plantuml-jar-preview-string)
+                      ('server #'plantuml-server-preview-string))))
     (if preview-fn
         (funcall preview-fn prefix string buf)
       (error "Unsupported execution mode %s" mode))))
