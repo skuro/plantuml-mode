@@ -10,14 +10,14 @@
 
 (defun assert-preview (puml output &optional format)
   (if format
-    (setq plantuml-output-type format)
-    (setq plantuml-output-type "utxt"))
+      (setq plantuml-output-type format)
+    (setq plantuml-output-type "txt"))
   (plantuml-preview-string 42 (read-test-file puml))
   (sleep-for 3)
   (should (equal (format-preview-output (replace-regexp-in-string " " "~" (read-test-file output)))
                  (format-preview-output (replace-regexp-in-string " " "~" (read-preview-buffer))))))
 
-(ert-deftest preview-utxt-test ()
+(ert-deftest preview-txt-test ()
   (setq-local plantuml-jar-path plantuml-test-jar-path)
   (assert-preview "a-b.puml" "a-b.txt"))
 

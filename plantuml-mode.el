@@ -274,10 +274,10 @@
 
 (defvar plantuml-output-type
   (if (not (display-images-p))
-      "utxt"
+      "txt"
     (cond ((image-type-available-p 'svg) "svg")
           ((image-type-available-p 'png) "png")
-          (t "utxt")))
+          (t "txt")))
   "Specify the desired output type to use for generated diagrams.")
 
 (defun plantuml-read-output-type ()
@@ -287,7 +287,7 @@
           (append
            (and (image-type-available-p 'svg) '("svg"))
            (and (image-type-available-p 'png) '("png"))
-           '("utxt"))))
+           '("txt"))))
     (completing-read (format "Output type [%s]: " plantuml-output-type)
                      available-types
                      nil
@@ -306,7 +306,7 @@ default output type for new buffers."
 
 (defun plantuml-is-image-output-p ()
   "Return non-nil if the diagram output format is an image, false if it's text based."
-  (not (equal "utxt" plantuml-output-type)))
+  (not (equal "txt" plantuml-output-type)))
 
 (defun plantuml-output-type-opt ()
   "Create the flag to pass to PlantUML to produce the selected output format."
