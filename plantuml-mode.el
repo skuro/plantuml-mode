@@ -165,13 +165,13 @@
   (interactive)
   (let* ((completion-ignore-case t)
          (supported-modes        '("jar" "server")))
-    (setq plantuml-exec-mode (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
-                                              supported-modes
-                                              nil
-                                              t
-                                              nil
-                                              nil
-                                              plantuml-exec-mode))))
+    (setq plantuml-exec-mode (intern (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
+                                                      supported-modes
+                                                      nil
+                                                      t
+                                                      nil
+                                                      nil
+                                                      plantuml-exec-mode)))))
 
 (defun plantuml-enable-debug ()
   "Enables debug messages into the *PLANTUML Messages* buffer."
@@ -299,13 +299,13 @@
            (and (image-type-available-p 'svg) '("svg"))
            (and (image-type-available-p 'png) '("png"))
            '("txt"))))
-    (setq plantuml-output-type (completing-read (format "Output type [%s]: " plantuml-output-type)
-                                                available-types
-                                                nil
-                                                t
-                                                nil
-                                                nil
-                                                plantuml-output-type))))
+    (completing-read (format "Output type [%s]: " plantuml-output-type)
+                     available-types
+                     nil
+                     t
+                     nil
+                     nil
+                     plantuml-output-type)))
 
 (defun plantuml-set-output-type (type)
   "Set the desired output type (as TYPE) for the current buffer.
