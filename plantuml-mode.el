@@ -160,6 +160,19 @@
 (defvar-local plantuml-exec-mode plantuml-default-exec-mode
   "The Plantuml execution mode. See `plantuml-default-exec-mode' for acceptable values.")
 
+(defun plantuml-set-exec-mode ()
+  "Set the execution mode for PlantUML."
+  (interactive)
+  (let* ((completion-ignore-case t)
+         (supported-modes        '("jar" "server")))
+    (setq plantuml-exec-mode (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
+                                              supported-modes
+                                              nil
+                                              t
+                                              nil
+                                              nil
+                                              plantuml-exec-mode))))
+
 (defun plantuml-enable-debug ()
   "Enables debug messages into the *PLANTUML Messages* buffer."
   (interactive)
@@ -227,8 +240,6 @@
   (let ((get-fn (pcase mode
                   ('jar #'plantuml-jar-get-language)
                   ('server #'plantuml-server-get-language))))
-    (message (symbol-name get-fn))
-    (message (concat "MODE" (symbol-name mode) (symbol-name plantuml-exec-mode)))
     (if get-fn
         (funcall get-fn buf)
       (error "Unsupported execution mode %s" mode))))
@@ -288,13 +299,13 @@
            (and (image-type-available-p 'svg) '("svg"))
            (and (image-type-available-p 'png) '("png"))
            '("txt"))))
-    (completing-read (format "Output type [%s]: " plantuml-output-type)
-                     available-types
-                     nil
-                     t
-                     nil
-                     nil
-                     plantuml-output-type)))
+    (setq plantuml-output-type (completing-read (format "Output type [%s]: " plantuml-output-type)
+                                                available-types
+                                                nil
+                                                t
+                                                nil
+                                                nil
+                                                plantuml-output-type))))
 
 (defun plantuml-set-output-type (type)
   "Set the desired output type (as TYPE) for the current buffer.
@@ -308,9 +319,12 @@ default output type for new buffers."
   "Return non-nil if the diagram output format is an image, false if it's text based."
   (not (equal "txt" plantuml-output-type)))
 
-(defun plantuml-output-type-opt ()
-  "Create the flag to pass to PlantUML to produce the selected output format."
-  (concat "-t" plantuml-output-type))
+(defun plantuml-jar-output-type-opt (output-type)
+  "Create the flag to pass to PlantUML according to OUTPUT-TYPE.
+Note that output type `txt' is promoted to `utxt' for better rendering."
+  (concat "-t" (pcase output-type
+                 ("txt" "utxt")
+                 (_     output-type))))
 
 (defun plantuml-jar-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
@@ -318,7 +332,7 @@ default output type for new buffers."
          "PLANTUML" buf plantuml-java-command
          `(,@plantuml-java-args
            ,(expand-file-name plantuml-jar-path)
-           ,(plantuml-output-type-opt)
+           ,(plantuml-jar-output-type-opt plantuml-output-type)
            ,@plantuml-jar-args
            "-p")))
 
@@ -400,7 +414,6 @@ to choose where to display it."
          (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
-
     (plantuml-exec-mode-preview-string prefix plantuml-exec-mode string buf)))
 
 (defun plantuml-preview-buffer (prefix)
