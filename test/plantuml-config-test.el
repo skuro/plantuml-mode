@@ -25,8 +25,7 @@
 
 (ert-deftest plantuml-config-test/set-exec-mode-wrong-mode ()
   "Test setting the exec mode with the wrong text"
-  :expected-result :failed
-  (plantuml-set-exec-mode "turing-machine"))
+  (should-error (plantuml-set-exec-mode "turing-machine")))
 
 (provide 'plantuml-mode-config-test)
 
