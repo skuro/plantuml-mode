@@ -54,7 +54,7 @@ Finally, the indented text in the buffer will be compared with AFTER."
     ;; fix the JAR location prior to mode initialization
     ;; for some reason, plantuml-mode disregards the setq-local
     (setq plantuml-jar-path plantuml-test-jar-path)
-    (plantuml-init-once)
+    (plantuml-init-once 'jar)
 
     (insert before)
     (goto-char (point-min))
