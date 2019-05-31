@@ -37,6 +37,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.3.0, 2019-05-31 Added experimental support for multiple rendering modes and, specifically, preview using a PlantUML server
 ;; version 1.2.11, 2019-04-09 Added `plantuml-download-jar'
 ;; version 1.2.10, 2019-04-03 Avoid messing with window layouts and buffers -- courtesy of https://github.com/wailo
 ;; version 1.2.9, Revamped indentation support, now working with a greater number of keywords
@@ -111,7 +112,7 @@
   :type '(repeat string)
   :group 'plantuml)
 
-(defcustom plantuml-server-url "http://www.plantuml.com/plantuml"
+(defcustom plantuml-server-url "https://www.plantuml.com/plantuml"
   "The base URL of the PlantUML server."
   :type 'string
   :group 'plantuml)
