@@ -35,6 +35,7 @@ You can also download the latest version of PlantUML straight into `plantuml-jar
 - Syntax highlight
 - Autocompletion
 - Preview of buffer or region
+- [EXPERIMENTAL] Use either local JAR or remote server for preview
 
 # Enable the major mode
 
@@ -87,6 +88,27 @@ Then you can edit a `plantuml` code block with `plantuml-mode` by hitting `C-'` 
 ```
 
 When in the `plantuml-mode` buffer you can then hit again `C-'` to return to the original `org-mode` document.
+
+# Execution modes
+
+**EXPERIMENTAL**
+
+As of `v1.3.0` support is added for switching execution mode. The following two modes are available:
+
+- `jar` (default) to run PlantUML as a local JAR file. This is the traditional system used by `plantuml-mode`
+- `server` (experimental) to let an instance of [`plantuml-server`](https://github.com/plantuml/plantuml-server) render the preview
+
+You can customize `plantuml-default-exec-mode` or run `plantuml-set-exec-mode` from a `plantuml-mode` buffer to switch modes.
+
+## Configure server rendering
+
+When selecting `server` execution modes, you can customize the following variable to set the server to use for rendering:
+
+```
+plantuml-server-url
+```
+
+It defaults to `"https://www.plantuml.com/plantuml"`.
 
 # Migration from `puml-mode`
 
