@@ -161,18 +161,20 @@
 (defvar-local plantuml-exec-mode plantuml-default-exec-mode
   "The Plantuml execution mode. See `plantuml-default-exec-mode' for acceptable values.")
 
-(defun plantuml-set-exec-mode ()
-  "Set the execution mode for PlantUML."
-  (interactive)
-  (let* ((completion-ignore-case t)
-         (supported-modes        '("jar" "server")))
-    (setq plantuml-exec-mode (intern (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
-                                                      supported-modes
-                                                      nil
-                                                      t
-                                                      nil
-                                                      nil
-                                                      plantuml-exec-mode)))))
+(defun plantuml-set-exec-mode (mode)
+  "Set the execution mode MODE for PlantUML."
+  (interactive (let* ((completion-ignore-case t)
+                      (supported-modes        '("jar" "server")))
+                 (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
+                                  supported-modes
+                                  nil
+                                  t
+                                  nil
+                                  nil
+                                  plantuml-exec-mode)))
+  (if (member mode '("jar" "server"))
+      (setq plantuml-exec-mode (intern mode))
+    (error (concat "Unsupported mode:" mode))))
 
 (defun plantuml-enable-debug ()
   "Enables debug messages into the *PLANTUML Messages* buffer."
