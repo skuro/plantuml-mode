@@ -20,6 +20,8 @@
     (should (equal 'server plantuml-exec-mode))
     (plantuml-set-exec-mode "jar")
     (should (equal 'jar plantuml-exec-mode))
+    (plantuml-set-exec-mode "executable")
+    (should (equal 'executable plantuml-exec-mode))
 
     (setq plantuml-exec-mode orig-mode)))
 
