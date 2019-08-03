@@ -379,7 +379,7 @@ Put the result into buffer BUF and place it according to PREFIX:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
-  (let* ((url-request-location (concat plantuml-server-url "/" plantuml-output-type "/-base64-" (base64-encode-string string))))
+  (let* ((url-request-location (concat plantuml-server-url "/" plantuml-output-type "/-base64-" (base64-encode-string string t))))
     (save-current-buffer
       (save-match-data
         (url-retrieve url-request-location
