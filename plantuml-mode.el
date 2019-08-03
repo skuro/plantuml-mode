@@ -165,13 +165,13 @@
   "Set the execution mode MODE for PlantUML."
   (interactive (let* ((completion-ignore-case t)
                       (supported-modes        '("jar" "server")))
-                 (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
-                                  supported-modes
-                                  nil
-                                  t
-                                  nil
-                                  nil
-                                  plantuml-exec-mode)))
+                 (list (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
+                                        supported-modes
+                                        nil
+                                        t
+                                        nil
+                                        nil
+                                        plantuml-exec-mode))))
   (if (member mode '("jar" "server"))
       (setq plantuml-exec-mode (intern mode))
     (error (concat "Unsupported mode:" mode))))
