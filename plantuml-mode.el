@@ -8,7 +8,7 @@
 ;; Keywords: uml plantuml ascii
 ;; Version: 1.2.9
 ;; Package-Version: 1.2.9
-;; Package-Requires: ((emacs "25.0"))
+;; Package-Requires: ((dash "2.0.0") (emacs "25.0"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@
 
 ;;; Change log:
 ;;
+;; version 1.3.1, 2019-08-02 Fixed interactive behavior of `plantuml-set-exec-mode'
+;; version 1.3.0, 2019-05-31 Added experimental support for multiple rendering modes and, specifically, preview using a PlantUML server
 ;; version 1.2.11, 2019-04-09 Added `plantuml-download-jar'
 ;; version 1.2.10, 2019-04-03 Avoid messing with window layouts and buffers -- courtesy of https://github.com/wailo
 ;; version 1.2.9, Revamped indentation support, now working with a greater number of keywords
@@ -84,7 +86,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.2.9pre2" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.3.1" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
@@ -111,12 +113,24 @@
   :type '(repeat string)
   :group 'plantuml)
 
+(defcustom plantuml-server-url "https://www.plantuml.com/plantuml"
+  "The base URL of the PlantUML server."
+  :type 'string
+  :group 'plantuml)
+
+(defcustom plantuml-default-exec-mode 'server
+  "Default execution mode for PlantUML.  Valid values are:
+- `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
+  :type 'symbol
+  :group 'plantuml
+  :options '(jar server))
+
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
   :type 'boolean
   :group 'plantuml)
 
-(defun plantuml-render-command (&rest arguments)
+(defun plantuml-jar-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
   (let* ((cmd-list (append plantuml-java-args (list (expand-file-name plantuml-jar-path)) plantuml-jar-args arguments))
          (cmd (mapconcat 'identity cmd-list "|")))
@@ -143,6 +157,25 @@
 
 ;; keyword completion
 (defvar plantuml-kwdList nil "The plantuml keywords.")
+
+;; PlantUML execution mode
+(defvar-local plantuml-exec-mode plantuml-default-exec-mode
+  "The Plantuml execution mode. See `plantuml-default-exec-mode' for acceptable values.")
+
+(defun plantuml-set-exec-mode (mode)
+  "Set the execution mode MODE for PlantUML."
+  (interactive (let* ((completion-ignore-case t)
+                      (supported-modes        '("jar" "server")))
+                 (list (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
+                                        supported-modes
+                                        nil
+                                        t
+                                        nil
+                                        nil
+                                        plantuml-exec-mode))))
+  (if (member mode '("jar" "server"))
+      (setq plantuml-exec-mode (intern mode))
+    (error (concat "Unsupported mode:" mode))))
 
 (defun plantuml-enable-debug ()
   "Enables debug messages into the *PLANTUML Messages* buffer."
@@ -185,20 +218,40 @@
                                     (xml-node-children)
                                     (first))))
               (message (concat "Downloading PlantUML v" version " into " plantuml-jar-path))
-              (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path)
-              (kill-buffer))
-            (message "Aborted.")))
+              (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path t)
+              (kill-buffer)))
+        (message "Aborted."))
     (message "Aborted.")))
 
-(defun plantuml-init ()
-  "Initialize the keywords or builtins from the cmdline language output."
+(defun plantuml-jar-get-language (buf)
+  "Retrieve the language specification from the PlantUML JAR file and paste it into BUF."
   (unless (or (eq system-type 'cygwin) (file-exists-p plantuml-jar-path))
     (error "Could not find plantuml.jar at %s" plantuml-jar-path))
-  (with-temp-buffer
+  (with-current-buffer buf
     (let ((cmd-args (append (list plantuml-java-command nil t nil)
-                            (plantuml-render-command "-language"))))
+                            (plantuml-jar-render-command "-language"))))
       (apply 'call-process cmd-args)
-      (goto-char (point-min)))
+      (goto-char (point-min)))))
+
+(defun plantuml-server-get-language (buf)
+  "Retrieve the language specification from the PlantUML server and paste it into BUF."
+  (let ((lang-url (concat plantuml-server-url "/language")))
+    (with-current-buffer buf
+      (url-insert-file-contents lang-url))))
+
+(defun plantuml-get-language (mode buf)
+  "Retrieve the language spec using the preferred PlantUML execution mode MODE.  Paste the result into BUF."
+  (let ((get-fn (pcase mode
+                  ('jar #'plantuml-jar-get-language)
+                  ('server #'plantuml-server-get-language))))
+    (if get-fn
+        (funcall get-fn buf)
+      (error "Unsupported execution mode %s" mode))))
+
+(defun plantuml-init (mode)
+  "Initialize the keywords or builtins from the cmdline language output.  Use exec mode MODE to load the language details."
+  (with-temp-buffer
+    (plantuml-get-language mode (current-buffer))
     (let ((found (search-forward ";" nil t))
           (word "")
           (count 0)
@@ -236,10 +289,10 @@
 
 (defvar plantuml-output-type
   (if (not (display-images-p))
-      "utxt"
+      "txt"
     (cond ((image-type-available-p 'svg) "svg")
           ((image-type-available-p 'png) "png")
-          (t "utxt")))
+          (t "txt")))
   "Specify the desired output type to use for generated diagrams.")
 
 (defun plantuml-read-output-type ()
@@ -249,7 +302,7 @@
           (append
            (and (image-type-available-p 'svg) '("svg"))
            (and (image-type-available-p 'png) '("png"))
-           '("utxt"))))
+           '("txt"))))
     (completing-read (format "Output type [%s]: " plantuml-output-type)
                      available-types
                      nil
@@ -267,57 +320,105 @@ default output type for new buffers."
   (setq plantuml-output-type type))
 
 (defun plantuml-is-image-output-p ()
-  "Return true if the diagram output format is an image, false if it's text based."
-  (not (equal "utxt" plantuml-output-type)))
+  "Return non-nil if the diagram output format is an image, false if it's text based."
+  (not (equal "txt" plantuml-output-type)))
 
-(defun plantuml-output-type-opt ()
-  "Create the flag to pass to PlantUML to produce the selected output format."
-  (concat "-t" plantuml-output-type))
+(defun plantuml-jar-output-type-opt (output-type)
+  "Create the flag to pass to PlantUML according to OUTPUT-TYPE.
+Note that output type `txt' is promoted to `utxt' for better rendering."
+  (concat "-t" (pcase output-type
+                 ("txt" "utxt")
+                 (_     output-type))))
 
-(defun plantuml-start-process (buf)
+(defun plantuml-jar-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
   (apply #'start-process
          "PLANTUML" buf plantuml-java-command
          `(,@plantuml-java-args
            ,(expand-file-name plantuml-jar-path)
-           ,(plantuml-output-type-opt)
+           ,(plantuml-jar-output-type-opt plantuml-output-type)
            ,@plantuml-jar-args
            "-p")))
 
-(defun plantuml-preview-string (prefix string)
-  "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
-to choose where to display it:
+(defun plantuml-update-preview-buffer (prefix buf)
+  "Show the preview in the preview buffer BUF.
+Window is selected according to PREFIX:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
+  (let ((imagep (and (display-images-p)
+                     (plantuml-is-image-output-p))))
+    (cond
+     ((= prefix 16) (switch-to-buffer-other-frame buf))
+     ((= prefix 4)  (switch-to-buffer-other-window buf))
+     (t             (display-buffer buf)))
+    (when imagep
+      (with-current-buffer buf
+        (image-mode)
+        (set-buffer-multibyte t)))))
+
+(defun plantuml-jar-preview-string (prefix string buf)
+  "Preview the diagram from STRING by running the PlantUML JAR.
+Put the result into buffer BUF.  Window is selected according to PREFIX:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (let* ((process-connection-type nil)
+         (ps (plantuml-jar-start-process buf)))
+    (process-send-string ps string)
+    (process-send-eof ps)
+    (set-process-sentinel ps
+                          (lambda (_ps event)
+                            (unless (equal event "finished\n")
+                              (error "PLANTUML Preview failed: %s" event))
+                            (plantuml-update-preview-buffer prefix buf)))))
+
+(defun plantuml-server-preview-string (prefix string buf)
+  "Preview the diagram from STRING as rendered by the PlantUML server.
+Put the result into buffer BUF and place it according to PREFIX:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (let* ((url-request-location (concat plantuml-server-url "/" plantuml-output-type "/-base64-" (base64-encode-string string))))
+    (save-current-buffer
+      (save-match-data
+        (url-retrieve url-request-location
+                      (lambda (status)
+                        ;; TODO: error check
+                        (goto-char (point-min))
+                        ;; skip the HTTP headers
+                        (while (not (looking-at "\n"))
+                          (forward-line))
+                        (kill-region (point-min) (+ 1 (point)))
+                        (copy-to-buffer buf (point-min) (point-max))
+                        (plantuml-update-preview-buffer prefix buf)))))))
+
+(defun plantuml-exec-mode-preview-string (prefix mode string buf)
+  "Preview the diagram from STRING using the execution mode MODE.
+Put the result into buffer BUF, selecting the window according to PREFIX:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (let ((preview-fn (pcase mode
+                      ('jar    #'plantuml-jar-preview-string)
+                      ('server #'plantuml-server-preview-string))))
+    (if preview-fn
+        (funcall preview-fn prefix string buf)
+      (error "Unsupported execution mode %s" mode))))
+
+(defun plantuml-preview-string (prefix string)
+  "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
+to choose where to display it."
   (let ((b (get-buffer plantuml-preview-buffer)))
     (when b
       (kill-buffer b)))
 
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
-         (process-connection-type nil)
          (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
-
-    (let ((ps (plantuml-start-process buf)))
-      (process-send-string ps string)
-      (process-send-eof ps)
-      (set-process-sentinel ps
-                            (lambda (_ps event)
-                              (unless (equal event "finished\n")
-                                (error "PLANTUML Preview failed: %s" event))
-                              (cond
-                               ((= prefix 16)
-                                (switch-to-buffer-other-frame plantuml-preview-buffer))
-                               ((= prefix 4)
-                                (switch-to-buffer-other-window plantuml-preview-buffer))
-                               (t (display-buffer plantuml-preview-buffer)))
-                              (when imagep
-                                (with-current-buffer plantuml-preview-buffer
-                                  (image-mode)
-                                  (set-buffer-multibyte t))))))))
+    (plantuml-exec-mode-preview-string prefix plantuml-exec-mode string buf)))
 
 (defun plantuml-preview-buffer (prefix)
   "Preview diagram from the PlantUML sources in the current buffer.
@@ -365,73 +466,74 @@ Uses prefix (as PREFIX) to choose where to display it:
       (plantuml-preview-region prefix (region-beginning) (region-end))
     (plantuml-preview-buffer prefix)))
 
-(defun plantuml-init-once ()
-  "Ensure initialization only happens once."
-  (unless plantuml-kwdList
-    (plantuml-init)
-    (defvar plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
-    (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
-    (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
-    (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
+(defun plantuml-init-once (&optional mode)
+  "Ensure initialization only happens once.  Use exec mode MODE to load the language details, which defaults to `plantuml-exec-mode'."
+  (let ((mode (or mode plantuml-exec-mode)))
+    (unless plantuml-kwdList
+      (plantuml-init mode)
+      (defvar plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
+      (defvar plantuml-keywords-regexp (concat "^\\s *" (regexp-opt plantuml-keywords 'words)  "\\|\\(<\\|<|\\|\\*\\|o\\)\\(\\.+\\|-+\\)\\|\\(\\.+\\|-+\\)\\(>\\||>\\|\\*\\|o\\)\\|\\.\\{2,\\}\\|-\\{2,\\}"))
+      (defvar plantuml-builtins-regexp (regexp-opt plantuml-builtins 'words))
+      (defvar plantuml-preprocessors-regexp (concat "^\\s *" (regexp-opt plantuml-preprocessors 'words)))
 
-    (defvar plantuml-indent-regexp-block-start "^.*{\s*$"
-      "Indentation regex for all plantuml elements that might define a {} block.
+      (defvar plantuml-indent-regexp-block-start "^.*{\s*$"
+        "Indentation regex for all plantuml elements that might define a {} block.
 Plantuml elements like skinparam, rectangle, sprite, package, etc.
 The opening { has to be the last visible character in the line (whitespace
 might follow).")
-    (defvar plantuml-indent-regexp-note-start "^\s*\\(floating\s+\\)?[hr]?note[^:]*?$" "simplyfied regex; note syntax is especially inconsistent across diagrams")
-    (defvar plantuml-indent-regexp-group-start "^\s*\\(alt\\|else\\|opt\\|loop\\|par\\|break\\|critical\\|group\\)\\(?:\s+.+\\|$\\)"
-      "Indentation regex for plantuml group elements that are defined for sequence diagrams.
+      (defvar plantuml-indent-regexp-note-start "^\s*\\(floating\s+\\)?[hr]?note[^:]*?$" "simplyfied regex; note syntax is especially inconsistent across diagrams")
+      (defvar plantuml-indent-regexp-group-start "^\s*\\(alt\\|else\\|opt\\|loop\\|par\\|break\\|critical\\|group\\)\\(?:\s+.+\\|$\\)"
+        "Indentation regex for plantuml group elements that are defined for sequence diagrams.
 Two variants for groups: keyword is either followed by whitespace and some text
 or it is followed by line end.")
-    (defvar plantuml-indent-regexp-activate-start "^\s*activate\s+.+$")
-    (defvar plantuml-indent-regexp-box-start "^\s*box\s+.+$")
-    (defvar plantuml-indent-regexp-ref-start "^ref\s+over\s+[^:]+?$")
-    (defvar plantuml-indent-regexp-title-start "^\s*title$")
-    (defvar plantuml-indent-regexp-header-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+header\\|header\\)$")
-    (defvar plantuml-indent-regexp-footer-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+footer\\|footer\\)$")
-    (defvar plantuml-indent-regexp-legend-start "^\s*\\(?:legend\\|legend\s+\\(?:bottom\\|top\\)\\|legend\s+\\(?:center\\|left\\|right\\)\\|legend\s+\\(?:bottom\\|top\\)\s+\\(?:center\\|left\\|right\\)\\)$")
-    (defvar plantuml-indent-regexp-oldif-start "^.*if\s+\".*\"\s+then$" "used in current activity diagram, sometimes already mentioned as deprecated")
-    (defvar plantuml-indent-regexp-macro-start "^\s*!definelong.*$")
-    (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
-                                               plantuml-indent-regexp-group-start
-                                               plantuml-indent-regexp-activate-start
-                                               plantuml-indent-regexp-box-start
-                                               plantuml-indent-regexp-ref-start
-                                               plantuml-indent-regexp-legend-start
-                                               plantuml-indent-regexp-note-start
-                                               plantuml-indent-regexp-oldif-start
-                                               plantuml-indent-regexp-title-start
-                                               plantuml-indent-regexp-header-start
-                                               plantuml-indent-regexp-footer-start
-                                               plantuml-indent-regexp-macro-start
-                                               plantuml-indent-regexp-oldif-start))
-    (defvar plantuml-indent-regexp-end "^\s*\\(?:}\\|endif\\|else\s*.*\\|end\\|end\s+note\\|endhnote\\|endrnote\\|end\s+box\\|end\s+ref\\|deactivate\s+.+\\|end\s+title\\|endheader\\|endfooter\\|endlegend\\|!enddefinelong\\)$")
-    (setq plantuml-font-lock-keywords
-          `(
-            (,plantuml-types-regexp . font-lock-type-face)
-            (,plantuml-keywords-regexp . font-lock-keyword-face)
-            (,plantuml-builtins-regexp . font-lock-builtin-face)
-            (,plantuml-preprocessors-regexp . font-lock-preprocessor-face)
-            ;; note: order matters
-            ))
+      (defvar plantuml-indent-regexp-activate-start "^\s*activate\s+.+$")
+      (defvar plantuml-indent-regexp-box-start "^\s*box\s+.+$")
+      (defvar plantuml-indent-regexp-ref-start "^ref\s+over\s+[^:]+?$")
+      (defvar plantuml-indent-regexp-title-start "^\s*title$")
+      (defvar plantuml-indent-regexp-header-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+header\\|header\\)$")
+      (defvar plantuml-indent-regexp-footer-start "^\s*\\(?:\\(?:center\\|left\\|right\\)\s+footer\\|footer\\)$")
+      (defvar plantuml-indent-regexp-legend-start "^\s*\\(?:legend\\|legend\s+\\(?:bottom\\|top\\)\\|legend\s+\\(?:center\\|left\\|right\\)\\|legend\s+\\(?:bottom\\|top\\)\s+\\(?:center\\|left\\|right\\)\\)$")
+      (defvar plantuml-indent-regexp-oldif-start "^.*if\s+\".*\"\s+then$" "used in current activity diagram, sometimes already mentioned as deprecated")
+      (defvar plantuml-indent-regexp-macro-start "^\s*!definelong.*$")
+      (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
+                                                 plantuml-indent-regexp-group-start
+                                                 plantuml-indent-regexp-activate-start
+                                                 plantuml-indent-regexp-box-start
+                                                 plantuml-indent-regexp-ref-start
+                                                 plantuml-indent-regexp-legend-start
+                                                 plantuml-indent-regexp-note-start
+                                                 plantuml-indent-regexp-oldif-start
+                                                 plantuml-indent-regexp-title-start
+                                                 plantuml-indent-regexp-header-start
+                                                 plantuml-indent-regexp-footer-start
+                                                 plantuml-indent-regexp-macro-start
+                                                 plantuml-indent-regexp-oldif-start))
+      (defvar plantuml-indent-regexp-end "^\s*\\(?:}\\|endif\\|else\s*.*\\|end\\|end\s+note\\|endhnote\\|endrnote\\|end\s+box\\|end\s+ref\\|deactivate\s+.+\\|end\s+title\\|endheader\\|endfooter\\|endlegend\\|!enddefinelong\\)$")
+      (setq plantuml-font-lock-keywords
+            `(
+              (,plantuml-types-regexp . font-lock-type-face)
+              (,plantuml-keywords-regexp . font-lock-keyword-face)
+              (,plantuml-builtins-regexp . font-lock-builtin-face)
+              (,plantuml-preprocessors-regexp . font-lock-preprocessor-face)
+              ;; note: order matters
+              ))
 
-    (setq plantuml-kwdList (make-hash-table :test 'equal))
-    (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-types)
-    (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-keywords)
-    (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-builtins)
-    (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-preprocessors)
-    (put 'plantuml-kwdList 'risky-local-variable t)
+      (setq plantuml-kwdList (make-hash-table :test 'equal))
+      (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-types)
+      (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-keywords)
+      (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-builtins)
+      (mapc (lambda (x) (puthash x t plantuml-kwdList)) plantuml-preprocessors)
+      (put 'plantuml-kwdList 'risky-local-variable t)
 
-    ;; clear memory
-    (setq plantuml-types nil)
-    (setq plantuml-keywords nil)
-    (setq plantuml-builtins nil)
-    (setq plantuml-preprocessors nil)
-    (setq plantuml-types-regexp nil)
-    (setq plantuml-keywords-regexp nil)
-    (setq plantuml-builtins-regexp nil)
-    (setq plantuml-preprocessors-regexp nil)))
+      ;; clear memory
+      (setq plantuml-types nil)
+      (setq plantuml-keywords nil)
+      (setq plantuml-builtins nil)
+      (setq plantuml-preprocessors nil)
+      (setq plantuml-types-regexp nil)
+      (setq plantuml-keywords-regexp nil)
+      (setq plantuml-builtins-regexp nil)
+      (setq plantuml-preprocessors-regexp nil))))
 
 (defun plantuml-complete-symbol ()
   "Perform keyword completion on word before cursor."
