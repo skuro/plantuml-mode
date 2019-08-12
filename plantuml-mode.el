@@ -159,8 +159,8 @@
 (defvar plantuml-kwdList nil "The plantuml keywords.")
 
 ;; PlantUML execution mode
-(defvar-local plantuml-exec-mode plantuml-default-exec-mode
-  "The Plantuml execution mode. See `plantuml-default-exec-mode' for acceptable values.")
+(defvar-local plantuml-exec-mode nil
+  "The Plantuml execution mode override. See `plantuml-default-exec-mode' for acceptable values.")
 
 (defun plantuml-set-exec-mode (mode)
   "Set the execution mode MODE for PlantUML."
@@ -176,6 +176,11 @@
   (if (member mode '("jar" "server"))
       (setq plantuml-exec-mode (intern mode))
     (error (concat "Unsupported mode:" mode))))
+
+(defun plantuml-get-exec-mode ()
+  "Retrieves the currently active PlantUML exec mode."
+  (or plantuml-exec-mode
+      plantuml-default-exec-mode))
 
 (defun plantuml-enable-debug ()
   "Enables debug messages into the *PLANTUML Messages* buffer."
@@ -418,7 +423,7 @@ to choose where to display it."
          (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
-    (plantuml-exec-mode-preview-string prefix plantuml-exec-mode string buf)))
+    (plantuml-exec-mode-preview-string prefix (plantuml-get-exec-mode) string buf)))
 
 (defun plantuml-preview-buffer (prefix)
   "Preview diagram from the PlantUML sources in the current buffer.
@@ -467,8 +472,8 @@ Uses prefix (as PREFIX) to choose where to display it:
     (plantuml-preview-buffer prefix)))
 
 (defun plantuml-init-once (&optional mode)
-  "Ensure initialization only happens once.  Use exec mode MODE to load the language details, which defaults to `plantuml-exec-mode'."
-  (let ((mode (or mode plantuml-exec-mode)))
+  "Ensure initialization only happens once.  Use exec mode MODE to load the language details or by first querying `plantuml-get-exec-mode'."
+  (let ((mode (or mode (plantuml-get-exec-mode))))
     (unless plantuml-kwdList
       (plantuml-init mode)
       (defvar plantuml-types-regexp (concat "^\\s *\\(" (regexp-opt plantuml-types 'words) "\\|\\<\\(note\\s +over\\|note\\s +\\(left\\|right\\|bottom\\|top\\)\\s +\\(of\\)?\\)\\>\\|\\<\\(\\(left\\|center\\|right\\)\\s +\\(header\\|footer\\)\\)\\>\\)"))
