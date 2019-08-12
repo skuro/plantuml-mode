@@ -621,8 +621,8 @@ Shortcuts             Command Name
   (if (and plantuml-suppress-deprecation-warning
            (featurep 'puml-mode))
       (display-warning :warning
-                       "`puml-mode' is now deprecated and no longer updated, but it's still present in your system.\
-You should move your configuration to use `plantuml-mode'. See https://github.com/sytac/plantuml-mode. \
+                       "`puml-mode' is now deprecated and no longer updated, but it's still present in your system. \
+You should move your configuration to use `plantuml-mode'. \
 See more at https://github.com/skuro/puml-mode/issues/26")))
 
 (add-hook 'plantuml-mode-hook 'plantuml-deprecation-warning)
