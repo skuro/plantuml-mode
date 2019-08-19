@@ -84,6 +84,12 @@
   :type 'string
   :group 'plantuml)
 
+(defcustom plantuml-executable-path
+  "plantuml"
+  "The location of the PlantUML executable."
+  :type 'string
+  :group 'plantuml)
+
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
 (defconst plantuml-mode-version "1.3.1" "The plantuml-mode version string.")
@@ -118,12 +124,17 @@
   :type 'string
   :group 'plantuml)
 
+(defcustom plantuml-executable-args (list "-headless")
+  "The parameters passed to plantuml executable when executing PlantUML."
+  :type '(repeat string)
+  :group 'plantuml)
+
 (defcustom plantuml-default-exec-mode 'server
   "Default execution mode for PlantUML.  Valid values are:
 - `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
   :type 'symbol
   :group 'plantuml
-  :options '(jar server))
+  :options '(jar server executable))
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
@@ -165,15 +176,15 @@
 (defun plantuml-set-exec-mode (mode)
   "Set the execution mode MODE for PlantUML."
   (interactive (let* ((completion-ignore-case t)
-                      (supported-modes        '("jar" "server")))
+                      (supported-modes        '("jar" "server" "executable")))
                  (list (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
-                                        supported-modes
-                                        nil
-                                        t
-                                        nil
-                                        nil
-                                        plantuml-exec-mode))))
-  (if (member mode '("jar" "server"))
+                                  supported-modes
+                                  nil
+                                  t
+                                  nil
+                                  nil
+                                  plantuml-exec-mode))))
+  (if (member mode '("jar" "server" "executable"))
       (setq plantuml-exec-mode (intern mode))
     (error (concat "Unsupported mode:" mode))))
 
@@ -244,11 +255,19 @@
     (with-current-buffer buf
       (url-insert-file-contents lang-url))))
 
+(defun plantuml-executable-get-language (buf)
+  "Retrieve the language specification from the PlantUML executable and paste it into BUF."
+  (with-current-buffer buf
+    (let ((cmd-args (append (list plantuml-executable-path nil t nil) (list "-language"))))
+      (apply 'call-process cmd-args)
+      (goto-char (point-min)))))
+
 (defun plantuml-get-language (mode buf)
   "Retrieve the language spec using the preferred PlantUML execution mode MODE.  Paste the result into BUF."
   (let ((get-fn (pcase mode
                   ('jar #'plantuml-jar-get-language)
-                  ('server #'plantuml-server-get-language))))
+                  ('server #'plantuml-server-get-language)
+                  ('executable #'plantuml-executable-get-language))))
     (if get-fn
         (funcall get-fn buf)
       (error "Unsupported execution mode %s" mode))))
@@ -345,6 +364,14 @@ Note that output type `txt' is promoted to `utxt' for better rendering."
            ,@plantuml-jar-args
            "-p")))
 
+(defun plantuml-executable-start-process (buf)
+  "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
+  (apply #'start-process
+         "PLANTUML" buf plantuml-executable-path
+         `(,@plantuml-executable-args
+           ,(plantuml-jar-output-type-opt plantuml-output-type)
+           "-p")))
+
 (defun plantuml-update-preview-buffer (prefix buf)
   "Show the preview in the preview buffer BUF.
 Window is selected according to PREFIX:
@@ -398,6 +425,22 @@ Put the result into buffer BUF and place it according to PREFIX:
                         (copy-to-buffer buf (point-min) (point-max))
                         (plantuml-update-preview-buffer prefix buf)))))))
 
+(defun plantuml-executable-preview-string (prefix string buf)
+  "Preview the diagram from STRING by running the PlantUML JAR.
+Put the result into buffer BUF.  Window is selected according to PREFIX:
+- 4  (when prefixing the command with C-u) -> new window
+- 16 (when prefixing the command with C-u C-u) -> new frame.
+- else -> new buffer"
+  (let* ((process-connection-type nil)
+         (ps (plantuml-executable-start-process buf)))
+    (process-send-string ps string)
+    (process-send-eof ps)
+    (set-process-sentinel ps
+                          (lambda (_ps event)
+                            (unless (equal event "finished\n")
+                              (error "PLANTUML Preview failed: %s" event))
+                            (plantuml-update-preview-buffer prefix buf)))))
+
 (defun plantuml-exec-mode-preview-string (prefix mode string buf)
   "Preview the diagram from STRING using the execution mode MODE.
 Put the result into buffer BUF, selecting the window according to PREFIX:
@@ -406,7 +449,8 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
 - else -> new buffer"
   (let ((preview-fn (pcase mode
                       ('jar    #'plantuml-jar-preview-string)
-                      ('server #'plantuml-server-preview-string))))
+                      ('server #'plantuml-server-preview-string)
+                      ('executable #'plantuml-executable-preview-string))))
     (if preview-fn
         (funcall preview-fn prefix string buf)
       (error "Unsupported execution mode %s" mode))))

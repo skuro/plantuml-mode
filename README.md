@@ -97,6 +97,7 @@ As of `v1.3.0` support is added for switching execution mode. The following two 
 
 - `jar` (default) to run PlantUML as a local JAR file. This is the traditional system used by `plantuml-mode`
 - `server` (experimental) to let an instance of [`plantuml-server`](https://github.com/plantuml/plantuml-server) render the preview
+- `executable` to run PlantUML as a local executable file. This is useful if your package manager provides a executable for PlantUML.
 
 You can customize `plantuml-default-exec-mode` or run `plantuml-set-exec-mode` from a `plantuml-mode` buffer to switch modes.
 
