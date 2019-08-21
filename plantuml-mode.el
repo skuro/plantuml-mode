@@ -102,7 +102,7 @@
   :type 'string
   :group 'plantuml)
 
-(defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar")
+(defcustom plantuml-java-args (list "-Djava.awt.headless=true" "-jar" "--illegal-access=deny")
   "The parameters passed to `plantuml-java-command' when executing PlantUML."
   :type '(repeat string)
   :group 'plantuml)
