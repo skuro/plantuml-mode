@@ -10,13 +10,13 @@
 
 (ert-deftest custom-jar-location ()
   (setq-local plantuml-jar-path "~/.plantuml/plantuml.jar")
-  (should (equal `("-Djava.awt.headless=true" "-jar"
+  (should (equal `("-Djava.awt.headless=true" "-jar" "--illegal-access=deny"
                    ,(expand-file-name "~/.plantuml/plantuml.jar")
                    "-charset" "UTF-8")
                  (plantuml-jar-render-command)))
 
   (setq-local plantuml-jar-path "/path/with spaces/plantuml.jar")
-  (should (equal `("-Djava.awt.headless=true" "-jar" "/path/with spaces/plantuml.jar" "-charset" "UTF-8")
+  (should (equal `("-Djava.awt.headless=true" "-jar" "--illegal-access=deny" "/path/with spaces/plantuml.jar" "-charset" "UTF-8")
                  (plantuml-jar-render-command))))
 
 (provide 'plantuml-mode-custom-jar-location-test)
