@@ -11,7 +11,7 @@ function grab_version(){
 # Updates the version in-place
 function update_version(){
     NEW_VERSION="${1}"
-    sed -i -E "s/plantuml-mode-version \"[1-9\.]+\"/plantuml-mode-version \"${1}\"/" plantuml-mode.el
+    sed -i -E "s/plantuml-mode-version \"[0-9\.]+\"/plantuml-mode-version \"${1}\"/" plantuml-mode.el
 }
 
 case "$(git rev-parse --abbrev-ref HEAD)" in
@@ -22,7 +22,7 @@ case "$(git rev-parse --abbrev-ref HEAD)" in
     ;;
 
     'develop')
-        VERSION="$(date '+%Y%m%d.%-H%M')" # MELPA style
+        VERSION="$(TZ='UTC' date '+%Y%m%d.%-H%M')" # MELPA style
         update_version "${VERSION}"
         git add plantuml-mode.el
     ;;
