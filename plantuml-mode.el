@@ -178,12 +178,12 @@
   (interactive (let* ((completion-ignore-case t)
                       (supported-modes        '("jar" "server" "executable")))
                  (list (completing-read (format "Exec mode [%s]: " plantuml-exec-mode)
-                                  supported-modes
-                                  nil
-                                  t
-                                  nil
-                                  nil
-                                  plantuml-exec-mode))))
+                                        supported-modes
+                                        nil
+                                        t
+                                        nil
+                                        nil
+                                        plantuml-exec-mode))))
   (if (member mode '("jar" "server" "executable"))
       (setq plantuml-exec-mode (intern mode))
     (error (concat "Unsupported mode:" mode))))
@@ -230,9 +230,9 @@
                    (strs       (xml-get-children doc 'str))
                    (version    (->> strs
                                     (--filter (string-equal "v" (xml-get-attribute it 'name)))
-                                    (first)
+                                    (car)
                                     (xml-node-children)
-                                    (first))))
+                                    (car))))
               (message (concat "Downloading PlantUML v" version " into " plantuml-jar-path))
               (url-copy-file (format "https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/%s/plantuml-%s.jar" version version) plantuml-jar-path t)
               (kill-buffer)))
