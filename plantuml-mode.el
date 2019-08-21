@@ -37,6 +37,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.4.0, 2019-08-21 Added `executable' exec mode to use locally installed `plantuml' binaries, various bugfixes
 ;; version 1.3.1, 2019-08-02 Fixed interactive behavior of `plantuml-set-exec-mode'
 ;; version 1.3.0, 2019-05-31 Added experimental support for multiple rendering modes and, specifically, preview using a PlantUML server
 ;; version 1.2.11, 2019-04-09 Added `plantuml-download-jar'
@@ -92,7 +93,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "20190821.1234" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.4.0" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
