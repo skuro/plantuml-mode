@@ -97,6 +97,7 @@ As of `v1.3.0` support is added for switching execution mode. The following two 
 
 - `jar` (default) to run PlantUML as a local JAR file. This is the traditional system used by `plantuml-mode`
 - `server` (experimental) to let an instance of [`plantuml-server`](https://github.com/plantuml/plantuml-server) render the preview
+- `executable` to run PlantUML as a local executable file. This is useful if your package manager provides a executable for PlantUML.
 
 You can customize `plantuml-default-exec-mode` or run `plantuml-set-exec-mode` from a `plantuml-mode` buffer to switch modes.
 
@@ -138,11 +139,20 @@ the textual mode and see if the output is valid SVG.
 
 ## Development
 
+Development happens mostly on the `develop` branch, which is released on MELPA at every commit. The `master` branch is used to generate tags which are then released to [MELPA
+stable](https://stable.melpa.org).
+
 In order to contribute to `plantuml-mode` make sure to:
 
 - agree with the [GPLv3+ licencing terms](#License) as they are mandated by Emacs
 - install [`cask`](https://github.com/cask/cask)
 - always test your code and run the full test suite with `cask exec ert-runner` (or just by `make`)
+- ensure you always target `develop` in your pull requests
+
+For collaborators who have merge access to the repo:
+- make sure [`set-version.sh`](./blob/develop/bin/set-version.sh) is run as part of your [`pre-commit` git hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
+- always merge PRs on the command line
+- when releasing a new stable version, add the proper entry in the changelog within `plantuml-mode.el` to ensure the right version is set for `plantuml-mode-version`
 
 # Credits
 
