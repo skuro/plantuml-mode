@@ -22,7 +22,7 @@ case "$(git rev-parse --abbrev-ref HEAD)" in
     ;;
 
     'develop')
-        VERSION="$(date '+%Y%m%d.%H%M')" # MELPA style
+        VERSION="$(date '+%Y%m%d.%-H%M')" # MELPA style
         update_version "${VERSION}"
         git add plantuml-mode.el
     ;;
