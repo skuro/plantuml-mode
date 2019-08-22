@@ -3,18 +3,18 @@ version: 2.0
 # Default actions to perform on each Emacs version
 default: &default-steps
   steps:
-    - checkout
-    - run:
-        # Note: this makes it hard to reproduce builds but easier to spot incompatibilities with
-        # newer PlantUML releases. Current trade off seems acceptable.
-        name: Download the latest PlantUML release
-        command: sh ./bin/download-plantuml.sh
     - run:
         name: Update APT packages
         command: apt-get update
     - run:
         name: Install prerequisites
         command: apt-get install -y openjdk-11-jre make python git
+    - checkout
+    - run:
+        # Note: this makes it hard to reproduce builds but easier to spot incompatibilities with
+        # newer PlantUML releases. Current trade off seems acceptable.
+        name: Download the latest PlantUML release
+        command: sh ./bin/download-plantuml.sh
     - run:
         name: Install cask
         command: curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
@@ -35,7 +35,7 @@ jobs:
 
   test-emacs-26:
     docker:
-      - image: silex/emacs:26.0
+      - image: silex/emacs:26
         entrypoint: bash
     <<: *default-steps
 
