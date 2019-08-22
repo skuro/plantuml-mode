@@ -1,6 +1,5 @@
 [![MELPA](http://melpa.org/packages/plantuml-mode-badge.svg)](http://melpa.org/#/plantuml-mode) [![MELPA Stable](http://stable.melpa.org/packages/plantuml-mode-badge.svg)](http://stable.melpa.org/#/plantuml-mode) [![CircleCI](https://circleci.com/gh/skuro/plantuml-mode.svg?style=svg)](https://circleci.com/gh/skuro/plantuml-mode) [![Coverage Status](https://coveralls.io/repos/github/skuro/plantuml-mode/badge.svg?branch=HEAD)](https://coveralls.io/github/skuro/plantuml-mode?branch=HEAD)
 
-
 # PlantUML mode for Emacs
 
 <img src="https://raw.githubusercontent.com/skuro/plantuml-mode/master/banner.png"
