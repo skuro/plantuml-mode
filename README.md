@@ -36,7 +36,7 @@ Alice <-- Bob: Another authentication Response
 
 Check that `plantuml-jar-path` is correct for your use case and that
 `plantuml-default-exec-mode` is set to `jar` before previewing any
-sensitive material.  See [Execution modes](# Execution modes) for more
+sensitive material.  See [Execution modes](#execution-modes) for more
 information.
 
 ```lisp
