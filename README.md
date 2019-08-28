@@ -15,19 +15,29 @@ A [PlantUML](http://plantuml.sourceforge.net/) major mode for Emacs.
 
 # Quick Guide
 
-1. Install with
+1. Install with `M-x package-install<RET>`
+2. Enable mode for current buffer `M-x plantuml-mode<RET>`
+3. Write some PlantUML:
 
 ```
-	 M-x package-install<RET>
-	 plantuml-mode<RET>
+@startuml
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: Another authentication Response
+@enduml
 ```
 
-2. Preview diagrams with `C-c C-c` (`plantuml-preview`).
+4. Preview diagrams with `C-c C-c` (`plantuml-preview`).
 
 **WARNING:** This may send information to
-`"https://www.plantuml.com/plantuml"`! Check that `plantuml-jar-path`
-is correct for your use case and that `plantuml-default-exec-mode` is
-set to `jar` before previewing any sensitive material.  See [Execution modes](# Execution modes) for more information.
+`"https://www.plantuml.com/plantuml"`!
+
+Check that `plantuml-jar-path` is correct for your use case and that
+`plantuml-default-exec-mode` is set to `jar` before previewing any
+sensitive material.  See [Execution modes](# Execution modes) for more
+information.
 
 ```lisp
 	(setq plantuml-jar-path "/path/to/your/copy/of/plantuml.jar")
