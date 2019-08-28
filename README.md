@@ -13,21 +13,40 @@
 
 A [PlantUML](http://plantuml.sourceforge.net/) major mode for Emacs.
 
+# Quick Guide
+
+Install with
+
+	M-x package-install<RET>
+	plantuml-mode<RET>
+
+Preview diagrams with `C-c C-c` (`plantuml-preview`).
+
+**WARNING:** This may send information to
+`"https://www.plantuml.com/plantuml"`! Check that `plantuml-jar-path`
+is correct for your use case and that `plantuml-default-exec-mode` is
+set to `jar` before previewing any sensitive material.  See [Execution modes](# Execution modes) for more information.
+
+```lisp
+	(setq plantuml-jar-path "/path/to/your/copy/of/plantuml.jar")
+	(setq plantuml-default-exec-mode 'jar)
+```
+
 # Installation
 
 Make sure you have [MELPA](http://melpa.org/) enabled in your ``emacs.d``. Then, you can just
 
-    M-x package-install<RET>
-    plantuml-mode<RET>
+	M-x package-install<RET>
+	plantuml-mode<RET>
 
 Also, to enable preview you need to tell `plantuml-mode` where to locate the PlantUML JAR file. By default it will look for it in `~/plantuml.jar`, but you can specify any location with:
 
-    M-x customize-variable<RET>
-    plantuml-jar-path<RET>
+	M-x customize-variable<RET>
+	plantuml-jar-path<RET>
 
 You can also download the latest version of PlantUML straight into `plantuml-jar-path`:
 
-    M-x plantuml-download-jar<RET>
+	M-x plantuml-download-jar<RET>
 
 # Features
 
@@ -40,8 +59,8 @@ You can also download the latest version of PlantUML straight into `plantuml-jar
 
 You can automatically enable `plantuml-mode` for files with extension `.plantuml` by adding the following to your `.emacsrc`:
 
-    ;; Enable plantuml-mode for PlantUML files
-    (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+	;; Enable plantuml-mode for PlantUML files
+	(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
 
 Of course, you can always enable manually the major mode by typing `M-x plantuml-mode` once in the desired PlantUML file buffer.
 
@@ -63,11 +82,11 @@ If you want to force a specific output format, you can customize the variable `p
 
 The following shortcuts are enabled by default:
 
-    C-c C-c  plantuml-preview: renders a PlantUML diagram from the current buffer in the best supported format
+	C-c C-c  plantuml-preview: renders a PlantUML diagram from the current buffer in the best supported format
 
-    C-u C-c C-c  plantuml-preview in other window
+	C-u C-c C-c  plantuml-preview in other window
 
-    C-u C-u C-c C-c plantuml-preview in other frame
+	C-u C-u C-c C-c plantuml-preview in other frame
 
 ## Integration with `org-mode`
 
