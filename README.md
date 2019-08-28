@@ -34,15 +34,16 @@ Alice <-- Bob: Another authentication Response
 **WARNING:** This may send information to
 `"https://www.plantuml.com/plantuml"`!
 
-Check that `plantuml-jar-path` is correct for your use case and that
-`plantuml-default-exec-mode` is set to `jar` before previewing any
-sensitive material.  See [Execution modes](#execution-modes) for more
-information.
+Before previewing any sensitive material, check that
+`plantuml-jar-path` is correct for your use case and that
+`plantuml-default-exec-mode` is set to `jar`.
 
 ```lisp
 	(setq plantuml-jar-path "/path/to/your/copy/of/plantuml.jar")
 	(setq plantuml-default-exec-mode 'jar)
 ```
+
+See [Execution modes](#execution-modes) for more information.
 
 # Installation
 
