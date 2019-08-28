@@ -15,12 +15,14 @@ A [PlantUML](http://plantuml.sourceforge.net/) major mode for Emacs.
 
 # Quick Guide
 
-Install with
+1. Install with
 
-	M-x package-install<RET>
-	plantuml-mode<RET>
+```
+	 M-x package-install<RET>
+	 plantuml-mode<RET>
+```
 
-Preview diagrams with `C-c C-c` (`plantuml-preview`).
+2. Preview diagrams with `C-c C-c` (`plantuml-preview`).
 
 **WARNING:** This may send information to
 `"https://www.plantuml.com/plantuml"`! Check that `plantuml-jar-path`
