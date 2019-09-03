@@ -37,6 +37,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.4.1, 2019-09-03 Better indentation; more bugfixing; actually adding `executable' mode
 ;; version 1.4.0, 2019-08-21 Added `executable' exec mode to use locally installed `plantuml' binaries, various bugfixes
 ;; version 1.3.1, 2019-08-02 Fixed interactive behavior of `plantuml-set-exec-mode'
 ;; version 1.3.0, 2019-05-31 Added experimental support for multiple rendering modes and, specifically, preview using a PlantUML server
@@ -93,7 +94,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "20190822.1403" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.4.1" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
@@ -585,7 +586,7 @@ or it is followed by line end.")
                                                  plantuml-indent-regexp-footer-start
                                                  plantuml-indent-regexp-macro-start
                                                  plantuml-indent-regexp-oldif-start
-						 plantuml-indent-regexp-user-control-start))
+                                                 plantuml-indent-regexp-user-control-start))
       (defvar plantuml-indent-regexp-block-end "^\s*\\(?:}\\|endif\\|else\s*.*\\|end\\)\s*\\('.*\\)?$")
       (defvar plantuml-indent-regexp-note-end "^\s*\\(end\s+note\\|end[rh]note\\)\s*\\('.*\\)?$")
       (defvar plantuml-indent-regexp-group-end "^\s*end\s*\\('.*\\)?$")
@@ -600,19 +601,19 @@ or it is followed by line end.")
       (defvar plantuml-indent-regexp-macro-end "^\s*!enddefinelong\s*\\('.*\\)?$")
       (defvar plantuml-indent-regexp-user-control-end "^.*'.*\s*PLANTUML_MODE_INDENT_DECREASE\s*.*$")
       (defvar plantuml-indent-regexp-end (list plantuml-indent-regexp-block-end
-                                                 plantuml-indent-regexp-group-end
-                                                 plantuml-indent-regexp-activate-end
-                                                 plantuml-indent-regexp-box-end
-                                                 plantuml-indent-regexp-ref-end
-                                                 plantuml-indent-regexp-legend-end
-                                                 plantuml-indent-regexp-note-end
-                                                 plantuml-indent-regexp-oldif-end
-                                                 plantuml-indent-regexp-title-end
-                                                 plantuml-indent-regexp-header-end
-                                                 plantuml-indent-regexp-footer-end
-                                                 plantuml-indent-regexp-macro-end
-                                                 plantuml-indent-regexp-oldif-end
-						 plantuml-indent-regexp-user-control-end))
+                                               plantuml-indent-regexp-group-end
+                                               plantuml-indent-regexp-activate-end
+                                               plantuml-indent-regexp-box-end
+                                               plantuml-indent-regexp-ref-end
+                                               plantuml-indent-regexp-legend-end
+                                               plantuml-indent-regexp-note-end
+                                               plantuml-indent-regexp-oldif-end
+                                               plantuml-indent-regexp-title-end
+                                               plantuml-indent-regexp-header-end
+                                               plantuml-indent-regexp-footer-end
+                                               plantuml-indent-regexp-macro-end
+                                               plantuml-indent-regexp-oldif-end
+                                               plantuml-indent-regexp-user-control-end))
       (setq plantuml-font-lock-keywords
             `(
               (,plantuml-types-regexp . font-lock-type-face)
