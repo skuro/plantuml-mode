@@ -16,16 +16,16 @@
   "Test correct indentation of a simple note block."
   (plantuml-test-indent-block
    "
-note: single line note
+note right: single line note
 
-note
+note right
 multi line note
 end note
 "
    "
-note: single line note
+note right: single line note
 
-note
+note right
   multi line note
 end note
 "
