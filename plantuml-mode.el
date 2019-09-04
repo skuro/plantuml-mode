@@ -241,6 +241,15 @@
         (message "Aborted."))
     (message "Aborted.")))
 
+(defun plantuml-jar-java-version ()
+  "Inspects the Java runtime version of the configured Java command in `plantuml-java-command'."
+  (save-excursion
+    (save-match-data
+      (with-temp-buffer
+        (call-process plantuml-java-command nil t nil "-XshowSettings:properties" "-version")
+        (re-search-backward "java.version = \\(1.\\)?\\([[:digit:]]+\\)")
+        (string-to-number (match-string 2))))))
+
 (defun plantuml-jar-get-language (buf)
   "Retrieve the language specification from the PlantUML JAR file and paste it into BUF."
   (unless (or (eq system-type 'cygwin) (file-exists-p plantuml-jar-path))
@@ -358,13 +367,16 @@ Note that output type `txt' is promoted to `utxt' for better rendering."
 
 (defun plantuml-jar-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
-  (apply #'start-process
-         "PLANTUML" buf plantuml-java-command
-         `(,@plantuml-java-args
-           ,(expand-file-name plantuml-jar-path)
-           ,(plantuml-jar-output-type-opt plantuml-output-type)
-           ,@plantuml-jar-args
-           "-p")))
+  (let ((java-args (if (<= 8 (plantuml-jar-java-version))
+                       (remove "--illegal-access=deny" plantuml-java-args)
+                     plantuml-java-args)))
+    (apply #'start-process
+           "PLANTUML" buf plantuml-java-command
+           `(,@java-args
+             ,(expand-file-name plantuml-jar-path)
+             ,(plantuml-jar-output-type-opt plantuml-output-type)
+             ,@java-args
+             "-p"))))
 
 (defun plantuml-executable-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
