@@ -10,7 +10,6 @@
 >
 > from [The Bitter Kingdom - Fire and Thorns #3](https://www.goodreads.com/book/show/11431896-the-bitter-kingdom)
 
-
 A [PlantUML](http://plantuml.sourceforge.net/) major mode for Emacs.
 
 # Installation

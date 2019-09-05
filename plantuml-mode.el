@@ -94,7 +94,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.4.1" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "20190905.838" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
