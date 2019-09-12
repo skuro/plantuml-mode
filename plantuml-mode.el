@@ -375,7 +375,7 @@ Note that output type `txt' is promoted to `utxt' for better rendering."
            `(,@java-args
              ,(expand-file-name plantuml-jar-path)
              ,(plantuml-jar-output-type-opt plantuml-output-type)
-             ,@java-args
+             ,@plantuml-jar-args
              "-p"))))
 
 (defun plantuml-executable-start-process (buf)
