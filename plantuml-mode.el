@@ -143,6 +143,9 @@
   :type 'boolean
   :group 'plantuml)
 
+(defcustom plantuml-indent-level 8
+  "Indentation level of PlantUML lines")
+
 (defun plantuml-jar-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
   (let* ((cmd-list (append plantuml-java-args (list (expand-file-name plantuml-jar-path)) plantuml-jar-args arguments))
@@ -708,7 +711,7 @@ Restore point to same position in text of the line as before indentation."
   (let ((original-position-eol (- (line-end-position) (point))))
     (save-excursion
       (beginning-of-line)
-      (indent-line-to (* tab-width (plantuml-current-block-depth))))
+      (indent-line-to (* plantuml-indent-level (plantuml-current-block-depth))))
 
     ;; restore position in text of line
     (goto-char (- (line-end-position) original-position-eol))))
