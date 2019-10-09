@@ -100,6 +100,130 @@ stop
 @enduml"))
 
 
+(ert-deftest plantuml-test-indentation/activity-new/while-loop ()
+  "Test correct indentation of plantuml activity-new while loop
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+"@startuml
+
+start
+
+while (data available?)
+:read data;
+:generate diagrams;
+endwhile
+
+stop
+
+@enduml"
+
+"@startuml
+
+start
+
+while (data available?)
+  :read data;
+  :generate diagrams;
+endwhile
+
+stop
+
+@enduml")
+
+    (plantuml-test-indent-block
+"@startuml
+while (check filesize ?) is (not empty)
+:read file;
+endwhile (empty)
+:close file;
+@enduml"
+
+"@startuml
+while (check filesize ?) is (not empty)
+  :read file;
+endwhile (empty)
+:close file;
+@enduml"))
+
+(ert-deftest plantuml-test-indentation/activity-new/fork ()
+  "Test correct indentation of plantuml activity-new forks
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+   "@startuml
+
+start
+
+if (multiprocessor?) then (yes)
+fork
+:Treatment 1;
+fork again
+:Treatment 2;
+end fork
+else (monoproc)
+:Treatment 1;
+:Treatment 2;
+endif
+
+@enduml"
+   "@startuml
+
+start
+
+if (multiprocessor?) then (yes)
+  fork
+    :Treatment 1;
+  fork again
+    :Treatment 2;
+  end fork
+else (monoproc)
+  :Treatment 1;
+  :Treatment 2;
+endif
+
+@enduml"))
+
+(ert-deftest plantuml-test-indentation/activity-new/notes ()
+  "Test correct indentation of plantuml activity-new notes
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+"@startuml
+
+start
+:foo1;
+floating note left: This is a note
+:foo2;
+note right
+This note is on several
+//lines// and can
+contain <b>HTML</b>
+====
+* Calling the method \"foo()\" is prohibited
+end note
+stop
+
+@enduml"
+
+"@startuml
+
+start
+:foo1;
+floating note left: This is a note
+:foo2;
+note right
+  This note is on several
+  //lines// and can
+  contain <b>HTML</b>
+  ====
+  * Calling the method \"foo()\" is prohibited
+end note
+stop
+
+@enduml"))
+
+
+
+
+
 (provide 'plantuml-indentation-activity-new-test)
 
 ;;; plantuml-indentation-activity-old-test.el ends here

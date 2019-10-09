@@ -587,7 +587,8 @@ or it is followed by line end.")
       (defvar plantuml-indent-regexp-legend-start "^\s*\\(?:legend\\|legend\s+\\(?:bottom\\|top\\)\\|legend\s+\\(?:center\\|left\\|right\\)\\|legend\s+\\(?:bottom\\|top\\)\s+\\(?:center\\|left\\|right\\)\\)\s*\\('.*\\)?$")
       (defvar plantuml-indent-regexp-oldif-start "^.*if\s+\".*\"\s+then\s*\\('.*\\)?$" "used in current activity diagram, sometimes already mentioned as deprecated")
       (defvar plantuml-indent-regexp-newif-start "^\s*\\(?:else\\)?if\s+(.*)\s+then\s*.*$")
-      (defvar plantuml-indent-regexp-repeat-start "^\s*repeat\s*$") 
+      (defvar plantuml-indent-regexp-loop-start "^\s*\\(?:repeat\s*\\|while\s+(.*).*\\)$")
+      (defvar plantuml-indent-regexp-fork-start "^\s*fork\\(?:\s+again\\)?\s*$")
       (defvar plantuml-indent-regexp-macro-start "^\s*!definelong.*$")
       (defvar plantuml-indent-regexp-user-control-start "^.*'.*\s*PLANTUML_MODE_INDENT_INCREASE\s*.*$")
       (defvar plantuml-indent-regexp-start (list plantuml-indent-regexp-block-start
@@ -598,7 +599,8 @@ or it is followed by line end.")
                                                  plantuml-indent-regexp-legend-start
                                                  plantuml-indent-regexp-note-start
                                                  plantuml-indent-regexp-newif-start
-                                                 plantuml-indent-regexp-repeat-start
+                                                 plantuml-indent-regexp-loop-start
+                                                 plantuml-indent-regexp-fork-start
                                                  plantuml-indent-regexp-title-start
                                                  plantuml-indent-regexp-header-start
                                                  plantuml-indent-regexp-footer-start
@@ -617,7 +619,8 @@ or it is followed by line end.")
       (defvar plantuml-indent-regexp-legend-end "^\s*endlegend\s*\\('.*\\)?$")
       (defvar plantuml-indent-regexp-oldif-end "^\s*\\(endif\\|else\\)\s*\\('.*\\)?$")
       (defvar plantuml-indent-regexp-newif-end "^\s*\\(endif\\|elseif\\|else\\)\s*.*$")
-      (defvar plantuml-indent-regexp-repeat-end "^\s*\\(repeat\s*while\\)\s*.*$")
+      (defvar plantuml-indent-regexp-loop-end "^\s*\\(repeat\s*while\\|endwhile\\)\s*.*$")
+      (defvar plantuml-indent-regexp-fork-end "^\s*\\(fork\s+again\\|end\s+fork\\)\s*$")
       (defvar plantuml-indent-regexp-macro-end "^\s*!enddefinelong\s*\\('.*\\)?$")
       (defvar plantuml-indent-regexp-user-control-end "^.*'.*\s*PLANTUML_MODE_INDENT_DECREASE\s*.*$")
       (defvar plantuml-indent-regexp-end (list plantuml-indent-regexp-block-end
@@ -628,7 +631,8 @@ or it is followed by line end.")
                                                plantuml-indent-regexp-legend-end
                                                plantuml-indent-regexp-note-end
                                                plantuml-indent-regexp-newif-end
-                                               plantuml-indent-regexp-repeat-end
+                                               plantuml-indent-regexp-loop-end
+                                               plantuml-indent-regexp-fork-end
                                                plantuml-indent-regexp-title-end
                                                plantuml-indent-regexp-header-end
                                                plantuml-indent-regexp-footer-end
