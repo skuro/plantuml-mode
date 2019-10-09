@@ -306,6 +306,84 @@ end split
 :finish;
 @enduml"))
 
+(ert-deftest plantuml-test-indentation/activity-new/complete ()
+  "Test correct indentation of plantuml activity-new complete example
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+"@startuml
+
+start
+:ClickServlet.handleRequest();
+:new page;
+if (Page.onSecurityCheck) then (true)
+:Page.onInit();
+if (isForward?) then (no)
+:Process controls;
+if (continue processing?) then (no)
+stop
+endif
+
+if (isPost?) then (yes)
+:Page.onPost();
+else (no)
+:Page.onGet();
+endif
+:Page.onRender();
+endif
+else (false)
+endif
+
+if (do redirect?) then (yes)
+:redirect process;
+else
+if (do forward?) then (yes)
+:Forward request;
+else (no)
+:Render page template;
+endif
+endif
+
+stop
+
+@enduml"
+
+"@startuml
+
+start
+:ClickServlet.handleRequest();
+:new page;
+if (Page.onSecurityCheck) then (true)
+  :Page.onInit();
+  if (isForward?) then (no)
+    :Process controls;
+    if (continue processing?) then (no)
+      stop
+    endif
+
+    if (isPost?) then (yes)
+      :Page.onPost();
+    else (no)
+      :Page.onGet();
+    endif
+    :Page.onRender();
+  endif
+else (false)
+endif
+
+if (do redirect?) then (yes)
+  :redirect process;
+else
+  if (do forward?) then (yes)
+    :Forward request;
+  else (no)
+    :Render page template;
+  endif
+endif
+
+stop
+
+@enduml"))
+
 (provide 'plantuml-indentation-activity-new-test)
 
 ;;; plantuml-indentation-activity-old-test.el ends here
