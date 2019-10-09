@@ -220,9 +220,91 @@ stop
 
 @enduml"))
 
+(ert-deftest plantuml-test-indentation/activity-new/grouping ()
+  "Test correct indentation of plantuml activity-new grouping
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+"@startuml
+start
+partition Initialization {
+:read config file;
+:init internal variable;
+}
+partition Running {
+:wait for user interaction;
+:print information;
+}
 
+stop
+@enduml"
 
+"@startuml
+start
+partition Initialization {
+  :read config file;
+  :init internal variable;
+}
+partition Running {
+  :wait for user interaction;
+  :print information;
+}
 
+stop
+@enduml"))
+
+(ert-deftest plantuml-test-indentation/activity-new/sdl+splits ()
+  "Test correct indentation of plantuml activity-new sdl rendering and splits
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+"@startuml
+:Ready;
+:next(o)|
+:Receiving;
+split
+:nak(i)<
+:ack(o)>
+split again
+:ack(i)<
+:next(o)
+on several lines|
+:i := i + 1]
+:ack(o)>
+split again
+:err(i)<
+:nak(o)>
+split again
+:foo/
+split again
+:i > 5}
+stop
+end split
+:finish;
+@enduml"
+
+"@startuml
+:Ready;
+:next(o)|
+:Receiving;
+split
+  :nak(i)<
+  :ack(o)>
+split again
+  :ack(i)<
+  :next(o)
+  on several lines|
+  :i := i + 1]
+  :ack(o)>
+split again
+  :err(i)<
+  :nak(o)>
+split again
+  :foo/
+split again
+  :i > 5}
+  stop
+end split
+:finish;
+@enduml"))
 
 (provide 'plantuml-indentation-activity-new-test)
 
