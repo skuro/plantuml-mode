@@ -69,6 +69,36 @@ endif
 stop
 @enduml"))
 
+(ert-deftest plantuml-test-indentation/activity-new/repeat-loop ()
+  "Test correct indentation of plantuml activity-new repeat loop
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+"@startuml
+
+start
+
+repeat
+:read data;
+:generate diagrams;
+repeat while (more data?) is (yes)
+->no;
+stop
+
+@enduml"
+
+"@startuml
+
+start
+
+repeat
+  :read data;
+  :generate diagrams;
+repeat while (more data?) is (yes)
+->no;
+stop
+
+@enduml"))
+
 
 (provide 'plantuml-indentation-activity-new-test)
 
