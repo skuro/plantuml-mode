@@ -1,12 +1,7 @@
 #!/bin/sh
 
-
-realpath() {
-    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
-}
-
 # Where the script is executed
-CURRENT_PATH="$(dirname "$(realpath "$0")")"
+CURRENT_PATH="$(dirname "$0")"
 
 # Where to download the file
 OUTPUT_PATH="${CURRENT_PATH}/plantuml.jar"
