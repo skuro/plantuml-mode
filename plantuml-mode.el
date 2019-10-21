@@ -479,15 +479,14 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
 to choose where to display it."
-  (let ((b (get-buffer plantuml-preview-buffer)))
-    (when b
-      (kill-buffer b)))
-
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
          (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
+    (with-current-buffer buf
+      (image-toggle-display-text)
+      (erase-buffer))
     (plantuml-exec-mode-preview-string prefix (plantuml-get-exec-mode) string buf)))
 
 (defun plantuml-preview-buffer (prefix)
