@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Where the script is executed
-CURRENT_PATH="$(dirname "$(readlink -f "$0")")"
+CURRENT_PATH="$(dirname "$0")"
 
 # Where to download the file
 OUTPUT_PATH="${CURRENT_PATH}/plantuml.jar"
@@ -10,7 +10,7 @@ OUTPUT_PATH="${CURRENT_PATH}/plantuml.jar"
 VERSIONS_URL='https://search.maven.org/solrsearch/select?q=g:net.sourceforge.plantuml+AND+a:plantuml&core=gav&start=0&rows=1&wt=xml'
 
 # Only match the contents of the version (name="v") XML tag
-LATEST_VERSION="$(curl -s "${VERSIONS_URL}" | grep -oP '(?<=<str name="v">).*(?=</str>)')"
+LATEST_VERSION="$(curl -s "${VERSIONS_URL}" | grep '<str name="v">'| sed 's/.*<str name="v">//g'|sed 's/<\/str>.*//')"
 
 # Compose the download link
 DOWNLOAD_URL="https://search.maven.org/remotecontent?filepath=net/sourceforge/plantuml/plantuml/${LATEST_VERSION}/plantuml-${LATEST_VERSION}.jar"
