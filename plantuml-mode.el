@@ -368,26 +368,35 @@ Note that output type `txt' is promoted to `utxt' for better rendering."
                  ("txt" "utxt")
                  (_     output-type))))
 
+(defun plantuml-start-process (command buf)
+  "Start rendering process running COMMAND with output to BUF"
+  (make-process :name
+                "PLANTUML"
+                :buffer buf
+                :command command
+                :noquery t
+                :stderr (get-buffer-create "*plantuml errors*")))
+
 (defun plantuml-jar-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
   (let ((java-args (if (<= 8 (plantuml-jar-java-version))
                        (remove "--illegal-access=deny" plantuml-java-args)
                      plantuml-java-args)))
-    (apply #'start-process
-           "PLANTUML" buf plantuml-java-command
-           `(,@java-args
-             ,(expand-file-name plantuml-jar-path)
-             ,(plantuml-jar-output-type-opt plantuml-output-type)
-             ,@plantuml-jar-args
-             "-p"))))
+    (plantuml-start-process `(,plantuml-java-command
+                             ,@java-args
+                             ,(expand-file-name plantuml-jar-path)
+                             ,(plantuml-jar-output-type-opt plantuml-output-type)
+                             "-p")
+                            buf)))
 
 (defun plantuml-executable-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
-  (apply #'start-process
-         "PLANTUML" buf plantuml-executable-path
-         `(,@plantuml-executable-args
-           ,(plantuml-jar-output-type-opt plantuml-output-type)
-           "-p")))
+  (plantuml-start-process `(,plantuml-executable-path
+                           ,@plantuml-executable-args
+                           ,(expand-file-name plantuml-jar-path)
+                           ,(plantuml-jar-output-type-opt plantuml-output-type)
+                           "-p")
+                            buf))
 
 (defun plantuml-update-preview-buffer (prefix buf)
   "Show the preview in the preview buffer BUF.
