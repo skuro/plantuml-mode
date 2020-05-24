@@ -106,6 +106,9 @@
     keymap)
   "Keymap for plantuml-mode.")
 
+;; only simple HEX format for now. Old prefixes, e.g. -base64- and -hex- not supported
+(defvar plantuml-encoding-prefix "~h" "PLantUML encoding prefix.")
+
 (defcustom plantuml-java-command "java"
   "The java command used to execute PlantUML."
   :type 'string
@@ -422,12 +425,24 @@ Put the result into buffer BUF.  Window is selected according to PREFIX:
                               (error "PLANTUML Preview failed: %s" event))
                             (plantuml-update-preview-buffer prefix buf)))))
 
+(defun plantuml-hexlify (string)
+  "Encode the string STRING as HEX."
+  (mapconcat (lambda(s) (format "%02x" s)) (string-to-list string) ""))
+
+(defun plantuml-encode-data (string)
+  "Encode string STRING according to the `plantuml-server-encoding'."
+  ;; handle only simple HEX encoding
+  (plantuml-hexlify string)
+  ;;
+  ;; base64
+  ;;(let ((coding-system (or buffer-file-coding-system "utf8")))
+  ;;   (base64-encode-string (encode-coding-string string coding-system) t)))
+  )
+
 (defun plantuml-server-encode-url (string)
   "Encode the string STRING into a URL suitable for PlantUML server interactions."
-  (let* ((coding-system (or buffer-file-coding-system
-                            "utf8"))
-         (encoded-string (base64-encode-string (encode-coding-string string coding-system) t)))
-    (concat plantuml-server-url "/" plantuml-output-type "/-base64-" encoded-string)))
+  (concat plantuml-server-url "/" plantuml-output-type  "/" plantuml-encoding-prefix (plantuml-encode-data string)))
+
 
 (defun plantuml-server-preview-string (prefix string buf)
   "Preview the diagram from STRING as rendered by the PlantUML server.
