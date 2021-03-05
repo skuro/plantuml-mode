@@ -143,7 +143,7 @@
   :type 'boolean
   :group 'plantuml)
 
-(defcustom plantuml-indent-level 8
+(defcustom plantuml-indent-level tab-width
   "Indentation level of PlantUML lines")
 
 (defun plantuml-jar-render-command (&rest arguments)
