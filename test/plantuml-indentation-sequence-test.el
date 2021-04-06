@@ -302,6 +302,38 @@ activate participant_1
 deactivate participant_1
 "))
 
+(ert-deftest plantuml-test-block-indentation/sequence/activate-return ()
+  "Test correct indentation of an activate-return block."
+  (plantuml-test-indent-block
+   "
+activate participant_1
+participant_1 -> participant_2 : f()
+return
+"
+   "
+activate participant_1
+  participant_1 -> participant_2 : f()
+return
+"))
+
+(ert-deftest plantuml-test-block-indentation/sequence/activate-return-nested ()
+  "Test correct indentation of two nested activate-deactivate blocks."
+  (plantuml-test-indent-block
+   "
+activate participant_1
+activate participant_2
+participant_1 -> participant_2 : f()
+return with a label
+return
+"
+   "
+activate participant_1
+  activate participant_2
+    participant_1 -> participant_2 : f()
+  return with a label
+return
+"))
+
 
 (ert-deftest plantuml-test-indentation/sequence-diagram ()
   "Test correct indentation of plantuml sequence diagram elements.
@@ -354,6 +386,60 @@ else Another type of failure
   Bob -> Alice: Please repeat
 
 end
+"))
+
+(ert-deftest plantuml-test-indentation/nested-sequence-diagram ()
+  "Test correct indentation of plantuml nested sequence diagram elements."
+  (plantuml-test-indent-block
+   "
+A -> foo
+activate foo
+	foo --> bar
+	activate bar
+        bar->baz
+	activate baz
+	alt success case
+        baz --> baz: success
+else
+        baz --> baz: fail
+end
+return
+bar->quux
+activate quux
+        note over quux
+        Cum sociis natoque
+        penatibus et magnis
+        dis parturient montes,
+        nascetur ridiculus mus.
+end note
+return
+return
+return
+"
+   "
+A -> foo
+activate foo
+  foo --> bar
+  activate bar
+    bar->baz
+    activate baz
+      alt success case
+        baz --> baz: success
+      else
+        baz --> baz: fail
+      end
+    return
+    bar->quux
+    activate quux
+      note over quux
+        Cum sociis natoque
+        penatibus et magnis
+        dis parturient montes,
+        nascetur ridiculus mus.
+      end note
+    return
+  return
+return
 "))
 
 
