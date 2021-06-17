@@ -66,6 +66,37 @@ Finally, the indented text in the buffer will be compared with AFTER."
     (indent-region (point-min) (point-max))
     (should (equal (buffer-string) after))))
 
+;; FIXME
+;; This function is just a copy of the above plantuml-test-indent-block with
+;; some minor changes to use indentation with tabs. Perhaps merge the two
+;; functions?
+(defun plantuml-test-indent-block-with-tabs (before after)
+  "Helper for the block indentation tests with tabs.
+
+BEFORE is the text block to be inserted into a temporary buffer.
+AFTER is the expected text block after indentation.
+
+The temporary buffer will be put into `plantuml-mode'. The whole buffer
+will be indented with one tab for each level of indentation.
+
+Finally, the indented text in the buffer will be compared with AFTER."
+
+  (with-temp-buffer
+    ;; fix the JAR location prior to mode initialization
+    ;; for some reason, plantuml-mode disregards the setq-local
+    (setq plantuml-jar-path plantuml-test-jar-path)
+    (plantuml-init-once 'jar)
+
+    (insert before)
+    (goto-char (point-min))
+    (plantuml-mode)
+    ;; ensure that plantuml-indent-level is the default value 8
+    (setq indent-tabs-mode t)
+    (setq plantuml-indent-level 8)
+
+    (indent-region (point-min) (point-max))
+    (should (equal (buffer-string) after))))
+
 ;; enable code coverage
 (when (require 'undercover nil t)
   (undercover "plantuml-mode.el"))
