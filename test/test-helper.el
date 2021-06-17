@@ -81,21 +81,22 @@ will be indented with one tab for each level of indentation.
 
 Finally, the indented text in the buffer will be compared with AFTER."
 
-  (with-temp-buffer
-    ;; fix the JAR location prior to mode initialization
-    ;; for some reason, plantuml-mode disregards the setq-local
-    (setq plantuml-jar-path plantuml-test-jar-path)
-    (plantuml-init-once 'jar)
+  ;; ensure that plantuml-indent-level is the default value 8
+  (let ((indent-tabs-mode t)
+	(plantuml-indent-level 8)
+	;; fix the JAR location prior to mode initialization
+	;; for some reason, plantuml-mode disregards the setq-local
+	(plantuml-jar-path plantuml-test-jar-path))
 
-    (insert before)
-    (goto-char (point-min))
-    (plantuml-mode)
-    ;; ensure that plantuml-indent-level is the default value 8
-    (setq indent-tabs-mode t)
-    (setq plantuml-indent-level 8)
+    (with-temp-buffer
+      (plantuml-init-once 'jar)
 
-    (indent-region (point-min) (point-max))
-    (should (equal (buffer-string) after))))
+      (insert before)
+      (goto-char (point-min))
+      (plantuml-mode)
+      
+      (indent-region (point-min) (point-max))
+      (should (equal (buffer-string) after)))))
 
 ;; enable code coverage
 (when (require 'undercover nil t)
