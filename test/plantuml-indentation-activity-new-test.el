@@ -384,6 +384,44 @@ stop
 
 @enduml"))
 
+(ert-deftest plantuml-test-indentation/activity-new/switch ()
+  "Test correct indentation of plantuml activity-new complete example
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+   "@startuml
+start
+switch (test?)
+case ( condition A )
+:Text 1;
+case ( condition B )
+:Text 2;
+case ( condition C )
+:Text 3;
+case ( condition D )
+:Text 4;
+case ( condition E )
+:Text 5;
+endswitch
+stop
+@enduml"
+
+   "@startuml
+start
+switch (test?)
+case ( condition A )
+  :Text 1;
+case ( condition B )
+  :Text 2;
+case ( condition C )
+  :Text 3;
+case ( condition D )
+  :Text 4;
+case ( condition E )
+  :Text 5;
+endswitch
+stop
+@enduml"))
+
 (provide 'plantuml-indentation-activity-new-test)
 
 ;;; plantuml-indentation-activity-old-test.el ends here
