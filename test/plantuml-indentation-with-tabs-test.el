@@ -106,6 +106,6 @@ package foo {
 "))
 
 
-(provide 'plantuml-indentation-class-test)
+(provide 'plantuml-indentation-with-tabs-test)
 
 ;;; plantuml-indentation-with-tabs-test.el ends here
