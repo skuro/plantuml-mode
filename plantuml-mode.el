@@ -723,8 +723,10 @@ Restore point to same position in text of the line as before indentation."
       (beginning-of-line)
       (indent-line-to (* plantuml-indent-level (plantuml-current-block-depth))))
 
-    ;; restore position in text of line
-    (goto-char (- (line-end-position) original-position-eol))))
+    ;; restore position in text of line, but not before the beginning of the
+    ;; current line
+    (goto-char (max (line-beginning-position)
+                    (- (line-end-position) original-position-eol)))))
 
 
 ;;;###autoload
