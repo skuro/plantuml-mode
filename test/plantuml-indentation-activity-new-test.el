@@ -384,7 +384,7 @@ stop
 
 @enduml"))
 
-(ert-deftest plantuml-test-indentation/activity-new/switch ()
+(ert-deftest plantuml-test-indentation/activity-new/switch-1 ()
   "Test correct indentation of plantuml activity-new complete example
 These code examples are taken from www.plantuml.com"
   (plantuml-test-indent-block
@@ -413,6 +413,44 @@ case ( condition A )
 case ( condition B )
   :Text 2;
 case ( condition C )
+  :Text 3;
+case ( condition D )
+  :Text 4;
+case ( condition E )
+  :Text 5;
+endswitch
+stop
+@enduml"))
+
+(ert-deftest plantuml-test-indentation/activity-new/switch-2 ()
+  "Test correct indentation of plantuml activity-new complete example
+These code examples are taken from www.plantuml.com"
+  (plantuml-test-indent-block
+   "@startuml
+start
+switch (test? (is it?))
+case ( condition (A) )
+:Text 1;
+case ( condition B (we do not care whether parentheses match or not)
+:Text 2;
+case ( condition C )))
+:Text 3;
+case ( condition D )
+:Text 4;
+case ( condition E )
+:Text 5;
+endswitch
+stop
+@enduml"
+
+   "@startuml
+start
+switch (test? (is it?))
+case ( condition (A) )
+  :Text 1;
+case ( condition B (we do not care whether parentheses match or not)
+  :Text 2;
+case ( condition C )))
   :Text 3;
 case ( condition D )
   :Text 4;
