@@ -324,6 +324,7 @@
           (setq found (search-forward ";" nil nil)))))))
 
 (defconst plantuml-preview-buffer "*PLANTUML Preview*")
+(defconst plantuml-stderr-buffer "*PLANTUML Stderr*")
 
 (defvar plantuml-output-type
   (if (not (display-images-p))
@@ -373,21 +374,29 @@ Note that output type `txt' is promoted to `utxt' for better rendering."
   (let ((java-args (if (<= 8 (plantuml-jar-java-version))
                        (remove "--illegal-access=deny" plantuml-java-args)
                      plantuml-java-args)))
-    (apply #'start-process
-           "PLANTUML" buf plantuml-java-command
-           `(,@java-args
-             ,(expand-file-name plantuml-jar-path)
-             ,(plantuml-jar-output-type-opt plantuml-output-type)
-             ,@plantuml-jar-args
-             "-p"))))
+    (apply #'make-process
+           (list
+            :name    "PLANTUML"
+            :buffer  buf
+            :stderr  (get-buffer-create plantuml-stderr-buffer)
+            :command (cons plantuml-java-command
+                           (append java-args
+                                   (list (expand-file-name plantuml-jar-path)
+                                         (plantuml-jar-output-type-opt plantuml-output-type))
+                                   plantuml-jar-args
+                                   (list "-p")))))))
 
 (defun plantuml-executable-start-process (buf)
   "Run PlantUML as an Emacs process and puts the output into the given buffer (as BUF)."
-  (apply #'start-process
-         "PLANTUML" buf plantuml-executable-path
-         `(,@plantuml-executable-args
-           ,(plantuml-jar-output-type-opt plantuml-output-type)
-           "-p")))
+  (apply #'make-process
+         (list
+          :name    "PLANTUML"
+          :buffer  buf
+          :stderr  (get-buffer-create plantuml-stderr-buffer)
+          :command (cons plantuml-executable-path
+                         (append plantuml-executable-args
+                                 (list (plantuml-jar-output-type-opt plantuml-output-type)
+                                       "-p"))))))
 
 (defun plantuml-update-preview-buffer (prefix buf)
   "Show the preview in the preview buffer BUF.
