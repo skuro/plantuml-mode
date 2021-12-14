@@ -133,10 +133,12 @@
 
 (defcustom plantuml-default-exec-mode 'server
   "Default execution mode for PlantUML.  Valid values are:
-- `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
+- `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'
+- `executable': run PlantUML as a shell command, see `plantuml-executable-path'
+- `server': use PlantUML server for rendering, see `plantuml-server-url'"
   :type 'symbol
   :group 'plantuml
-  :options '(jar server executable))
+  :options '(jar executable server))
 
 (defcustom plantuml-suppress-deprecation-warning t
   "To silence the deprecation warning when `puml-mode' is found upon loading."
