@@ -573,7 +573,7 @@ Uses prefix (as PREFIX) to choose where to display it:
 Plantuml elements like skinparam, rectangle, sprite, package, etc.
 The opening { has to be the last visible character in the line (whitespace
 might follow).")
-      (defvar plantuml-indent-regexp-note-start "^\s*\\(floating\s+\\)?[hr]?note\s+\\(right\\|left\\|top\\|bottom\\|over\\)[^:]*?$" "simplyfied regex; note syntax is especially inconsistent across diagrams")
+      (defvar plantuml-indent-regexp-note-start "^\s*\\(floating\s+\\)?[hr]?note\s+\\(right\\|left\\|top\\|bottom\\|over\\|as\\)[^:]*\\(\\:\\:[^:]+\\)?$" "simplyfied regex; note syntax is especially inconsistent across diagrams")
       (defvar plantuml-indent-regexp-group-start "^\s*\\(alt\\|else\\|opt\\|loop\\|par\\|break\\|critical\\|group\\)\\(?:\s+.+\\|$\\)"
         "Indentation regex for plantuml group elements that are defined for sequence diagrams.
 Two variants for groups: keyword is either followed by whitespace and some text
