@@ -404,7 +404,8 @@ Window is selected according to PREFIX:
     (when imagep
       (with-current-buffer buf
         (image-mode)
-        (set-buffer-multibyte t)))))
+        (set-buffer-multibyte t)))
+    (set-window-point (get-buffer-window buf 'visible) (point-min))))
 
 (defun plantuml-jar-preview-string (prefix string buf)
   "Preview the diagram from STRING by running the PlantUML JAR.
@@ -482,9 +483,10 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
 to choose where to display it."
-  (let ((b (get-buffer plantuml-preview-buffer)))
-    (when b
-      (kill-buffer b)))
+  (when-let ((b (get-buffer plantuml-preview-buffer))
+             (inhibit-read-only t))
+    (with-current-buffer b
+      (erase-buffer)))
 
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
