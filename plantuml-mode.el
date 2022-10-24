@@ -491,6 +491,9 @@ to choose where to display it."
          (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
+    (when imagep
+      (with-current-buffer buf
+        (set-buffer-file-coding-system 'no-conversion)))
     (plantuml-exec-mode-preview-string prefix (plantuml-get-exec-mode) string buf)))
 
 (defun plantuml-preview-buffer (prefix)
