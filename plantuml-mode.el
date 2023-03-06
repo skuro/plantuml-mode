@@ -144,7 +144,9 @@
   :group 'plantuml)
 
 (defcustom plantuml-indent-level 8
-  "Indentation level of PlantUML lines")
+  "Indentation level of PlantUML lines"
+  :type 'integer
+  :group 'plantuml)
 
 (defun plantuml-jar-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
