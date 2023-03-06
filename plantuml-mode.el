@@ -178,6 +178,17 @@
 (defvar-local plantuml-exec-mode nil
   "The Plantuml execution mode override. See `plantuml-default-exec-mode' for acceptable values.")
 
+(defun plantuml-hex-encode-string (text)
+  "Encode text TEXT as a sequence of hexadecimal digits."
+  (with-temp-buffer
+    (insert text)
+    (goto-char (point-min))
+    (let ((output ""))
+      (while (not (eobp))
+        (setq output (concat output (format "%02x" (char-after))))
+        (forward-char 1))
+      output)))
+
 (defun plantuml-set-exec-mode (mode)
   "Set the execution mode MODE for PlantUML."
   (interactive (let* ((completion-ignore-case t)
@@ -426,8 +437,8 @@ Put the result into buffer BUF.  Window is selected according to PREFIX:
   "Encode the string STRING into a URL suitable for PlantUML server interactions."
   (let* ((coding-system (or buffer-file-coding-system
                             "utf8"))
-         (encoded-string (base64-encode-string (encode-coding-string string coding-system) t)))
-    (concat plantuml-server-url "/" plantuml-output-type "/-base64-" encoded-string)))
+         (encoded-string (plantuml-hex-encode-string (encode-coding-string string coding-system))))
+    (concat plantuml-server-url "/" plantuml-output-type "/~h" encoded-string)))
 
 (defun plantuml-server-preview-string (prefix string buf)
   "Preview the diagram from STRING as rendered by the PlantUML server.
@@ -436,6 +447,7 @@ Put the result into buffer BUF and place it according to PREFIX:
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
   (let* ((url-request-location (plantuml-server-encode-url string)))
+    (message "%s" url-request-location)
     (save-current-buffer
       (save-match-data
         (url-retrieve url-request-location
