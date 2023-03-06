@@ -133,7 +133,10 @@
 
 (defcustom plantuml-default-exec-mode 'server
   "Default execution mode for PlantUML.  Valid values are:
-- `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'"
+- `jar': run PlantUML as a JAR file (requires a local install of the PlantUML JAR file, see `plantuml-jar-path'
+- `server': run PlantUML against a tomcat/jetty hosted servlet. Requires specification of `plantuml-server-url'
+- `server-pico': run PlantUML against a pico server. Requires both specification of `plantuml-jar-path', and the `plantuml-server-url'
+- `executable': run PlantUML as a bin executable. Requires `plantuml-executable-path'."
   :type 'symbol
   :group 'plantuml
   :options '(jar server executable))
@@ -281,6 +284,7 @@
   (let ((get-fn (pcase mode
                   ('jar #'plantuml-jar-get-language)
                   ('server #'plantuml-server-get-language)
+                  ('server-pico #'plantuml-jar-get-language) ;; pico server does not support the endpoint, so get the details from the jar instead
                   ('executable #'plantuml-executable-get-language))))
     (if get-fn
         (funcall get-fn buf)
@@ -474,6 +478,7 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
   (let ((preview-fn (pcase mode
                       ('jar    #'plantuml-jar-preview-string)
                       ('server #'plantuml-server-preview-string)
+                      ('server-pico #'plantuml-server-preview-string)
                       ('executable #'plantuml-executable-preview-string))))
     (if preview-fn
         (funcall preview-fn prefix string buf)
