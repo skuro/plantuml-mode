@@ -75,7 +75,7 @@ You can also download the latest version of PlantUML straight into `plantuml-jar
 You can automatically enable `plantuml-mode` for files with extension `.plantuml` by adding the following to your `.emacsrc`:
 
     ;; Enable plantuml-mode for PlantUML files
-    (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+    (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
 
 Of course, you can always enable manually the major mode by typing `M-x plantuml-mode` once in the desired PlantUML file buffer.
 
