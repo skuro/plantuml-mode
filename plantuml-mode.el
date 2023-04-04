@@ -324,6 +324,7 @@
           (setq found (search-forward ";" nil nil)))))))
 
 (defconst plantuml-preview-buffer "*PLANTUML Preview*")
+(defconst plantuml-compute-buffer "*PLANTUML compute*")
 
 (defvar plantuml-output-type
   (if (not (display-images-p))
@@ -395,6 +396,9 @@ Window is selected according to PREFIX:
 - 4  (when prefixing the command with C-u) -> new window
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
+  (let ((b (get-buffer plantuml-preview-buffer)))
+    (when b
+      (kill-buffer b)))
   (let ((imagep (and (display-images-p)
                      (plantuml-is-image-output-p))))
     (cond
@@ -403,6 +407,7 @@ Window is selected according to PREFIX:
      (t             (display-buffer buf)))
     (when imagep
       (with-current-buffer buf
+        (rename-buffer plantuml-preview-buffer)
         (image-mode)
         (set-buffer-multibyte t)))))
 
@@ -482,17 +487,16 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
 (defun plantuml-preview-string (prefix string)
   "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
 to choose where to display it."
-  (let ((b (get-buffer plantuml-preview-buffer)))
+  (let ((b (get-buffer plantuml-compute-buffer)))
     (when b
       (kill-buffer b)))
 
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
-         (buf (get-buffer-create plantuml-preview-buffer))
+         (buf (get-buffer-create plantuml-compute-buffer))
          (coding-system-for-read (and imagep 'binary))
          (coding-system-for-write (and imagep 'binary)))
     (plantuml-exec-mode-preview-string prefix (plantuml-get-exec-mode) string buf)))
-
 (defun plantuml-preview-buffer (prefix)
   "Preview diagram from the PlantUML sources in the current buffer.
 Uses prefix (as PREFIX) to choose where to display it:
