@@ -106,6 +106,8 @@
     keymap)
   "Keymap for plantuml-mode.")
 
+(defvar plantuml-preview-theme nil)
+
 (defcustom plantuml-java-command "java"
   "The java command used to execute PlantUML."
   :type 'string
@@ -480,8 +482,24 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
       (error "Unsupported execution mode %s" mode))))
 
 (defun plantuml-preview-string (prefix string)
-  "Preview diagram from PlantUML sources (as STRING), using prefix (as PREFIX)
-to choose where to display it."
+  "Preview a diagram from PlantUML sources.
+
+PREFIX determines where to display the preview:
+  - 4  (C-u) -> Display in a new window.
+  - 16 (C-u C-u) -> Display in a new frame.
+  - Otherwise -> Display in a new buffer.
+
+STRING is the PlantUML source code of the diagram to preview.
+
+This function kills the existing preview buffer, if any, and creates a new buffer
+to display the modified diagram. The modification involves inserting a `!theme`
+directive after the `@startuml` line, if the `plantuml-preview-theme` variable is set.
+
+If the `display-images-p` and `plantuml-is-image-output-p` conditions are met,
+the coding systems for reading and writing are set to `binary` to handle image output.
+
+The modified diagram, along with the prefix and the PlantUML execution mode,
+is passed to `plantuml-exec-mode-preview-string` to generate the preview in the buffer."
   (let ((b (get-buffer plantuml-preview-buffer)))
     (when b
       (kill-buffer b)))
@@ -490,8 +508,14 @@ to choose where to display it."
                       (plantuml-is-image-output-p)))
          (buf (get-buffer-create plantuml-preview-buffer))
          (coding-system-for-read (and imagep 'binary))
-         (coding-system-for-write (and imagep 'binary)))
-    (plantuml-exec-mode-preview-string prefix (plantuml-get-exec-mode) string buf)))
+         (coding-system-for-write (and imagep 'binary))
+         (theme (and (boundp 'plantuml-preview-theme) plantuml-preview-theme))
+         (modified-string (if theme
+                              (replace-regexp-in-string "^@startuml"
+                                                        (concat "@startuml\n!theme " theme)
+                                                        string)
+                            string)))
+    (plantuml-exec-mode-preview-string prefix (plantuml-get-exec-mode) modified-string buf)))
 
 (defun plantuml-preview-buffer (prefix)
   "Preview diagram from the PlantUML sources in the current buffer.
