@@ -145,7 +145,7 @@
 
 (defcustom plantuml-indent-level 8
   "Indentation level of PlantUML lines"
-  :type 'integer
+  :type 'natnum
   :group 'plantuml)
 
 (defun plantuml-jar-render-command (&rest arguments)
