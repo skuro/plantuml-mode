@@ -148,7 +148,7 @@
 
 (defun plantuml-jar-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
-  (let* ((cmd-list (append plantuml-java-args (list (expand-file-name plantuml-jar-path)) plantuml-jar-args arguments))
+  (let* ((cmd-list (append plantuml-java-args (list (plantuml-expand-file-name plantuml-jar-path)) plantuml-jar-args arguments))
          (cmd (mapconcat 'identity cmd-list "|")))
     (plantuml-debug (format "Command is [%s]" cmd))
     cmd-list))
@@ -376,7 +376,7 @@ Note that output type `txt' is promoted to `utxt' for better rendering."
     (apply #'start-process
            "PLANTUML" buf plantuml-java-command
            `(,@java-args
-             ,(expand-file-name plantuml-jar-path)
+             ,(plantuml-expand-file-name plantuml-jar-path)
              ,(plantuml-jar-output-type-opt plantuml-output-type)
              ,@plantuml-jar-args
              "-p"))))
@@ -757,5 +757,23 @@ See more at https://github.com/skuro/puml-mode/issues/26")))
 
 (add-hook 'plantuml-mode-hook 'plantuml-deprecation-warning)
 
+(defun plantuml-running-under-cygwin-p ()
+  "Check if the current environment is running under Cygwin."
+  (and (eq system-type 'cygwin)
+       (or (getenv "CYGWIN")
+           (file-exists-p "/cygdrive"))))
+
+(defun plantuml-cygwin-to-windows-path (cygwin-path)
+  "Convert a Cygwin path to a Windows path using the cygpath utility."
+  (let* ((command (concat "cygpath -w " (shell-quote-argument cygwin-path)))
+         (output (shell-command-to-string command)))
+    (string-trim output)))
+
+(defun plantuml-expand-file-name (jar-path)
+  "expand JAR-PATH depending on system-type"
+  (if (plantuml-running-under-cygwin-p)
+      (plantuml-cygwin-to-windows-path (expand-file-name jar-path))
+    (expand-file-name jar-path)))
+  
 (provide 'plantuml-mode)
 ;;; plantuml-mode.el ends here
