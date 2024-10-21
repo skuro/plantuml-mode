@@ -484,7 +484,9 @@ Put the result into buffer BUF, selecting the window according to PREFIX:
 to choose where to display it."
   (let ((b (get-buffer plantuml-preview-buffer)))
     (when b
-      (kill-buffer b)))
+      (with-current-buffer b
+        (let ((inhibit-read-only t))
+          (erase-buffer)))))
 
   (let* ((imagep (and (display-images-p)
                       (plantuml-is-image-output-p)))
