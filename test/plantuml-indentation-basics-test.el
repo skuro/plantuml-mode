@@ -13,7 +13,7 @@
 ;;; Code:
 
 (defun plantuml-test-add-text-and-position-cursor (txt)
-  "Test helper for `plantuml-mode' tests.
+  "Test helper for `plantuml-mode'.
 Add TXT into the buffer, move cursor to the position of the marker
 ?| and delete the marker."
   (insert txt)
@@ -22,7 +22,7 @@ Add TXT into the buffer, move cursor to the position of the marker
   (delete-char -1))
 
 (defun plantuml-test-assert-block-depth (expected txt)
-  "Test helper for `plantuml-mode' tests.
+  "Test helper for `plantuml-mode'.
 Assert the EXPECTED indentation level for the given TXT."
   (with-temp-buffer
     (plantuml-test-add-text-and-position-cursor txt)
