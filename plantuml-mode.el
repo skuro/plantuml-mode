@@ -37,6 +37,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.5.0, 2025-05-14 Fixed warnings with new Java versions #157; updated versions to let CI work again
 ;; version 1.4.1, 2019-09-03 Better indentation; more bugfixing; actually adding `executable' mode
 ;; version 1.4.0, 2019-08-21 Added `executable' exec mode to use locally installed `plantuml' binaries, various bugfixes
 ;; version 1.3.1, 2019-08-02 Fixed interactive behavior of `plantuml-set-exec-mode'
@@ -93,7 +94,7 @@
 
 (defvar plantuml-mode-hook nil "Standard hook for plantuml-mode.")
 
-(defconst plantuml-mode-version "1.2025.2" "The plantuml-mode version string.")
+(defconst plantuml-mode-version "1.5.0" "The plantuml-mode version string.")
 
 (defvar plantuml-mode-debug-enabled nil)
 
