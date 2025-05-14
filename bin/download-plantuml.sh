@@ -17,4 +17,4 @@ DOWNLOAD_URL="https://search.maven.org/remotecontent?filepath=net/sourceforge/pl
 
 # finally, download the JAR file
 echo "Downloading PlantUML v${LATEST_VERSION} into ${OUTPUT_PATH}"
-curl -so "${OUTPUT_PATH}" "${DOWNLOAD_URL}" 2>/dev/null
+wget -O "${OUTPUT_PATH}" "${DOWNLOAD_URL}" 2>/dev/null
