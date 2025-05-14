@@ -8,7 +8,7 @@ default: &default-steps
         command: apt-get update
     - run:
         name: Install prerequisites
-        command: apt-get install -y openjdk-11-jre make python git
+        command: apt-get install -y openjdk-17-jre make python3 git
     - checkout
     - run:
         # Note: this makes it hard to reproduce builds but easier to spot incompatibilities with
