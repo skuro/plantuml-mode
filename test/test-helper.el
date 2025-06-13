@@ -9,6 +9,7 @@
 ;;; Code:
 
 (require 'f)
+(require 'subr-x)
 
 (defvar package-test-path
   (f-dirname (f-this-file)))

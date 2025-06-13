@@ -9,6 +9,9 @@
 ;;; Code:
 
 (defun assert-preview (puml output &optional format mode)
+  "Ensure the source PUML is translated into OUTPUT.
+Use FORMAT to define the output type (default: txt).
+Use MODE to switch between jar and server execution mode."
   (if format
       (setq plantuml-output-type format)
     (setq plantuml-output-type "txt"))

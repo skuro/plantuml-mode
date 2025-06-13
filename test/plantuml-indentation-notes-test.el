@@ -400,4 +400,46 @@ end note
 "
    ))
 
+(ert-deftest plantuml-test-block-indentation/note-on-field-or-method ()
+  "Test correct indentation of notes attached to fields or methods."
+  (plantuml-test-indent-block
+
+   "
+@startuml
+class Foo {
++ method()
+}
+
+note left of Foo
+this indents fine
+end note
+
+note left of Foo::method
+this used not to indent
+end note
+
+class Bar {
+all lines after the second note also are not indented
+}
+@enduml"
+
+   "
+@startuml
+class Foo {
+  + method()
+}
+
+note left of Foo
+  this indents fine
+end note
+
+note left of Foo::method
+  this used not to indent
+end note
+
+class Bar {
+  all lines after the second note also are not indented
+}
+@enduml"))
+
 ;;; plantuml-indentation-notes-test.el ends here
