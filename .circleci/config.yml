@@ -82,6 +82,7 @@ jobs:
       ## Server listens at port 8080
       - image: plantuml/plantuml-server:jetty
     steps:
+      - checkout
       - restore_cache:
           name: Restore Emacs deps
           keys:
