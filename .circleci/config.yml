@@ -121,8 +121,7 @@ workflows:
       - test-emacs-28
       - test-emacs-29
       - test-emacs-30
-      # Testing against master currently hangs on CircleCI
-      # - test-emacs-master
+      - test-emacs-master
   server:
     jobs:
       - test-plantuml-server
