@@ -6,13 +6,13 @@ default: &default-steps
     - restore_cache:
         name: Restore Emacs deps
         keys:
-          - cask-{{checksum Cask}}
+          - cask-{{ checksum Cask }}
     - run:
         name: Update APT packages
         command: apt-get update
     - run:
         name: Install prerequisites
-        command: apt-get install -y openjdk-17-jre make python3 git
+        command: apt-get install -y openjdk-17-jre
     - checkout
     - run:
         # Note: this makes it hard to reproduce builds but easier to spot incompatibilities with
@@ -33,7 +33,7 @@ default: &default-steps
         command: make unit
     - save_cache:
         name: Restore Emacs deps
-        key: cask-{{checksum Cask}}
+        key: cask-{{ checksum Cask }}
         paths:
           - ~/.emacs.d
 
@@ -41,49 +41,49 @@ default: &default-steps
 jobs:
   test-emacs-25:
     docker:
-      - image: silex/emacs:25
+      - image: silex/emacs:25-ci-cask
         entrypoint: bash
     <<: *default-steps
 
   test-emacs-26:
     docker:
-      - image: silex/emacs:26
+      - image: silex/emacs:26-ci-cask
         entrypoint: bash
     <<: *default-steps
 
   test-emacs-27:
     docker:
-      - image: silex/emacs:27
+      - image: silex/emacs:27-ci-cask
         entrypoint: bash
     <<: *default-steps
 
   test-emacs-28:
     docker:
-      - image: silex/emacs:28
+      - image: silex/emacs:28-ci-cask
         entrypoint: bash
     <<: *default-steps
 
   test-emacs-29:
     docker:
-      - image: silex/emacs:29
+      - image: silex/emacs:29-ci-cask
         entrypoint: bash
     <<: *default-steps
 
   test-emacs-30:
     docker:
-      - image: silex/emacs:30
+      - image: silex/emacs:30-ci-cask
         entrypoint: bash
     <<: *default-steps
 
   test-emacs-master:
     docker:
-      - image: silex/emacs:master
+      - image: silex/emacs:master-ci-cask
         entrypoint: bash
     <<: *default-steps
 
   test-plantuml-server:
     docker:
-      - image: silex/emacs:30
+      - image: silex/emacs:30-ci-cask
         entrypoint: bash
       ## Server listens at port 8080
       - image: plantuml/plantuml-server:jetty
@@ -91,7 +91,7 @@ jobs:
       - restore_cache:
           name: Restore Emacs deps
           keys:
-            - cask-{{checksum Cask}}
+            - cask-{{ checksum Cask }}
       - run:
           name: Install cask
           command: curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python3
@@ -106,7 +106,7 @@ jobs:
           command: cask install
       - save_cache:
           name: Restore Emacs deps
-          key: cask-{{checksum Cask}}
+          key: cask-{{ checksum Cask }}
           paths:
             - ~/.emacs.d
 
