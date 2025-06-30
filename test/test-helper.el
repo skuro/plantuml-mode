@@ -46,7 +46,7 @@
 BEFORE is the text block to be inserted into a temporary buffer.
 AFTER is the expected text block after indentation.
 
-The temporary buffer will be put into `plantuml-mode'. The whole buffer
+The temporary buffer will be put into `plantuml-mode'.  The whole buffer
 will be indented with two spaces for each level of indentation.
 
 Finally, the indented text in the buffer will be compared with AFTER."
@@ -66,6 +66,14 @@ Finally, the indented text in the buffer will be compared with AFTER."
 
     (indent-region (point-min) (point-max))
     (should (equal (buffer-string) after))))
+
+(defun plantuml-test-server (body)
+  "Execute BODY while ensuring the PlantUML server is reachable."
+  (with-temp-buffer
+    (setq plantuml-server-url "http://localhost:8080")
+    (plantuml-init-once 'server)
+
+    (funcall body)))
 
 ;; enable code coverage
 (when (require 'undercover nil t)

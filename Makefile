@@ -16,10 +16,13 @@ all: version test
 version:
 	$(EMACS) $(BATCH) --version
 
-test: install unit
+test: install unit integration
 
 unit:
-	${CASK} exec ert-runner
+	${CASK} exec ert-runner -t !server
+
+integration:
+	${CASK} exec ert-runner -t server
 
 install:
 	${CASK} install
