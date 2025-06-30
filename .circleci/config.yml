@@ -89,26 +89,26 @@ jobs:
       - image: plantuml/plantuml-server:jetty
     steps:
       - restore_cache:
-        name: Restore Emacs deps
-        keys:
-          - cask-{{checksum Cask}}
+          name: Restore Emacs deps
+          keys:
+            - cask-{{checksum Cask}}
       - run:
-        name: Install cask
-        command: curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python3
+          name: Install cask
+          command: curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python3
       - run:
-        name: Make Cask available on the path
-        command: echo 'export PATH="/root/.cask/bin:$PATH"' >> $BASH_ENV
+          name: Make Cask available on the path
+          command: echo 'export PATH="/root/.cask/bin:$PATH"' >> $BASH_ENV
       - run:
-        name: Run the tests
-        command: make version integration
+          name: Run the tests
+          command: make version integration
       - run:
-        name: Download Cask deps
-        command: cask install
+          name: Download Cask deps
+          command: cask install
       - save_cache:
-        name: Restore Emacs deps
-        key: cask-{{checksum Cask}}
-        paths:
-          - ~/.emacs.d
+          name: Restore Emacs deps
+          key: cask-{{checksum Cask}}
+          paths:
+            - ~/.emacs.d
 
 # Executing in parallel
 workflows:
