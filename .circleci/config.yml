@@ -6,7 +6,7 @@ default: &default-steps
     - restore_cache:
         name: Restore Emacs deps
         keys:
-          - cask-{{ checksum Cask }}
+          - cask-{{ checksum "Cask" }}
     - run:
         name: Update APT packages
         command: apt-get update
@@ -27,7 +27,7 @@ default: &default-steps
         command: make unit
     - save_cache:
         name: Restore Emacs deps
-        key: cask-{{ checksum Cask }}
+        key: cask-{{ checksum "Cask" }}
         paths:
           - ~/.emacs.d
 
@@ -85,16 +85,16 @@ jobs:
       - restore_cache:
           name: Restore Emacs deps
           keys:
-            - cask-{{ checksum Cask }}
+            - cask-{{ checksum "Cask" }}
       - run:
           name: Run the tests
-          command: make version integration
+          command: make integration
       - run:
           name: Download Cask deps
           command: cask install
       - save_cache:
           name: Restore Emacs deps
-          key: cask-{{ checksum Cask }}
+          key: cask-{{ checksum "Cask" }}
           paths:
             - ~/.emacs.d
 
