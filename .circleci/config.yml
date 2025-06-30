@@ -3,6 +3,10 @@ version: 2.0
 # Default actions to perform on each Emacs version
 default: &default-steps
   steps:
+    - restore_cache:
+        name: Restore Emacs deps
+        keys:
+          - cask-{{checksum Cask}}
     - run:
         name: Update APT packages
         command: apt-get update
@@ -22,8 +26,16 @@ default: &default-steps
         name: Make Cask available on the path
         command: echo 'export PATH="/root/.cask/bin:$PATH"' >> $BASH_ENV
     - run:
+        name: Download Cask deps
+        command: cask install
+    - run:
         name: Run the tests
         command: make unit
+    - save_cache:
+        name: Restore Emacs deps
+        key: cask-{{checksum Cask}}
+        paths:
+          - ~/.emacs.d
 
 # Enumerated list of Emacs versions
 jobs:
@@ -71,12 +83,16 @@ jobs:
 
   test-plantuml-server:
     docker:
-      - image: siles/emacs:30
+      - image: silex/emacs:30
         entrypoint: bash
       ## Server listens at port 8080
       - image: plantuml/plantuml-server:jetty
     steps:
-      - run:
+      - restore_cache:
+        name: Restore Emacs deps
+        keys:
+          - cask-{{checksum Cask}}
+    - run:
         name: Install cask
         command: curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python3
       - run:
@@ -85,7 +101,14 @@ jobs:
       - run:
         name: Run the tests
         command: make version integration
-
+      - run:
+        name: Download Cask deps
+        command: cask install
+      - save_cache:
+        name: Restore Emacs deps
+        key: cask-{{checksum Cask}}
+        paths:
+          - ~/.emacs.d
 
 # Executing in parallel
 workflows:
@@ -100,3 +123,6 @@ workflows:
       - test-emacs-30
       # Testing against master currently hangs on CircleCI
       # - test-emacs-master
+  server:
+    jobs:
+      - test-plantuml-server
