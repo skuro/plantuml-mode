@@ -88,6 +88,9 @@ jobs:
           keys:
             - cask-{{ checksum "Cask" }}
       - run:
+          name: Download Cask deps
+          command: cask install
+      - run:
           name: Run the tests
           command: make integration
       - run:
