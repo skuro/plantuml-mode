@@ -33,6 +33,48 @@
    (lambda ()
      (plantuml-server-get-language (current-buffer)))))
 
+(ert-deftest plantuml-server-test/hex-encoding ()
+  "Test HEX encoding."
+  :tags '(server)
+
+  (plantuml-test-server
+   (lambda ()
+     ;; The diagram looks like this, but has extra spaces at the end of lines making it awkward for the test:
+     ;;      ┌─┐          ┌─┐
+     ;;      │A│          │B│
+     ;;      └┬┘          └┬┘
+     ;;       │            │
+     ;;       │───────────>│
+     ;;      ┌┴┐          ┌┴┐
+     ;;      │A│          │B│
+     ;;      └─┘          └─┘
+     (setq-local plantuml-server-encode-mode 'hex)
+     (plantuml-server-preview-string 0 "@startuml\nA -> B\n@enduml" (current-buffer))
+
+     (should (equal"     ┌─┐          ┌─┐\n     │A│          │B│\n     └┬┘          └┬┘\n      │            │ \n      │───────────>│ \n     ┌┴┐          ┌┴┐\n     │A│          │B│\n     └─┘          └─┘\n"
+                    (buffer-string))))))
+
+(ert-deftest plantuml-server-test/deflate-encoding ()
+  "Test DEFLATE encoding."
+  :tags '(server)
+
+  (plantuml-test-server
+   (lambda ()
+     ;; The diagram looks like this, but has extra spaces at the end of lines making it awkward for the test:
+     ;;      ┌─┐          ┌─┐
+     ;;      │A│          │B│
+     ;;      └┬┘          └┬┘
+     ;;       │            │
+     ;;       │───────────>│
+     ;;      ┌┴┐          ┌┴┐
+     ;;      │A│          │B│
+     ;;      └─┘          └─┘
+     (setq-local plantuml-server-encode-mode 'deflate)
+     (plantuml-server-preview-string 0 "@startuml\nA -> B\n@enduml" (current-buffer))
+
+     (should (equal"     ┌─┐          ┌─┐\n     │A│          │B│\n     └┬┘          └┬┘\n      │            │ \n      │───────────>│ \n     ┌┴┐          ┌┴┐\n     │A│          │B│\n     └─┘          └─┘\n"
+                    (buffer-string))))))
+
 
 
 (provide 'plantuml-server-test)

@@ -8,7 +8,7 @@
 ;; Keywords: files text processes tools
 ;; Version: 1.2.9
 ;; Package-Version: 1.2.9
-;; Package-Requires: ((dash "2.0.0") (emacs "25.1"))
+;; Package-Requires: ((dash "2.0.0") (emacs "25.1") (deflate "0.0.3"))
 ;; Homepage: https://github.com/skuro/plantuml-mode
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -76,8 +76,10 @@
 ;; version 0.1, 2010-08-25 [from puml-mode] First version
 
 ;;; Code:
-(require 'thingatpt)
+(require 'cl-lib)
 (require 'dash)
+(require 'deflate)
+(require 'thingatpt)
 (require 'xml)
 
 (defgroup plantuml nil  "Major mode for editing plantuml file."
@@ -165,6 +167,12 @@ Works only if `!theme' does not appear  in the diagram to be displayed."
   :type 'string
   :group 'plantuml
   :safe #'stringp)
+
+(defcustom plantuml-server-encode-mode 'deflate
+  "Whether to encode the server URL using HEX or DEFLATE."
+  :type 'symbol
+  :group 'plantuml
+  :options '(deflate hex))
 
 (defun plantuml-jar-render-command (&rest arguments)
   "Create a command line to execute PlantUML with arguments (as ARGUMENTS)."
@@ -450,13 +458,39 @@ Put the result into buffer BUF.  Window is selected according to PREFIX:
                               (error "PLANTUML Preview failed: %s" event))
                             (plantuml-update-preview-buffer prefix buf)))))
 
-(defun plantuml-server-encode-url (string)
-  "Encode STRING into a URL suitable for PlantUML server interactions."
+(defun plantuml-server-hex-encode-url (string)
+  "HEX-encode STRING into a URL suitable for PlantUML server interactions."
   (let* ((coding-system (or buffer-file-coding-system
                             "utf8"))
          (str (encode-coding-string string coding-system))
          (encoded-string (mapconcat (lambda(x)(format "%02X" x)) str)))
     (concat plantuml-server-url "/" plantuml-output-type "/~h" encoded-string)))
+
+(defconst plantuml-server-base64-char-table
+  (let ((translation-table (make-char-table 'translation-table))
+        (base64-chars "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
+        (plantuml-chars "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_="))
+    (dotimes (i (length base64-chars))
+      (aset translation-table
+            (aref base64-chars i)
+            (aref plantuml-chars i)))
+    translation-table))
+
+(defun plantuml-server-deflate-encode-url (string)
+  "DEFLATE-encode STRING into a URL suitable for PlantUML server interactions."
+  (let* ((compressed-bytes (deflate-zlib-compress string 'dynamic))
+         (base64-encoded (base64-encode-string (apply #'unibyte-string compressed-bytes))))
+    (with-temp-buffer
+      (insert base64-encoded)
+      (translate-region (point-min) (point-max) plantuml-server-base64-char-table)
+      (concat plantuml-server-url "/" plantuml-output-type "/~1" (buffer-string)))))
+
+(defun plantuml-server-encode-url (string)
+  "Encode STRING into a URL suitable for PlantUML server interactions."
+  (let ((encode-mode (or plantuml-server-encode-mode 'deflate)))
+    (cl-case encode-mode
+      (deflate (plantuml-server-deflate-encode-url string))
+      (hex (plantuml-server-hex-encode-url string)))))
 
 (defun plantuml-server-preview-string (prefix string buf)
   "Preview the diagram from STRING as rendered by the PlantUML server.
@@ -465,19 +499,18 @@ Put the result into buffer BUF and place it according to PREFIX:
 - 16 (when prefixing the command with C-u C-u) -> new frame.
 - else -> new buffer"
   (let* ((url-request-location (plantuml-server-encode-url string)))
-    (save-current-buffer
-      (save-match-data
-        (url-retrieve url-request-location
-                      (lambda (status)
-                        (if-let ((error (plist-get status :error)))
-                          (message (concat "PlantUML " (prin1-to-string error))))
-                        (goto-char (point-min))
-                        ;; skip the HTTP headers
-                        (while (not (looking-at "\n"))
-                          (forward-line))
-                        (kill-region (point-min) (+ 1 (point)))
-                        (copy-to-buffer buf (point-min) (point-max))
-                        (plantuml-update-preview-buffer prefix buf)))))))
+    (let* ((response-buf (url-retrieve-synchronously url-request-location)))
+      (save-current-buffer
+        (save-match-data
+          (with-current-buffer response-buf
+            (set-buffer-multibyte t)
+            (decode-coding-region (point-min) (point-max) 'utf-8)
+            (goto-char (point-min))
+            (while (not (looking-at "\n"))
+              (forward-line))
+            (kill-region (point-min) (+ 1 (point)))
+            (copy-to-buffer buf (point-min) (point-max))
+            (plantuml-update-preview-buffer prefix buf)))))))
 
 (defun plantuml-executable-preview-string (prefix string buf)
   "Preview the diagram from STRING by running the PlantUML JAR.

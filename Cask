@@ -9,4 +9,5 @@
  (depends-on "ecukes")
  (depends-on "ert-runner")
  (depends-on "el-mock")
- (depends-on "undercover"))
+ (depends-on "undercover")
+ (depends-on "deflate" "0.0.4"))

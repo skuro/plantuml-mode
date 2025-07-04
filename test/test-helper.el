@@ -71,6 +71,7 @@ Finally, the indented text in the buffer will be compared with AFTER."
   "Execute BODY while ensuring the PlantUML server is reachable."
   (with-temp-buffer
     (setq plantuml-server-url "http://localhost:8080")
+    (setq plantuml-output-type "txt")
     (plantuml-init-once 'server)
 
     (funcall body)))
