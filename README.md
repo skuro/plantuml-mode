@@ -108,6 +108,7 @@ The following custom variables are available:
 - `plantuml-suppress-deprecation-warning`: whether to silence the warning if the deprecated `puml-mode` is found
 - `plantuml-indent-level`: the indentation level to use for PlantUML blocks
 - `plantuml-preview-default-theme`: the default `!theme` to use when rendering diagrams when no explicit `!theme` directive is found
+- `plantuml-server-encode-mode`: how to generate the URL when in `server` execution mode,  either compress with `'deflate` (better for network) or encode with `'hex` (better for CPU usage), see [the official PlantUML docs] (https://plantuml.com/text-encoding)
 
 ## Default key bindings
 

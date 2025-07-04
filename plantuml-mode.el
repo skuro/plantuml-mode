@@ -6,8 +6,8 @@
 ;; Author: Zhang Weize (zwz)
 ;; Maintainer: Carlo Sciolla (skuro)
 ;; Keywords: files text processes tools
-;; Version: 1.2.9
-;; Package-Version: 1.2.9
+;; Version: 1.8.0
+;; Package-Version: 1.8.0
 ;; Package-Requires: ((dash "2.0.0") (emacs "25.1") (deflate "0.0.3"))
 ;; Homepage: https://github.com/skuro/plantuml-mode
 
@@ -38,6 +38,7 @@
 
 ;;; Change log:
 ;;
+;; version 1.8.0, 2025-07-04 Support for `'hex' and `'deflate' modes for server URL encoding
 ;; version 1.7.0, 2025-05-24 Support for `completion-at-point'
 ;; version 1.6.0, 2025-05-15 Fix server exec mode; various indentation enhancements and bug fixes; better preview buffer management
 ;; version 1.5.0, 2025-05-14 Fixed warnings with new Java versions #157; updated versions to let CI work again
