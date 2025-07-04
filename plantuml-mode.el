@@ -461,7 +461,7 @@ Put the result into buffer BUF.  Window is selected according to PREFIX:
 (defun plantuml-server-hex-encode-url (string)
   "HEX-encode STRING into a URL suitable for PlantUML server interactions."
   (let* ((coding-system (or buffer-file-coding-system
-                            "utf8"))
+                            'utf8))
          (str (encode-coding-string string coding-system))
          (encoded-string (mapconcat (lambda(x)(format "%02X" x)) str)))
     (concat plantuml-server-url "/" plantuml-output-type "/~h" encoded-string)))
