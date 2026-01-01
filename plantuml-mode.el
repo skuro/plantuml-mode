@@ -495,7 +495,7 @@ Put the result into buffer BUF.  Window is selected according to PREFIX:
 (defun plantuml-server-deflate-encode-url (string)
   "DEFLATE-encode STRING into a URL suitable for PlantUML server interactions."
   (let* ((compressed-bytes (deflate-zlib-compress string 'dynamic))
-         (base64-encoded (base64-encode-string (apply #'unibyte-string compressed-bytes))))
+         (base64-encoded (base64-encode-string (apply #'unibyte-string compressed-bytes) t)))
     (with-temp-buffer
       (insert base64-encoded)
       (translate-region (point-min) (point-max) plantuml-server-base64-char-table)
