@@ -71,6 +71,28 @@
                             "     └─┘          └─┘\n")
                     (buffer-string))))))
 
+(ert-deftest plantuml-server-test/deflate-encoding/no-injected-line-breaks ()
+  "Test DEFLATE encoding does not inject line breaks when encoding to base64."
+  :tags '(server)
+
+  (plantuml-test-server
+   (lambda ()
+     (setq-local plantuml-server-encode-mode 'deflate)
+     (plantuml-server-preview-string 0 "@startuml\nBob -> Alice : foo\nAlice -> Bob : bar\n@enduml" (current-buffer))
+
+     (should (equal (concat "     ┌───┐          ┌─────┐\n"
+                            "     │Bob│          │Alice│\n"
+                            "     └─┬─┘          └──┬──┘\n"
+                            "       │     foo       │   \n"
+                            "       │──────────────>│   \n"
+                            "       │               │   \n"
+                            "       │     bar       │   \n"
+                            "       │<──────────────│   \n"
+                            "     ┌─┴─┐          ┌──┴──┐\n"
+                            "     │Bob│          │Alice│\n"
+                            "     └───┘          └─────┘\n")
+                    (buffer-string))))))
+
 
 
 (provide 'plantuml-server-test)
